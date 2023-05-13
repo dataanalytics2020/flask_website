@@ -1,5 +1,7 @@
 from flask import Flask, render_template, request
 from datetime import date, timedelta
+import pandas as pd
+df  = pd.read_csv(r'csv\2022-12-09_touhou.csv')
 
 app = Flask(__name__)
 
@@ -8,7 +10,11 @@ def index():
     if request.method == 'POST':
         user_data = request.form
         print(user_data)
-        return render_template('values.html', user_data=user_data)
+        return render_template('values.html',
+                                            user_data=user_data,\
+                                            column_names=df.columns.values, \
+                                            row_data=list(df.values.tolist()),\
+                                            zip=zip)
     else:
         return render_template('index.html')
 

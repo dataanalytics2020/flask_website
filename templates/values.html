@@ -20,4 +20,27 @@
   <p>日付：{{ user_data['target-date'] }}</p>
   <p>回数：{{ user_data['n-times'] }}</p>
 </div>
+<table>
+    <thead>
+      <tr>
+        {% for col in column_names %}
+        <th>
+          {{col}}
+        </th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in row_data %}
+      <tr>
+        {% for col, row_ in zip(column_names, row) %}
+        <td>{{row_}}</td>
+        {% endfor %}
+      </tr>
+      {% endfor %}
+
+
+</tbody>
+
+  </table>
 {% endblock %}
