@@ -4,5 +4,20 @@
 <title>Index Page</title>
 {% endblock %}
 {% block content %}
-<h1>Index Page</h1>
+<h1>N回分析</h1>
+<form action="" method="post">
+  <div>
+    <label for="user-name">店舗名</label>
+    <input type="text" id="tenpo-name" name="tenpo-name" required>
+  </div>
+  <div>
+    <label for="start">日付:</label>
+    <input type="date" id="target-date" name="target-date" value="2018-07-22"min="2018-01-01" max="2018-12-31">
+  </div>
+  <div>
+    <label for="user-age">何回分分析するか</label>
+    <input type="number" id="n-times" name="n-times" min="1" max="5" required>
+  </div>
+  <button>送信</button>
+</form>
 {% endblock %}

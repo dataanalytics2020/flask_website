@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>データの出力</title>
+{% endblock %}
+
+{% block content %}
+<h1>キーとバリュー</h1>
+<div>
+  <h2>キー一覧</h2>
+  <ul>
+  {% for key in user_data.keys() %}
+    <li>{{ key }}</li>
+  {% endfor %}
+  </ul>
+</div>
+<div>
+  <h2>入力されたデータ</h2>
+  <p>店舗名： {{ user_data['tenpo-name'] }}</p>
+  <p>日付：{{ user_data['target-date'] }}</p>
+  <p>回数：{{ user_data['n-times'] }}</p>
+</div>
+{% endblock %}

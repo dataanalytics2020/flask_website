@@ -17,3 +17,7 @@ wsl touch flaskr/templates/{layout,show_entries}.html
 
 ## ライブラリ一括インストール
 pip install -r requirements.txt
+
+
+## サーバー起動
+python app.py --reload

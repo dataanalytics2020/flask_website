@@ -7,7 +7,7 @@
 
 {% block content %}
 <h1>プロフィールの入力</h1>
-<form action="#" method="post">
+<form action="{{ url_for('print_values') }}" method="post">
   <div>
     <label for="user-name">名前</label>
     <input type="text" id="user-name" name="name" required>
