@@ -37,7 +37,7 @@ def index():
         concat_df_list = []
         urls = []
         for serch_date in target_day_list:
-            search_url = url = f"https://ana-slo.com/{user_data['target-date']}-{user_data['tenpo-name']}-data/"
+            search_url = url = f"https://ana-slo.com/{serch_date}-{user_data['tenpo-name']}-data/"
             urls.append(search_url)
             #search_response = requests.get(search_url)
             #print(search_response)
@@ -60,17 +60,19 @@ def index():
             for df in dfs:
                 if '機種名' in list(df.columns):
                     tmp_df = df
-                    tmp_df['店舗名'] = user_data['tenpo-name']
+                    #tmp_df['店舗名'] = user_data['tenpo-name']
                     tmp_df['日付'] = target_day
                     #tmp_df['機種名'] = tmp_df['機種名'].map(removal_text)
                     break
             concat_df_list.append(df)
 
         concat_df = pd.concat(concat_df_list,axis=0)
+        concat_df = concat_df.drop(['合成確率','BB確率','RB確率','台番号'],axis=1)
         concat_df = concat_df.groupby(['日付','機種名']).mean().sort_values('差枚',ascending=False)
-        concat_df = concat_df[['G数','差枚']]
         concat_df['差枚'] =concat_df['差枚'].astype(int)
         concat_df['G数'] =concat_df['G数'].astype(int)
+        concat_df['BB'] =concat_df['BB'].astype(int)
+        concat_df['RB'] =concat_df['RB'].astype(int)
         concat_df = concat_df.reset_index()
         return render_template('values.html',
                                             user_data=user_data,\
