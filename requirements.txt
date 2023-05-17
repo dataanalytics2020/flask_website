@@ -1,2 +1,5 @@
 Flask==2.0.2
 Flask-SQLAlchemy==2.5.1
+lxml
+beautifulsoup4
+requests
