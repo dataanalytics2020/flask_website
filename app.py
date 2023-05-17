@@ -10,6 +10,7 @@ def index():
     if request.method == 'POST':
         user_data = request.form
         print(user_data)
+        
         return render_template('values.html',
                                             user_data=user_data,\
                                             column_names=df.columns.values, \
