@@ -1,4 +1,4 @@
-body            { font-family: sans-serif; background: #eee; }
+body            { font-family: sans-serif;  background: linear-gradient(90deg, rgb(171, 255, 247), rgb(255, 255, 255));}
 a, h1, h2       { color: #377ba8; }
 h1, h2          { font-family: 'Georgia', serif; margin: 0; }
 h1              { border-bottom: 2px solid #eee; }
@@ -60,9 +60,11 @@ table{
   }
   
   table tr:last-child td:first-child {
-    border-radius: 0 0 0 5px;
+    border-radius: 5px;
   }
   
   table tr:last-child td:last-child {
     border-radius: 0 0 5px 0;
   }
+
+ 
