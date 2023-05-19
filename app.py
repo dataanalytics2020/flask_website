@@ -67,12 +67,19 @@ def index():
             concat_df_list.append(df)
 
         concat_df = pd.concat(concat_df_list,axis=0)
-        concat_df = concat_df.drop(['合成確率','BB確率','RB確率','台番号'],axis=1)
-        concat_df = concat_df.groupby(['日付','機種名']).mean().sort_values('差枚',ascending=False)
-        concat_df['差枚'] =concat_df['差枚'].astype(int)
-        concat_df['G数'] =concat_df['G数'].astype(int)
-        concat_df['BB'] =concat_df['BB'].astype(int)
-        concat_df['RB'] =concat_df['RB'].astype(int)
+        for column_name in ['合成確率','BB確率','RB確率','台番号','ART確率']:
+            try:
+                concat_df = concat_df.drop([column_name],axis=1)
+            except:
+                pass
+        
+        concat_df = concat_df.groupby(['日付','機種名']).mean().sort_values('差枚',ascending=False)#機種毎に集計
+        for column_name in ['差枚','G数','BB','RB','ART']:
+            try:
+                concat_df[column_name] =concat_df[column_name].astype(int)
+            except:
+                pass
+
         concat_df = concat_df.reset_index()
         return render_template('values.html',
                                             user_data=user_data,\

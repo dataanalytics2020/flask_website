@@ -5,12 +5,12 @@
 {% endblock %}
 
 {% block content %}
-<h1>キーとバリュー</h1>
+<h1>分析結果</h1>
 <div>
   <h2>キー一覧</h2>
   <ul>
   {% for key in user_data.keys() %}
-    <li>{{ key }}</li>
+    '{{ key }}'
   {% endfor %}
   </ul>
 </div>
@@ -20,6 +20,76 @@
   <p>日付：{{ user_data['target-date'] }}</p>
   <p>回数：{{ user_data['n-times'] }}</p>
 </div>
+<div class="container" style="width:100%">
+  <canvas id="canvas"></canvas>
+</div>
+<script>
+  window.onload = function() {
+      ctx = document.getElementById("canvas").getContext("2d");
+      window.myBar = new Chart(ctx, {
+          type: 'bar',
+          data: barChartData,
+          options: complexChartOption
+      });
+  };
+</script>
+
+<script>
+  // とある4週間分のデータログ
+  var barChartData = {
+      labels: ['2023-5月16日', '2023-05月6日', '2023-04月26日'],
+      datasets: [
+      {
+          type: 'line',
+          label: '平均差枚',
+          data:['247', '152', '141'],
+          borderColor : "rgba(254,97,132,0.8)",
+                  pointBackgroundColor    : "rgba(254,97,132,0.8)",
+                  fill: false,
+          yAxisID: "y-axis-1",// 追加
+      },
+      {
+          type: 'bar',
+          label: '平均G数',
+          data:['6224', '4744', '5303'],
+          borderColor : "rgba(54,164,235,0.8)",
+          backgroundColor : "rgba(54,164,235,0.5)",
+          yAxisID: "y-axis-2",
+      },
+      ],
+  };
+</script>
+
+<script>
+  var complexChartOption = {
+      responsive: true,
+      scales: {
+          yAxes: [{
+              id: "y-axis-1",
+              type: "linear", 
+              position: "left",
+              ticks: {
+                  max: 500,
+                  min: -200,
+                  stepSize: 100
+              },
+          }, {
+              id: "y-axis-2",
+              type: "linear", 
+              position: "right",
+              ticks: {
+                  max: 7000,
+                  min: 2000,
+                  stepSize: 1000
+              },
+              gridLines: {
+                  drawOnChartArea: false, 
+              },
+          }],
+      }
+  };
+</script>
+
 <table>
     <thead>
       <tr>
