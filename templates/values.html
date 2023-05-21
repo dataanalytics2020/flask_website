@@ -33,11 +33,11 @@
       });
   };
 </script>
-
+<p>日付： {{ target_day_list }}</p>
 <script>
   // とある4週間分のデータログ
   var barChartData = {
-      labels: ['2023-5月16日', '2023-05月6日', '2023-04月26日'],
+      labels: {{ target_day_list }},
       datasets: [
       {
           type: 'line',

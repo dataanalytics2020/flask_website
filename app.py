@@ -33,7 +33,8 @@ def index():
                 else: 
                     pass
                 number += 1
-        target_day_list   
+        target_day_list.reverse()
+        print(target_day_list)
         concat_df_list = []
         urls = []
         for serch_date in target_day_list:
@@ -85,7 +86,7 @@ def index():
                                             user_data=user_data,\
                                             column_names=concat_df.columns.values, \
                                             row_data=list(concat_df.values.tolist()),\
-                                            zip=zip)
+                                            zip=zip,target_day_list=str(target_day_list))
     else:
         return render_template('index.html')
 
