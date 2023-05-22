@@ -86,7 +86,7 @@ def index():
                                             user_data=user_data,\
                                             column_names=concat_df.columns.values, \
                                             row_data=list(concat_df.values.tolist()),\
-                                            zip=zip,target_day_list=str(target_day_list))
+                                            zip=zip,target_day_list=str(target_day_list).replace("'",'"'))
     else:
         return render_template('index.html')
 
