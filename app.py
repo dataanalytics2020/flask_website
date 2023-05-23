@@ -77,7 +77,7 @@ def index():
         concat_df = concat_df.groupby(['日付','機種名']).mean().sort_values('差枚',ascending=False)#機種毎に集計
         for column_name in ['差枚','G数','BB','RB','ART']:
             try:
-                concat_df[column_name] =concat_df[column_name].astype(int)
+                concat_df[column_name] = concat_df[column_name].astype(int)
             except:
                 pass
 

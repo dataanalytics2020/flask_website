@@ -37,7 +37,7 @@
 <script>
   // とある4週間分のデータログ
   var barChartData = {
-      labels: {{ target_day_list }},
+      labels: {{ target_day_list|safe }},
       datasets: [
       {
           type: 'line',
