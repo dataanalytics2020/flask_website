@@ -67,59 +67,39 @@ table{
     border-radius: 0 0 5px 0;
   }
 
-  
-  .accordion {
-    margin-left: auto;
-    margin-right: auto;
+  section {
     margin-top: 30px;
-    max-width: 300px;
-    position: relative;
-    width: 100%;
   }
-  .accordion-title {
-    color: #fff;
+  .accordion {
+    margin: 0 auto;
+  }
+  .menu {
+    background-color: purple;
+    color: white;
+    font-size: 18px;
+    padding: 10px;
+    text-align: center;
     cursor: pointer;
-    font-size: 16px;
-    padding: 10px 20px;
+    user-select: none;
   }
-  .accordion-content {
-    display: none;
-    padding: 10px 20px;
+  .menu:hover,
+  .menu:active,
+  .menu.is-active {
+    background-color: black;
   }
-  .accordion-content p {
-    font-size: 13px;
-    line-height: 1.5;
+  .contents {
+    text-align: center;
+    line-height: 0;
+    height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition-duration: 0.4s;
   }
-  /* タイトルの背景色 */
-  .accordion-item:nth-of-type(1) .accordion-title {
-    background-color: #7f7fff;
+   
+  .contents.is-open {
+    border: 1px solid black;
+    padding: 10px;
+    line-height: normal;
+    height: auto;
+    opacity: 1;
   }
-  .accordion-item:nth-of-type(2) .accordion-title {
-    background-color: #66cdaa;
-  }
-  .accordion-item:nth-of-type(3) .accordion-title {
-    background-color: #ff7f7f;
-  }
-  /* コンテンツボックスの枠線 */
-  .accordion-item:nth-of-type(1) .accordion-content {
-    border-bottom: 2px solid #7f7fff;
-    border-left: 2px solid #7f7fff;
-    border-right: 2px solid #7f7fff;
-  }
-  .accordion-item:nth-of-type(2) .accordion-content {
-    border-bottom: 2px solid #66cdaa;
-    border-left: 2px solid #66cdaa;
-    border-right: 2px solid #66cdaa;
-  }
-  .accordion-item:nth-of-type(3) .accordion-content {
-    border-bottom: 2px solid #ff7f7f;
-    border-left: 2px solid #ff7f7f;
-    border-right: 2px solid #ff7f7f;
-  }
-  /* 矢印 */
-  .accordion-title {
-    position: relative;
-  }
-  .accordion-title::after {
-    border-right: solid 2px #fff;
-    
