@@ -123,8 +123,8 @@
 
 <h2><p>{{ user_data['tenpo-name'] }}  {{data['target_number']}}のつく日直近過去{{serch_number}}回で最も出ていた機種TOP15</p></h2>
 
-<div class="container">
-  {{groupby_kisyu_table|safe}}
+<table class="tb01">
+{{groupby_kisyu_table|safe}}
 </div>
 <h2>日別機種別データ</h2>
 <table>

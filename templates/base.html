@@ -8,6 +8,11 @@
     {% block head %}
     <title>スロマップ</title>
     {% endblock %}
+
+    {% assets "example_style" %}
+      <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
+    {% endassets %}
+
   </head>
   <body>
 

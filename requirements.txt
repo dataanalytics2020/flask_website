@@ -4,3 +4,4 @@ lxml
 beautifulsoup4
 requests
 html5lib
+Flask-Assets

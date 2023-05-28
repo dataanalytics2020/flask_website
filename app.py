@@ -4,10 +4,21 @@ import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 from concurrent.futures import ThreadPoolExecutor
+from flask_assets import Environment, Bundle
 
 df  = pd.read_csv(r'csv\2022-12-09_touhou.csv')
 
+
 app = Flask(__name__)
+assets = Environment(app) # create an Environment instance
+bundles = {  # define nested Bundle
+  'example_style': Bundle(
+            'SCSS/example.scss',
+            filters='pyscss',
+            output='Gen/example.css',
+  )
+} 
+assets.register(bundles) # register name for every bundle in bundles object
 
 @app.route('/', methods=['GET', 'POST'])
 def main():
@@ -150,8 +161,8 @@ def target_date_recommend():
                                             target_day_list=target_day_list,\
                                             samai_list=samai_list,\
                                             gamesuu_list=gamesuu_list,\
-                                            samai_table = ave_tenpo_df.to_html(justify='justify-all'),\
-                                            groupby_kisyu_table = groupby_kisyubetu_df.to_html(justify='justify-all',index=False))
+                                            samai_table = ave_tenpo_df.to_html(justify='justify-all',classes='tb01'),\
+                                            groupby_kisyu_table = groupby_kisyubetu_df.to_html(justify='justify-all',classes='tb01',index=False))
     else:
         today = date.today()
         date_list = [today + timedelta(days=day) for day in range(1,9)]
