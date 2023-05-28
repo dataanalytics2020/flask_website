@@ -112,25 +112,6 @@ wp = Client(WORDPRESS_URL, WORDPRESS_ID, WORDPRESS_PW)
 
 
 
-def upload_image(in_image_file_name, out_image_file_name):
-    if os.path.exists(in_image_file_name):
-        with open(in_image_file_name, 'rb') as f:
-            binary = f.read()
-
-        data = {
-            "name": out_image_file_name,
-            "type": 'image/png',
-            "overwrite": True,
-            "bits": binary
-        }
-
-        media_id = wp.call(media.UploadFile(data))['id']
-        print(in_image_file_name.split('/')
-              [-1], 'Upload Success : id=%s' % media_id)
-        return media_id
-    else:
-        print(in_image_file_name.split('/')[-1], 'NO IMAGE!!')
-
 
 def context_change_tenpo_name(df_temp,tenpo_name,day):
     #⬇️列のデータをインデックスに指定する
