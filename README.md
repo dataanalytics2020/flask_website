@@ -21,3 +21,6 @@ pip install -r requirements.txt
 
 ## サーバー起動
 python app.py --reload
+
+## Flaskのサンプルサイト
+https://github.com/topics/flask-template
