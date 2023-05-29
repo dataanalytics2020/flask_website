@@ -1,4 +1,4 @@
-{% extends 'bootstrap/base.html' %}
+{% extends "base.html" %}
 
 {% block head %}
 <title>データの出力</title>
@@ -121,7 +121,7 @@
   }
 </script>
 
-<h2><p>{{ user_data['tenpo-name'] }}  {{data['target_number']}}のつく日直近過去{{serch_number}}回で最も出ていた機種TOP15</p></h2>
+<h4><p>{{ user_data['tenpo-name'] }}  {{data['target_number']}}のつく日直近過去{{serch_number}}回で最も出ていた機種TOP15</p></h4>
 
 <table class="tb01">
 {{groupby_kisyu_table|safe}}

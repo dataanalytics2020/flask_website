@@ -6,6 +6,8 @@ from bs4 import BeautifulSoup
 from concurrent.futures import ThreadPoolExecutor
 from flask_assets import Environment, Bundle
 from flask_bootstrap import Bootstrap
+from flask_bootstrap import Bootstrap
+import os
 
 df  = pd.read_csv(r'csv\2022-12-09_touhou.csv')
 
@@ -19,6 +21,11 @@ bootstrap = Bootstrap(app)
 @app.route('/', methods=['GET', 'POST'])
 def main():
     return redirect("/target-date-recommend")
+
+@app.route('/test', methods=['GET', 'POST'])
+def test():
+    print('test')
+    return render_template('test.html')
 
 @app.route('/target-date-recommend', methods=['GET', 'POST'])
 def target_date_recommend():
@@ -147,7 +154,7 @@ def target_date_recommend():
         groupby_kisyubetu_df = groupby_kisyubetu_df[['機種順位','機種名','勝率','機種平均出率','平均G数','平均差枚','合計差枚','合計G数','総台数']]
         groupby_kisyubetu_df['平均G数'] = groupby_kisyubetu_df['平均G数'].astype(str) + 'G'
         groupby_kisyubetu_df['平均G数'] = groupby_kisyubetu_df['平均差枚'].astype(str) + '枚'
-        groupby_kisyubetu_df = groupby_kisyubetu_df[:15]
+        groupby_kisyubetu_df = groupby_kisyubetu_df[:5]
 
         return render_template('target_date_recommend_report.html',data=data,serch_number=serch_number,\
                                             user_data=user_data,\

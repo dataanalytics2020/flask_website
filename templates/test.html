@@ -1,19 +1,6 @@
-{% extends 'bootstrap/base.html' %}
-<style>
-table {
-width: 100%; /* テーブルの横幅を指定する */
-}
-table th, table td {
-padding: 10px; /* セルの余白を指定する(上下左右) */
-border: 1px solid #666; /* セルの境界線を実線で指定する */
-}
-table th {
-background-color: #AAA; /* ボックスの背景色を指定する */
-width: 30%; /* テーブルの見出しの横幅を指定する */
-text-align: center; /* セル内のテキストの位置を指定（真ん中）する */
-}
-</style>
-</head>
+{% extends "base.html" %}
+
+{% block content %}
 <body>
 <h1>レスポンシブ対応のテーブルデザイン</h1>
 <table>
@@ -32,3 +19,8 @@ text-align: center; /* セル内のテキストの位置を指定（真ん中）
 </table>
 </body>
 </html>
+
+
+{% endblock %}
+
+

@@ -1,0 +1,7 @@
+{
+    "cSpell.enableFiletypes": [
+        "csv",
+        "django-html",
+        "jinja"
+    ]
+}
