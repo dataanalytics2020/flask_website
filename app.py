@@ -5,20 +5,16 @@ import requests
 from bs4 import BeautifulSoup
 from concurrent.futures import ThreadPoolExecutor
 from flask_assets import Environment, Bundle
+from flask_bootstrap import Bootstrap
 
 df  = pd.read_csv(r'csv\2022-12-09_touhou.csv')
 
-
 app = Flask(__name__)
-assets = Environment(app) # create an Environment instance
-bundles = {  # define nested Bundle
-  'example_style': Bundle(
-            'SCSS/example.scss',
-            filters='pyscss',
-            output='Gen/example.css',
-  )
-} 
-assets.register(bundles) # register name for every bundle in bundles object
+bootstrap = Bootstrap(app)
+
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///blog.db'
+# app.config['SECRET_KEY'] = os.urandom(24)
+# db = SQLAlchemy(app)
 
 @app.route('/', methods=['GET', 'POST'])
 def main():

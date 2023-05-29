@@ -1,0 +1,34 @@
+{% extends 'bootstrap/base.html' %}
+<style>
+table {
+width: 100%; /* テーブルの横幅を指定する */
+}
+table th, table td {
+padding: 10px; /* セルの余白を指定する(上下左右) */
+border: 1px solid #666; /* セルの境界線を実線で指定する */
+}
+table th {
+background-color: #AAA; /* ボックスの背景色を指定する */
+width: 30%; /* テーブルの見出しの横幅を指定する */
+text-align: center; /* セル内のテキストの位置を指定（真ん中）する */
+}
+</style>
+</head>
+<body>
+<h1>レスポンシブ対応のテーブルデザイン</h1>
+<table>
+<tr>
+<th>見出し１</th>
+<td>レスポンシブ対応のテーブル(table)を作成する方法は色々あります。その一つの方法として、「display」プロパティに「block」を設定して縦並びのテーブルを作成する方法があります。</td>
+</tr>
+<tr>
+<th>見出し２</th>
+<td>コンテンツ２</td>
+</tr>
+<tr>
+<th>見出し３</th>
+<td>コンテンツ３</td>
+</tr>
+</table>
+</body>
+</html>
