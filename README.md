@@ -24,3 +24,6 @@ python app.py --reload
 
 ## Flaskのサンプルサイト
 https://github.com/topics/flask-template
+
+### アコーディオンのサンプルサイト
+https://lmn-blog.com/jquery_accordion01/
