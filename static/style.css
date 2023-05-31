@@ -1,56 +1,6 @@
-body            { font-family: sans-serif;  background: linear-gradient(90deg, rgb(171, 255, 247), rgb(255, 255, 255));}
-a, h1, h2       { color: #377ba8; }
-h1, h2          { font-family: 'Georgia', serif; margin: 0; }
-h1              { border-bottom: 2px solid #eee; }
-h2              { font-size: 1.2em; }
-
-.page           { margin: 2em auto; width: 35em; border: 5px solid #ccc;
-                  padding: 0.8em; background: white; }
-.entries        { list-style: none; margin: 0; padding: 0; }
-.entries li     { margin: 0.8em 1.2em; }
-.entries li h2  { margin-left: -1em; }
-.add-entry      { font-size: 0.9em; border-bottom: 1px solid #ccc; }
-.add-entry dl   { font-weight: bold; }
-.metanav        { text-align: right; font-size: 0.8em; padding: 0.3em;
-                  margin-bottom: 1em; background: #fafafa; }
-.flash          { background: #cee5F5; padding: 0.5em;
-                  border: 1px solid #aacbe2; }
-.error          { background: #f0d6d6; padding: 0.5em; }
-
-
-  section {
-    margin-top: 30px;
-  }
-  .accordion {
-    margin: 0 auto;
-  }
-  .menu {
-    background-color: purple;
-    color: white;
-    font-size: 18px;
-    padding: 10px;
-    text-align: center;
-    cursor: pointer;
-    user-select: none;
-  }
-  .menu:hover,
-  .menu:active,
-  .menu.is-active {
-    background-color: black;
-  }
-  .contents {
-    text-align: center;
-    line-height: 0;
-    height: 0;
-    overflow: hidden;
-    opacity: 0;
-    transition-duration: 0.4s;
-  }
-  
-.contents.is-open {
-  line-height: normal;
-  height: auto;
-  opacity: 1;
+.navbar-brand {
+  font-family:  "Arial Black", sans-serif;
+  font-size: 1.5rem;
 }
 
 
@@ -66,7 +16,7 @@ table {
   width: 30%; /* テーブルの見出しの横幅を指定する */
   text-align: center; /* セル内のテキストの位置を指定（真ん中）する */
   }
-  
+
   @media only screen and (max-width:480px){
   table {
   margin: 10px 5px; /* テーブルの余白を指定する */
@@ -77,3 +27,12 @@ table {
   border-top: 1px solid #666; /* セルの境界線を実線で指定する */
   }
   }
+
+ul li {
+    list-style: none;
+    cursor:pointer;
+}
+
+.close{
+    display: none;
+}

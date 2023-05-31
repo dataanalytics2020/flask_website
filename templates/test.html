@@ -1,26 +1,32 @@
 {% extends "base.html" %}
-
 {% block content %}
-<body>
-<h1>レスポンシブ対応のテーブルデザイン</h1>
-<table>
-<tr>
-<th>見出し１</th>
-<td>レスポンシブ対応のテーブル(table)を作成する方法は色々あります。その一つの方法として、「display」プロパティに「block」を設定して縦並びのテーブルを作成する方法があります。</td>
-</tr>
-<tr>
-<th>見出し２</th>
-<td>コンテンツ２</td>
-</tr>
-<tr>
-<th>見出し３</th>
-<td>コンテンツ３</td>
-</tr>
-</table>
-</body>
-</html>
-
-
+  <!--アコーディオンメニュー部分 start-->
+  <nav id="accordion">
+    <ul>
+      <li><span>▼東京都</span>
+        <ul class="close">
+          <li><span>▼マルハン</span>
+            <ul class="close">
+              <li><a href="#">・マルハン新宿東宝ビル店</a></li>
+              <li><a href="#">・マルハン鹿浜店</a></li>
+            </ul>
+          </li>
+          <li><span>▼ピーアーク</span>
+            <ul class="close">
+              <li><a href="#">・ピーくんガーデン</a></li>
+              <li><a href="#">・ピーくんガーデン北綾瀬</a></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <!--2階層アコーディオン end-->
+      <li><a href="#">menu3</a></li>
+    </ul>
+  </nav>
+  <!--アコーディオンメニュー部分 end-->
+</header>
+<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
 {% endblock %}
 
 
