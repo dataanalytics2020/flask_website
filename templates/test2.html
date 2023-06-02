@@ -1,13 +1,18 @@
 {% extends "base.html" %}
 {% block content %}
-<title>ポップアップ画面</title>
-</head>
-<body>
-    <h1>私は元の画面です。</h1>
-    <div id="popup">
-        <div id="popup-modal"></div>
-    </div>
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
-</body>
-</html>
+<h1>検索結果{{ prefecture }}</h1>
+<nav id="accordion">
+{% for group_name_list,display_group_name,group_num in zip(web_group_name_list,display_group_name_list,group_num_list) %}
+    {% if group_num != 0 %}    
+    <li><span>{{ display_group_name }} {{ group_num }}店舗</span>
+        <ul class="close">
+            {% for tenpo_name in group_name_list %}
+            <li><a href="/{{ prefecture }}/{{ tenpo_name  }}">{{ tenpo_name }}</a></li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endfor %}
+</nav>
+<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
 {% endblock %}
