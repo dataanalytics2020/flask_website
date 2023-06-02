@@ -20,11 +20,10 @@ bootstrap = Bootstrap(app)
 
 @app.route('/', methods=['GET', 'POST'])
 def main():
-    return redirect("/東京都")
+    return redirect("/top")
 
 @app.route('/top', methods=['GET', 'POST'])
 def top():
-    print('top')
     return render_template('top.html')
 
 
