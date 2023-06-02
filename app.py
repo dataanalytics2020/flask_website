@@ -20,20 +20,82 @@ bootstrap = Bootstrap(app)
 
 @app.route('/', methods=['GET', 'POST'])
 def main():
-    return redirect("/target-date-recommend")
+    return redirect("/東京都")
+
 
 @app.route('/test', methods=['GET', 'POST'])
 def test():
     print('test')
     return render_template('test.html')
 
-@app.route('/test2', methods=['GET', 'POST'])
-def test():
-    print('test2')
-    return render_template('test2.html')
 
-@app.route('/target-date-recommend', methods=['GET', 'POST'])
-def target_date_recommend():
+
+@app.route('/<prefecture>', methods=['GET', 'POST'])
+def test2(prefecture):
+    tenpo_url_df:pd.DataFrame = pd.read_csv('csv/tenpo_url_flask_web_site.csv')
+    group_name_list:list[str] ='''123,BBステーション,DAS,Dステーション,MGM,PIA,やすだ,ウエスタン,エスパス,\
+エンジェル,オゼック,オリエンタルパサージュ,オーパス・ワン,カレイド,キコーナ,\
+キューデンアネックス,グランパ,コンサートホール,ゴードン,ジャラン,\
+ジャンジャンマールゴット,デルパラ,ドキわくランド,ニラク,パラッツォ,\
+パーラースーパーセブン,パーラーフィオーレ,ヒノマル,ヒロキ,ビックディッパー,\
+ピーアーク,フルハウス,プレゴ,ベガスベガス,マルハン,ミカド,ミリオン,ガイア,\
+メッセ,国際センター,UNO,楽園,オーシャン,金時'''.split(',')
+    others_extract_tokyo_tenpo_url_df = extract_tokyo_tenpo_url_df = tenpo_url_df[tenpo_url_df['都道府県'] == prefecture]
+    extract_tokyo_tenpo_url_df = extract_tokyo_tenpo_url_df.sort_values('店舗名')
+
+    group_name_count_dict:dict[str] = {}
+    web_group_name_list:list[str] = []
+    for group_name in group_name_list:
+        extract_groupname_df = extract_tokyo_tenpo_url_df[extract_tokyo_tenpo_url_df['店舗名'].str.contains(group_name)]
+        #display(extract_groupname_df)
+        group_name_count_dict[group_name] = len(extract_groupname_df)
+        #break
+        #print(group_name)
+        tmp_list = []
+        #print(group_name)
+        for tenpo_name in extract_groupname_df['店舗名']:
+            tmp_list.append(tenpo_name)
+            target = extract_tokyo_tenpo_url_df.index[(extract_tokyo_tenpo_url_df['店舗名'] == tenpo_name)]
+        web_group_name_list.append(tmp_list)
+
+
+    sorted_group_name_count_dict = sorted(group_name_count_dict.items(), key = lambda fruit : fruit[1])
+    #print(type(sorted_group_name_count_dict))
+    # <class 'list'>
+    sorted_group_name_count_dict.reverse()
+    sorted_group_name_count_dict = dict(sorted_group_name_count_dict)
+    sorted_group_name_count_dict
+
+    group_name_count_dict:dict[str] = {}
+    web_group_name_list:list[str] = []
+    for group_name in sorted_group_name_count_dict:
+        extract_groupname_df = extract_tokyo_tenpo_url_df[extract_tokyo_tenpo_url_df['店舗名'].str.contains(group_name)]
+        #display(extract_groupname_df)
+        group_name_count_dict[group_name] = len(extract_groupname_df)
+        #break
+        #print(group_name)
+        tmp_list = []
+        #print(group_name)
+        for tenpo_name in extract_groupname_df['店舗名']:
+            tmp_list.append(tenpo_name)
+            target = extract_tokyo_tenpo_url_df.index[(extract_tokyo_tenpo_url_df['店舗名'] == tenpo_name)]
+        web_group_name_list.append(tmp_list)
+
+    
+    others_extract_tokyo_tenpo_url_df = extract_tokyo_tenpo_url_df 
+    for group_name in sorted_group_name_count_dict:
+        extract_groupname_df = extract_tokyo_tenpo_url_df[extract_tokyo_tenpo_url_df['店舗名'].str.contains(group_name)]
+        for tenpo_name in extract_groupname_df['店舗名']:
+            target = extract_tokyo_tenpo_url_df.index[(extract_tokyo_tenpo_url_df['店舗名'] == tenpo_name)]
+            others_extract_tokyo_tenpo_url_df = others_extract_tokyo_tenpo_url_df.drop(target)
+    web_group_name_list.append(list(others_extract_tokyo_tenpo_url_df['店舗名'].unique()))
+    sorted_group_name_count_dict['その他'] = len(others_extract_tokyo_tenpo_url_df)
+    group_num_list = list(sorted_group_name_count_dict.values())
+    display_group_name_list = list(sorted_group_name_count_dict.keys())
+    return render_template('test2.html',prefecture=prefecture,zip=zip,web_group_name_list=web_group_name_list,group_num_list=group_num_list,display_group_name_list=display_group_name_list,)
+
+@app.route('/<prefecture>/<tenpo_name>', methods=['GET', 'POST'])
+def clicked_tenpo_name(prefecture,tenpo_name):
     from datetime import date, timedelta
     if request.method == 'POST':
         user_data = request.form
@@ -175,7 +237,7 @@ def target_date_recommend():
         today = date.today()
         date_list = [today + timedelta(days=day) for day in range(1,9)]
         date_list = [date.strftime("%Y-%m-%d") for date in date_list]
-        return render_template('target_date_recommend_schedule.html',date_list=date_list)
+        return render_template('target_date_recommend_schedule.html',date_list=date_list,tenpo_name=tenpo_name)
 
 @app.route('/target-date-analytics', methods=['GET', 'POST'])
 def target_date_analytics():
