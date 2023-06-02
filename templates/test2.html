@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<title>ポップアップ画面</title>
+</head>
+<body>
+    <h1>私は元の画面です。</h1>
+    <div id="popup">
+        <div id="popup-modal"></div>
+    </div>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
+{% endblock %}

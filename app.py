@@ -27,6 +27,11 @@ def test():
     print('test')
     return render_template('test.html')
 
+@app.route('/test2', methods=['GET', 'POST'])
+def test():
+    print('test2')
+    return render_template('test2.html')
+
 @app.route('/target-date-recommend', methods=['GET', 'POST'])
 def target_date_recommend():
     from datetime import date, timedelta
