@@ -35,7 +35,7 @@ def test():
 @app.route('/<prefecture>', methods=['GET', 'POST'])
 def test2(prefecture):
     tenpo_url_df:pd.DataFrame = pd.read_csv('csv/tenpo_url_flask_web_site.csv')
-    group_name_list:list[str] ='''123,BBステーション,DAS,Dステーション,MGM,PIA,やすだ,ウエスタン,エスパス,\
+    group_name_list:list[str] ='''123,BBステーション,SAP,アビバ,グランドホール,ともえ,トワーズ,アスカ,アリーナ,ラ・カータ,DAS,Dステーション,MGM,PIA,やすだ,ウエスタン,エスパス,\
 エンジェル,オゼック,オリエンタルパサージュ,オーパス・ワン,カレイド,キコーナ,\
 キューデンアネックス,グランパ,コンサートホール,ゴードン,ジャラン,\
 ジャンジャンマールゴット,デルパラ,ドキわくランド,ニラク,パラッツォ,\
