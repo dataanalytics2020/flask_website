@@ -1,8 +1,14 @@
 .navbar-brand {
   font-family:  "Arial Black", sans-serif;
-  font-size: 1.5rem;
+  font-size: 4.266vw !important;
+  font-size: 16px;
 }
 
+body {
+      font-size: 4.266vw !important;
+      font-size: 16px;
+  }
+  
 
 table {
   width: 100%; /* テーブルの横幅を指定する */
@@ -150,4 +156,41 @@ ul li {
   .japan_map .area_btn{
       font-size: 4vw;
   }
+}
+
+ul.sample1{
+  font: 14px/1.6 'arial narrow', sans-serif;
+  list-style: none;
+  padding: 0.5em 0.7em;
+  border: solid 2px #5c9ee7;
+  border-radius: 5px;
+}
+li{
+  position: relative;
+  color: #5c9ee7;
+  margin-bottom:5px;
+  padding-left:5px;
+  line-height: 70px;
+  font-size: 30px;
+  font-weight: bold;
+  border-bottom: 1px dashed #5c9ee7;
+}
+li:last-child{
+  border:none;
+  margin: 0;
+}
+li:before{
+  font-family: FontAwesome;
+  content: "\f078";
+  position: absolute;
+  right: 5px;
+  font-size: 1.2em;
+  -webkit-transition: all 0.2s linear;
+  transition: all 0.2s linear;
+}
+li:hover:before{
+  -webkit-transform:scale(1.5);
+  transform:scale(1.5);
+  background-position: bottom;
+  color: red;
 }
