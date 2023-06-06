@@ -26,8 +26,8 @@ $(function(){
             var id = $(this).data('id');
             //このidを使用して行いたい操作をしてください
             //都道府県IDに応じて別ページに飛ばしたい場合はこんな風に書く↓
-            window.location.href = 'http://127.0.0.1:5000/' + id;
-            
+            window.location.href = 'http://127.0.0.1:5000/recommend/' + id;
+
             prefReset();
         }
     });

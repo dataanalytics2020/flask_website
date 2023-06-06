@@ -2,12 +2,12 @@
 
 {% block head %}
 <title>フォーム</title>
-<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
 {% endblock %}
 
 {% block content %}
 <h1>プロフィールの入力</h1>
-<form action="{{ url_for('print_values') }}" method="post">
+<form action="{{ url_for('test') }}" method="post">
   <div>
     <label for="user-name">名前</label>
     <input type="text" id="user-name" name="name" required>

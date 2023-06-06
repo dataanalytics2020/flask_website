@@ -1,18 +1,18 @@
 {% extends "base.html" %}
 {% block content %}
-<h1>検索結果{{ prefecture }}</h1>
+<h1>都道府県:{{ prefecture }}</h1>
 <nav id="accordion">
 {% for group_name_list,display_group_name,group_num in zip(web_group_name_list,display_group_name_list,group_num_list) %}
-    {% if group_num != 0 %}    
-    <li><span>{{ display_group_name }} {{ group_num }}店舗</span>
+    {% if group_num != 0 %}
+    <li class="menu"><span>{{ display_group_name }} {{ group_num }}店舗  <i class="fa-solid fa-angle-down fa-lg" style="color: #005eff;"></i></span>
         <ul class="close">
             {% for tenpo_name in group_name_list %}
-                <a href="/{{ prefecture }}/{{ tenpo_name  }}">{{ tenpo_name }}</a></li>
-            {% endfor %}
+            <li class="menu"><a href="{{ url_for('clicked_tenpo_name', tenpo_name=tenpo_name,prefecture=prefecture)}}">{{ tenpo_name }}<span class="fas fa-link"></span></a></li>
+            {% endfor %}     
         </ul>
+    </li>
     {% endif %}
 {% endfor %}
 </nav>
-<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
-<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
 {% endblock %}
