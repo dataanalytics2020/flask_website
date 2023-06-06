@@ -34,11 +34,6 @@ table {
   }
   }
 
-ul li {
-    list-style: none;
-    cursor:pointer;
-}
-
 .close{
     display: none;
 }
@@ -158,13 +153,6 @@ ul li {
   }
 }
 
-ul.sample1{
-  font: 14px/1.6 'arial narrow', sans-serif;
-  list-style: none;
-  padding: 0.5em 0.7em;
-  border: solid 2px #5c9ee7;
-  border-radius: 5px;
-}
 li{
   position: relative;
   color: #5c9ee7;
@@ -175,22 +163,25 @@ li{
   font-weight: bold;
   border-bottom: 1px dashed #5c9ee7;
 }
+
 li:last-child{
   border:none;
   margin: 0;
 }
+
 li:before{
-  font-family: FontAwesome;
-  content: "\f078";
-  position: absolute;
-  right: 5px;
-  font-size: 1.2em;
-  -webkit-transition: all 0.2s linear;
-  transition: all 0.2s linear;
 }
+
 li:hover:before{
   -webkit-transform:scale(1.5);
   transform:scale(1.5);
   background-position: bottom;
   color: red;
+}
+
+ul, ol a {
+  color: #1e366a;
+  border-top: solid #1e366a 1px;/*上のボーダー*/
+  border-bottom: solid #1e366a 1px;/*下のボーダー*/
+  padding: 0.5em 0 0.5em 1.5em;
 }
