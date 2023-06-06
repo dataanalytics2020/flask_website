@@ -11,8 +11,12 @@ import os
 
 df  = pd.read_csv(r'csv\2022-12-09_touhou.csv')
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder="static")
 bootstrap = Bootstrap(app)
+
+#pathがどこにあるか確認
+path=os.getcwd()
+print(path)
 
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///blog.db'
 # app.config['SECRET_KEY'] = os.urandom(24)
@@ -26,13 +30,16 @@ def main():
 def top():
     return render_template('top.html')
 
+@app.route('/form', methods=['GET', 'POST'])
+def form():
+    return render_template('form.html')
 
 @app.route('/test', methods=['GET', 'POST'])
 def test():
     print('test')
     return render_template('test.html')
 
-@app.route('/<prefecture>', methods=['GET', 'POST'])
+@app.route('/recommend/<prefecture>', methods=['GET', 'POST'])
 def test2(prefecture):
     tenpo_url_df:pd.DataFrame = pd.read_csv('csv/tenpo_url_flask_web_site.csv')
     group_name_list:list[str] ='''123,BBステーション,SAP,アビバ,グランドホール,ともえ,トワーズ,アスカ,アリーナ,ラ・カータ,DAS,Dステーション,MGM,PIA,やすだ,ウエスタン,エスパス,\
