@@ -27,3 +27,7 @@ https://github.com/topics/flask-template
 
 ### アコーディオンのサンプルサイト
 https://lmn-blog.com/jquery_accordion01/
+
+参考動画 Udemy
+https://www.udemy.com/share/107ggo3@Txcm81u9m0_R8WkgeEfxzhIgmQLev8Y-bo3XeWtZf-xpGNmtwNK2BWfe94n4SryHTg==/
+
