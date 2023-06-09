@@ -8,8 +8,123 @@ from flask_assets import Environment, Bundle
 from flask_bootstrap import Bootstrap
 from flask_bootstrap import Bootstrap
 import os
+from PIL  import ImageDraw , ImageFont , Image
 
 df  = pd.read_csv(r'csv\2022-12-09_touhou.csv')
+
+#テーブルタイプの画像出力
+def create_df_cell_image(_df,image_name):
+    global create_df_cell_image_path
+    width_concat_lists = []
+    font = ImageFont.truetype('font/MochiyPopOne-OTF-ExtraBold.otf', 18)
+    df_columns_list = list(_df.columns)
+    for column_number in range(len(_df.columns)):
+        height_concat_lists = []
+        #print(column_number)
+        print(df_columns_list[column_number])
+        if df_columns_list[column_number] == '機種名':
+            cell_width = 380
+        elif df_columns_list[column_number] == '店舗名':
+            cell_width = 300
+        elif df_columns_list[column_number] == '店舗平均差枚':
+            cell_width = 150
+        elif df_columns_list[column_number] == '店舗平均G数':
+            cell_width = 150
+        elif df_columns_list[column_number] == '勝率':
+            cell_width = 200
+        elif df_columns_list[column_number] == 'データ':
+            cell_width = 200
+        else:
+            cell_width = 100
+        cell_height = 40
+        im = Image.new('RGB', (cell_width, cell_height), (139, 0, 206))  # イメージオブジェクトの生成(黒のベタ画像)
+        draw = ImageDraw.Draw(im)  # Drawオブジェクトを生成  
+        # フォントの指定(メイリオ48pt)
+        draw.multiline_text((cell_width/2, 20), df_columns_list[column_number], fill=(255,255,255), font=font, align ="center",anchor="mm") # 文字の描画
+        w, h = im.size
+        draw.rectangle((0, 0, w-1, h-1), outline = (255,255,255))
+        height_concat_lists.append(im)
+        for index_number ,(i,record) in enumerate(_df.iterrows()):
+            if (index_number + 1 ) %  2 != 0:
+                im = Image.new('RGB', (cell_width, cell_height), (255, 255, 255))  # イメージオブジェクトの生成(黒のベタ画像)
+            else:
+                im = Image.new('RGB', (cell_width, cell_height), (202, 168, 255))  # イメージオブジェクトの生成(黒のベタ画像)
+            draw = ImageDraw.Draw(im)  # Drawオブジェクトを生成  
+            
+            draw.multiline_text((cell_width/2,10), f'{record[column_number]}', fill=(0,0,0), font=font,anchor="ma") 
+            w, h = im.size
+            
+            if df_columns_list[column_number] == '店舗平均差枚':
+                samai = record[column_number]
+                if samai > 0:
+                    samai_bunbo = 400
+                    samai_percet = samai / samai_bunbo
+                    draw.rectangle([(30, 0), (30+ samai_percet * 100, 40)], fill=(124, 233, 255))
+                else :
+                    samai_bunbo = 500
+                    samai_percet = samai / samai_bunbo
+                    draw.rectangle([(30, 0),  (30+ samai_percet * 100, 40)], fill=(255, 0,0))
+                draw.rectangle([(29, 0), (30, 40)], fill=(255, 255, 255)) 
+                
+            if df_columns_list[column_number] == '差枚' :
+                samai = record[column_number]
+                if samai > 0:
+                    samai_bunbo = 50000
+                    samai_percet = samai / samai_bunbo
+                    draw.rectangle([(30, 0), (30+ samai_percet * 100, 40)], fill=(124, 233, 255))
+                else :
+                    samai_bunbo = 50000
+                    samai_percet = samai / samai_bunbo
+                    draw.rectangle([(30, 0),  (30+ samai_percet * 50, 40)], fill=(255, 0,0))
+                draw.rectangle([(29, 0), (30, 40)], fill=(255, 255, 255))  
+                
+            if df_columns_list[column_number] == 'G数' or df_columns_list[column_number] == 'ゲーム数' or df_columns_list[column_number] == '店舗平均G数':
+                gamesuu = record[column_number]
+                samai_bunbo = 6000
+                samai_percet = gamesuu / samai_bunbo
+                #print(samai_percet)
+                draw.rectangle([(0, 0), (samai_percet * 100, 40)], fill=(0, 255, 206))
+
+            if df_columns_list[column_number] ==  'BB' or df_columns_list[column_number] ==  'RB' or df_columns_list[column_number] ==  'ART' :
+                atari_kaisuu = record[column_number]
+                bunbo = 35
+                percet = atari_kaisuu / bunbo
+                #print(percet)
+                draw.rectangle([(0, 0), (percet * 100, 40)], fill=(255, 193, 133))
+                
+            if df_columns_list[column_number] ==  '総台数'  :
+                atari_kaisuu = int(record[column_number])
+                bunbo = 20
+                percet = atari_kaisuu / bunbo
+                #print(percet)
+                draw.rectangle([(0, 0), (percet * 100, 40)], fill=(255, 193, 133))
+            if df_columns_list[column_number] ==  '台数'  :
+                atari_kaisuu = int(record[column_number])
+                bunbo = 500
+                percet = atari_kaisuu / bunbo
+                #print(percet)
+                draw.rectangle([(0, 0), (percet * 100, 40)], fill=(255, 193, 133))
+                
+            if df_columns_list[column_number] ==  '勝率'  :
+                atari_kaisuu = float(record[column_number].split(')')[1].replace('%','').replace(' ',''))
+                #print(atari_kaisuu)
+                draw.rectangle([(0, 0), ((atari_kaisuu/100)*200, 40)], fill=(251, 244, 0))
+            
+            else:
+                pass
+                
+            draw.multiline_text((cell_width/2,10), f'{record[column_number]}', fill=(0,0,0), font=font,anchor="ma")
+            draw.rectangle((0, 0, w-1, h-1), outline = (0,0,0))
+            height_concat_lists.append(im)
+            
+        #break
+        concat_image_path  = rf"image/temp_image/complted_cell_{column_number}.png"
+        get_concat_v_multi_resize(height_concat_lists).save(concat_image_path)
+        concat_im = Image.open(concat_image_path)
+        width_concat_lists.append(concat_im)
+    create_df_cell_image_path = rf"image/temp_image/temp_complted_df_image_cell_{image_name}.png"
+    get_concat_h_multi_resize(width_concat_lists).save(create_df_cell_image_path)
+    return create_df_cell_image_path
 
 app = Flask(__name__, static_folder="static")
 bootstrap = Bootstrap(app)
