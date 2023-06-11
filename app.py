@@ -362,7 +362,7 @@ def clicked_tenpo_name(prefecture,tenpo_name):
         groupby_kisyubetu_df['平均G数'] = groupby_kisyubetu_df['平均G数'].astype(str) + 'G'
         groupby_kisyubetu_df['平均G数'] = groupby_kisyubetu_df['平均差枚'].astype(str) + '枚'
         groupby_kisyubetu_df = groupby_kisyubetu_df[:5]
-
+        groupby_kisyubetu_df.to_csv('csv/test_groupby_kisyubetu_df.csv',index=False)
         return render_template('target_date_recommend_report.html',data=data,serch_number=serch_number,\
                                             user_data=user_data,\
                                             column_names=concat_df.columns.values, \
