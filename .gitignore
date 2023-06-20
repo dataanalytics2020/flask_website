@@ -11,5 +11,5 @@ dist/
 build/
 *.egg-info/
 static/.webassets-cache/*
-
-
+.env
+sercret/akasaka.key
