@@ -14,15 +14,31 @@ import mysql.connector
 import os
 
 import datetime
-
+import unicodedata
 
 from dotenv import load_dotenv
 load_dotenv(".env")
+import sshtunnel
+from sshtunnel import SSHTunnelForwarder
+
+server = sshtunnel.SSHTunnelForwarder((os.getenv('SSH_USERNAME'), 10022), 
+    ssh_username="pachislot777", 
+    ssh_private_key_password=os.getenv('SSH_PRIVATE_KEY_PASSWORD'), 
+    ssh_pkey="sercret/akasaka.key", 
+    remote_bind_address=("mysql8055.xserver.jp", 3306 )) 
+# SSH接続確認
+
+
+
+# sql = f"""
+# SELECT 取材名 , 媒体名,取得時間
+# FROM pledge 
+# """
+#st.write(sql)
+# cursor.execute(sql)
 
 
 print('ライブラリの読み込み完了')
-
-
 
 def removal_text(text):
     text = unicodedata.normalize("NFKC", text)
@@ -84,7 +100,9 @@ def login_scraping_site(area_name):
     browser.implicitly_wait(10)
     return browser
 
-for area_name in ['kanto','chubu','hokkaido','tohoku']:
+
+
+for area_name in ['chubu','hokkaido','tohoku','kanto']:
     try:
         furture_syuzai_list_df = pd.DataFrame(index=[], columns=['都道府県','イベント日','店舗名','取材名','媒体名','取材ランク'])
         browser = login_scraping_site(area_name)
@@ -173,33 +191,30 @@ for area_name in ['kanto','chubu','hokkaido','tohoku']:
         today_str:str = today.strftime('%Y-%m-%d')
         eight_days_after:str = (today + datetime.timedelta(days=8)).strftime('%Y-%m-%d')
         yesterday:str = (today + datetime.timedelta(days=-2)).strftime('%Y-%m-%d')
-        #### Create dataframe from resultant table ####
 
-        cnx = mysql.connector.connect(
-                                user = os.getenv('DB_USER_NAME'),
-                                password=os.getenv('DB_PASSWORD'), 
-                                host=os.getenv('DB_HOST'), 
-                                port='3306',
-                                database=os.getenv('DB_NAME'))
-
-        cursor = cnx.cursor()
-
-        # prefectures ="("
-        # prefecture_list = ['愛知県','静岡県','山梨県','長野県','岐阜県','新潟県','富山県','石川県','福井県','三重県']
-        # for i,text in enumerate(prefecture_list):
-        #     if i == (len(prefecture_list) -1 ):
-        #         prefectures += f"'{text}'"
-        #     else:
-        #         prefectures += f"'{text}',"
-        # prefectures += ')'
-        # print(prefectures)
 
 
         sql = f"""
-                SELECT *
-                FROM pledge
-                """
+SELECT *
+FROM pledge
+"""
         print(sql)
+        server.start()
+        print(f"local bind port: {server.local_bind_port}")
+        # データベース接続
+        cnx = mysql.connector.connect(
+            host="localhost", 
+            port=server.local_bind_port, 
+            user=os.getenv('WORDPRESS_DB_ID'), 
+            password=os.getenv('DB_PASSWORD'), 
+            database=os.getenv('WORDPRESS_DB_NAME'), 
+            charset="utf8",
+            use_pure=True
+            )
+
+        # 接続確認
+        print(f"sql connection status: {cnx.is_connected()}")
+        cursor = cnx.cursor()
         cursor.execute(sql)
         #cols = [col[0] for col in cursor.description]
         sql_syuzai_report_all_df = pd.DataFrame(cursor.fetchall(),columns = ['id','取材名','媒体名','公約内容','取得時間'])
@@ -224,7 +239,7 @@ for area_name in ['kanto','chubu','hokkaido','tohoku']:
             else:
                 #print('追加なし')
                 pass
-
-        post_line_text(f'{area_name} {count}件の公約レコードの追加が終了しました。',os.getenv('LINE_TOKEN'))
+        server.stop()
+        post_line_text(f'{area_name} {count}件のxサーバーへ公約レコードの追加が終了しました。',os.getenv('LINE_TOKEN'))
     except Exception as e:
         post_line_text(f'取材予定エラー\n{e}',os.getenv('LINE_TOKEN'))
