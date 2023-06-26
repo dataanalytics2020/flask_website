@@ -68,10 +68,10 @@ line_token = os.getenv('LINE_TOKEN')
 #print(line_token)
 for prefecture in prefecture_list:
     try:
-        post_line_text(f'{prefecture}MYSQL追加処理を開始します',line_token)
+        post_line_text(f'{prefecture}XサーバーへのMYSQL追加処理を開始します',line_token)
         cols = ['機種名', '台番号', 'G数', '差枚', 'BB', 'RB', 'ART', 'BB確率', 'RB確率', 'ART確率','合成確率','店舗名']
         ichiran_all_tennpo_df = pd.DataFrame(index=[], columns=cols)
-        yesterday = datetime.date.today() + datetime.timedelta(days=-3)
+        yesterday = datetime.date.today() + datetime.timedelta(days=-1)
         url = f'https://{os.getenv("SCRAPING_DOMAIN")}/%E3%83%9B%E3%83%BC%E3%83%AB%E3%83%87%E3%83%BC%E3%82%BF/{prefecture}/'
         res = requests.get(url)
         soup = BeautifulSoup(res.text, 'html.parser')
@@ -161,7 +161,8 @@ for prefecture in prefecture_list:
             delete_data(cnx,35)
             # 終了
             cnx.close()
-
+            
+        #break
     except Exception as e:
         print(e)
         post_line_text(f'{prefecture}処理失敗{e}',line_token)
