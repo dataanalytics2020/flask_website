@@ -7,3 +7,4 @@ html5lib
 Flask-Assets
 flask-bootstrap4
 Pillow
+folium
