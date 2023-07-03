@@ -1,4 +1,8 @@
 "# flask_website"
+
+### 2023/07/04 時点のTOP画面
+![スクリーンショット 2023-07-04 035103](https://github.com/dataanalytics2020/flask_website/assets/117744645/9f1da422-e147-4ce9-ae9b-0b996808402a)
+
 # Flask チュートリアル
 https://study-flask.readthedocs.io/ja/latest/01.html
 
