@@ -12,7 +12,6 @@ from PIL  import ImageDraw , ImageFont , Image
 
 df  = pd.read_csv(r'csv\2022-12-09_touhou.csv')
 
-
 def get_concat_h_multi_resize(im_list, resample=Image.BICUBIC):
     min_height = min(im.height for im in im_list)
     im_list_resize = [im.resize((int(im.width * min_height / im.height), min_height),resample=resample)
@@ -164,11 +163,16 @@ print(path)
 
 @app.route('/', methods=['GET', 'POST'])
 def main():
+
     return redirect("/top")
 
 @app.route('/top', methods=['GET', 'POST'])
 def top():
-    return render_template('top.html')
+    prefecture_list =['東京都','神奈川県','千葉県','埼玉県']
+    today = date.today()
+    date_list = [today + timedelta(days=day) for day in range(1,9)]
+    date_list = [date.strftime("%Y-%m-%d") for date in date_list]
+    return render_template('top.html',date_list=date_list,prefecture_list=prefecture_list)
 
 @app.route('/form', methods=['GET', 'POST'])
 def form():

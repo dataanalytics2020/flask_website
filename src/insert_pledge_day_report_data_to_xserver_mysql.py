@@ -155,8 +155,8 @@ while True:
     except Exception as e:
         print('エラー理由',e)
         break
-    # if i > 13:
-    #break
+    # if i > 5:
+    #     break
 
 pattern = '東京都|北海道|(京都|大阪)府|.{2,3}県'
 # 都道府県を抽出する
