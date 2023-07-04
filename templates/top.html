@@ -1,23 +1,27 @@
 {% extends "base.html" %}
 {% block content %}
 <h2>都道府県から行きたい日の取材予定を地図で探す</h2>
-  <form action="" method="post">
-    <p>都道府県を選択：
-        <select name="prefecture">
+<form action="" method="post">
+    <p>検索したい都道府県を選択：</p>
+        <select class="form-select form-select-lg mb-2" 　aria-label="Default select example" name="prefecture">
+            <option selected>東京都</option>
             {% for prefecture in prefecture_list %}
                 <option value="{{ prefecture }}">{{ prefecture }}</option>
             {% endfor %}
         </select>
-    </p>
-    <p>検索したい日付を選択：
-      <select name="recommend-day">
+
+    <p>検索したい日付を選択：</p>
+    <select class="form-select form-select-lg mb-2" 　aria-label="Default select example"　name="recommend-day">
       {% for target_day in date_list %}
         <option value="{{ target_day }}">{{ target_day }}</option>
       {% endfor %}
-      </select>
-    </p>
-    <button class="btn btn-primary">送信</button>
-  </form>
+    </select>
+
+    <div class="d-grid gap-2 col-6 mx-auto">
+    <button class="btn btn-primary" type="button">送信</button>
+    </div>
+</form>
+  
 <h2>地図から行きたい店舗のお勧め機種を探す</h2>
 <div class="japan_map">
     <img src="../static/img/japanmap.png" width="1100" height="1000" alt="日本地図">

@@ -163,16 +163,25 @@ print(path)
 
 @app.route('/', methods=['GET', 'POST'])
 def main():
-
     return redirect("/top")
 
 @app.route('/top', methods=['GET', 'POST'])
 def top():
-    prefecture_list =['東京都','神奈川県','千葉県','埼玉県']
-    today = date.today()
-    date_list = [today + timedelta(days=day) for day in range(1,9)]
-    date_list = [date.strftime("%Y-%m-%d") for date in date_list]
-    return render_template('top.html',date_list=date_list,prefecture_list=prefecture_list)
+    if request.method == 'POST':
+        user_data = request.form
+        print(user_data)
+        data = {}
+        prefecture = user_data['prefecture']
+        target_day = user_data['target_day']
+        print(prefecture,target_day)
+        return render_template('schedule_map.html',data=data,\
+                                            user_data=user_data)
+    else:
+        prefecture_list =['神奈川県','千葉県','埼玉県']
+        today = date.today()
+        date_list = [today + timedelta(days=day) for day in range(1,9)]
+        date_list = [date.strftime("%Y-%m-%d") for date in date_list]
+        return render_template('top.html',date_list=date_list,prefecture_list=prefecture_list)
 
 @app.route('/form', methods=['GET', 'POST'])
 def form():
