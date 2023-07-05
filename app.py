@@ -218,10 +218,11 @@ def main():
 def top():
     if request.method == 'POST':
         user_data = request.form
+        today = datetime.date.today()
         print('user_data',user_data)
         data = {}
         prefecture = user_data['prefecture']
-        target_day = user_data['target_day']
+        target_day = str(today.year) + '- ' + user_data['target_day'].split('月')[0] + '-' + user_data['target_day'].split('月')[1].split('日')[0]
         jpn_target_day = target_day.split('-')[1].lstrip('0') + '月' + target_day.split('-')[2].lstrip('0') + '日'
         print(prefecture,target_day)
         
@@ -239,7 +240,7 @@ def top():
         report_df =  pd.DataFrame(cursor.fetchall(),columns = cols )
         report_df = report_df.drop_duplicates(keep='first')
         report_df =report_df.dropna(subset=['経度'])
-        map_report_df = report_df[['店舗名','取材名','媒体名']]
+        map_report_df = report_df[['店舗名','取材名','媒体名']].sort_values('店舗名').drop_duplicates(keep='first')
         
         if prefecture == '神奈川県':
             prefecture_latitude = 35.44778
@@ -298,11 +299,13 @@ def top():
             im.save('syuzai_image.png', quality=95)
             img = 'syuzai_image.png'
             popup_df = folium.Popup(
-            extract_syuzai_df_1[['店舗名','取材名','媒体名']].to_html(), 
+            extract_syuzai_df_1[['店舗名','取材名','媒体名']].sort_values('店舗名').to_html(), 
             width=1500, 
             height=300)
 
             folium.Marker(location=[latitude ,longitude],
+                tiles='https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png',
+                attr='国土地理院',
                 popup=popup_df,
                 icon = CustomIcon(
                             icon_image = img,
@@ -313,7 +316,6 @@ def top():
                             shadow_anchor = (-4, -40),
                             popup_anchor = (3, 3))).add_to(folium_map)
             #break
-        folium_map.save(outfile="./output_map.html")
   
         # set the iframe width and height
         folium_map.get_root().width = "1000px"
@@ -328,10 +330,14 @@ def top():
                                             row_data=list(map_report_df.values.tolist()))
     else:
         prefecture_list =['神奈川県','千葉県','埼玉県']
+        w_list = ['(月)', '(火)', '(水)', '(木)', '(金)', '(土)', '(日)']
         today = date.today()
-        date_list = [today + timedelta(days=day) for day in range(1,9)]
-        date_list = [date.strftime("%Y-%m-%d") for date in date_list]
-        return render_template('top.html',date_list=date_list,prefecture_list=prefecture_list)
+        jp_str_day_list = []
+        for i in range(0,7):
+            day = today + timedelta(days=i)
+            jp_str_day = day.strftime('%m').lstrip('0') + '月' + day.strftime('%d').lstrip('0') + '日' + w_list[day.weekday()]
+            jp_str_day_list.append(jp_str_day)
+        return render_template('top.html',date_list=jp_str_day_list,prefecture_list=prefecture_list)
 
 @app.route('/form', methods=['GET', 'POST'])
 def form():

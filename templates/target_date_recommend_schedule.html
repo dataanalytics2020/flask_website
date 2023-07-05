@@ -6,20 +6,21 @@
 {% block content %}
 <h3>明日のおすすめ店舗過去N回分析</h3>
   <form action="" method="post">
-    <div>
-      <label for="user-name">店舗名</label>
+    <div class="input-group input-group-lg">
+      <span class="input-group-text" id="inputGroup-sizing-lg">店舗名</span>
       <input type="text" id="tenpo-name" name="tenpo-name" value="{{tenpo_name}}" required>
     </div>
-    <p>検索したい日付を選択：
-      <select name="recommend-day">
+    <p>行きたい日付を選択：
+      <select class="form-select form-select-lg mb-2"  name="recommend-day">
       {% for target_day in date_list %}
       <option value="{{ target_day }}">{{ target_day }}</option>
       {% endfor %}
       </select>
     </p>
     <div>
-      <label for="user-age">何回分分析するか</label>
-      <input type="number" id="n-times" name="n-times" min="1" max="5" value="3" required>
+      <label for="user-age">過去何回分分析するか
+      <input type="number" id="n-times" name="n-times" min="1" max="5" value="3" required>回
+      </label>
     </div>
     <button class="btn btn-primary">送信</button>
   </form>
