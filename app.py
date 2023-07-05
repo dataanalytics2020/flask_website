@@ -1,3 +1,4 @@
+#utf-8
 from flask import Flask, render_template, request, redirect
 from datetime import date, timedelta
 import pandas as pd
@@ -9,8 +10,56 @@ from flask_bootstrap import Bootstrap
 from flask_bootstrap import Bootstrap
 import os
 from PIL  import ImageDraw , ImageFont , Image
-
+import unicodedata
+import string
+from folium import plugins
+import branca
+import folium
+from folium.features import CustomIcon
+import mysql
+import mysql.connector
+import sshtunnel
+from sshtunnel import SSHTunnelForwarder
+import datetime
 df  = pd.read_csv(r'csv\2022-12-09_touhou.csv')
+
+def get_driver():
+    server = sshtunnel.SSHTunnelForwarder((os.getenv('SSH_USERNAME'), 10022), 
+        ssh_username="pachislot777", 
+        ssh_private_key_password=os.getenv('SSH_PRIVATE_KEY_PASSWORD'), 
+        ssh_pkey="sercret/akasaka.key", 
+        remote_bind_address=("mysql8055.xserver.jp", 3306 )) 
+    # SSH接続確認
+
+
+    # 現在時刻
+    today = datetime.datetime.now()
+    print(today)
+    #[結果] 2021-08-23 07:12:20.806648
+    # 1日後
+    today_str:str = today.strftime('%Y-%m-%d')
+    eight_days_after:str = (today + datetime.timedelta(days=8)).strftime('%Y-%m-%d')
+    yesterday:str = (today + datetime.timedelta(days=-2)).strftime('%Y-%m-%d')
+    #### Create dataframe from resultant table ####
+
+    server.start()
+
+    print(f"local bind port: {server.local_bind_port}")
+    # データベース接続
+    cnx = mysql.connector.connect(
+        host="localhost", 
+        port=server.local_bind_port, 
+        user=os.getenv('WORDPRESS_DB_ID'), 
+        password=os.getenv('DB_PASSWORD'), 
+        database=os.getenv('WORDPRESS_DB_NAME'), 
+        charset='utf8',
+        use_pure=True
+        )
+
+    # 接続確認
+    print(f"sql connection status: {cnx.is_connected()}")
+    cursor = cnx.cursor()
+    return cursor, cnx, server
 
 def get_concat_h_multi_resize(im_list, resample=Image.BICUBIC):
     min_height = min(im.height for im in im_list)
@@ -169,13 +218,114 @@ def main():
 def top():
     if request.method == 'POST':
         user_data = request.form
-        print(user_data)
+        print('user_data',user_data)
         data = {}
         prefecture = user_data['prefecture']
         target_day = user_data['target_day']
+        jpn_target_day = target_day.split('-')[1].lstrip('0') + '月' + target_day.split('-')[2].lstrip('0') + '日'
         print(prefecture,target_day)
-        return render_template('schedule_map.html',data=data,\
-                                            user_data=user_data)
+        
+        #イベント日,店舗名,取材名,媒体名,アナスロ店舗名
+        cursor, cnx, server = get_driver()
+        sql = f"""SELECT イベント日,店舗名,取材名,媒体名,アナスロ店舗名,経度,緯度,取材ランク
+                FROM schedule as schedule2
+                left join maptable as maptable2
+                on schedule2.店舗名 = maptable2.アナスロ店舗名
+                        where schedule2.都道府県 = '{prefecture}' and schedule2.イベント日 IN ('2023-07-07') and schedule2.媒体名 != 'ホールナビ' 
+                """
+        print(sql)
+        cursor.execute(sql)
+        cols = [col[0] for col in cursor.description]
+        report_df =  pd.DataFrame(cursor.fetchall(),columns = cols )
+        report_df = report_df.drop_duplicates(keep='first')
+        report_df =report_df.dropna(subset=['経度'])
+        map_report_df = report_df[['店舗名','取材名','媒体名']]
+        
+        if prefecture == '神奈川県':
+            prefecture_latitude = 35.44778
+            prefecture_longitude = 139.64250
+        elif prefecture == '東京都':
+            prefecture_latitude = 35.68944
+            prefecture_longitude = 139.69167
+        elif prefecture == '千葉県':
+            prefecture_latitude = 35.60472
+            prefecture_longitude = 140.12333
+        elif prefecture == '埼玉県':
+            prefecture_latitude = 35.85694
+            prefecture_longitude = 139.64889
+        elif prefecture == '茨城県':
+            prefecture_latitude = 36.34139
+            prefecture_longitude = 140.44667
+        else:
+            pass
+
+        folium_map = folium.Map(location=[prefecture_latitude,prefecture_longitude], zoom_start=12)
+        # 地図表示
+        # マーカープロット（ポップアップ設定，色変更，アイコン変更）
+        for tenpo_name in report_df['アナスロ店舗名'].unique():
+            print(tenpo_name)
+            extract_syuzai_df_1 = report_df[report_df['アナスロ店舗名'] == tenpo_name]
+            #display(extract_syuzai_df_1)
+            syuzai_rank_list = list(extract_syuzai_df_1['取材ランク'].unique())
+            #print(syuzai_rank_list)
+            
+            latitude = extract_syuzai_df_1.iloc[0]['緯度']
+            longitude = extract_syuzai_df_1.iloc[0]['経度']
+
+            # グレースケールの画像データを作成
+            im = Image.new("L", (260, 50),color=(55))
+
+            # 画像の表示
+            im.putalpha(100)
+            # 描画準備
+            draw = ImageDraw.Draw(im)
+            font = ImageFont.truetype('font\LightNovelPOPv2.otf',19)
+            if len(extract_syuzai_df_1)==1:
+                syuzai_name_text = '◆' + tenpo_name + f'\n {extract_syuzai_df_1["取材名"].values[0]}'
+            else:
+                syuzai_name_text = '◆' + tenpo_name + f'\n {extract_syuzai_df_1["取材名"].values[0]}、他{len(extract_syuzai_df_1)-1}件'
+            #print(syuzai_name_text)
+            draw.multiline_text(
+                (130, 0),
+                f'{syuzai_name_text}',
+                font=font,
+                fill='white',
+                align='center',
+                spacing=0,
+                anchor='ma'
+            )
+            # 画像を表示
+            im.save('syuzai_image.png', quality=95)
+            img = 'syuzai_image.png'
+            popup_df = folium.Popup(
+            extract_syuzai_df_1[['店舗名','取材名','媒体名']].to_html(), 
+            width=1500, 
+            height=300)
+
+            folium.Marker(location=[latitude ,longitude],
+                popup=popup_df,
+                icon = CustomIcon(
+                            icon_image = img,
+                            icon_size = (260, 50),
+                            icon_anchor = (0, 0),
+                            #shadow_image = shadow_img, # 影効果（今回は使用せず コメントアウト
+                            #shadow_size = (30, 30),
+                            shadow_anchor = (-4, -40),
+                            popup_anchor = (3, 3))).add_to(folium_map)
+            #break
+        folium_map.save(outfile="./output_map.html")
+  
+        # set the iframe width and height
+        folium_map.get_root().width = "1000px"
+        folium_map.get_root().height = "800px"
+        iframe = folium_map.get_root()._repr_html_()
+        
+        
+        return render_template('schedule_map.html',data=data,jpn_target_day=jpn_target_day,\
+                                            user_data=user_data,iframe=iframe,\
+                                            zip=zip,\
+                                            column_names=map_report_df.columns.values, \
+                                            row_data=list(map_report_df.values.tolist()))
     else:
         prefecture_list =['神奈川県','千葉県','埼玉県']
         today = date.today()

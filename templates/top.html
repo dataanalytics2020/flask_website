@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 <h2>都道府県から行きたい日の取材予定を地図で探す</h2>
-<form action="" method="post">
+<form action="{{ url_for('top') }}" method="post">
     <p>検索したい都道府県を選択：</p>
         <select class="form-select form-select-lg mb-2" 　aria-label="Default select example" name="prefecture">
             <option selected>東京都</option>
@@ -11,14 +11,14 @@
         </select>
 
     <p>検索したい日付を選択：</p>
-    <select class="form-select form-select-lg mb-2" 　aria-label="Default select example"　name="recommend-day">
+    <select class="form-select form-select-lg mb-2" aria-label="Default select example" name="target_day">
       {% for target_day in date_list %}
         <option value="{{ target_day }}">{{ target_day }}</option>
       {% endfor %}
     </select>
 
     <div class="d-grid gap-2 col-6 mx-auto">
-    <button class="btn btn-primary" type="button">送信</button>
+        <button class="btn btn-primary" type="submit" value="送信">送信</button>
     </div>
 </form>
   
