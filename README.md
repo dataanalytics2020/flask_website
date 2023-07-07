@@ -1,4 +1,8 @@
-"# flask_website"
+## 製作過程のスクショ一覧
+### 2023/07/08 時点の店舗N回分析結果画面
+![2023-07-08_1](https://github.com/dataanalytics2020/flask_website/assets/117744645/3c1a98e2-f759-46f4-8ed3-4cea5e31e7a2)
+![2023-07-08 051507](https://github.com/dataanalytics2020/flask_website/assets/117744645/06e42118-931a-4a57-876a-9581a4adbf99)
+
 ### 2023/07/06 時点のTOP画面
 ![スクリーンショット 2023-07-06 005740](https://github.com/dataanalytics2020/flask_website/assets/117744645/36a93bb8-257d-4a52-b0f4-be5082c684c3)
 ### 2023/07/04 時点のTOP画面
