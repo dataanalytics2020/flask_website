@@ -4,142 +4,145 @@
 <title>データの出力</title>
 {% endblock %}
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.3.0/Chart.bundle.min.js"></script>
+
+
 {% block content %}
-<h1>分析結果</h1>
+<h1>{{data['target_number']}}のつく日の直近{{serch_number}}回分 分析結果</h1>
 <div>
   <h2>行きたい日付： {{ user_data['recommend-day'] }}</h2>
-  <h2>比較した日付</h2>
+  <br><h2>比較した日付</h2>
   <p>比較するデータは{{ user_data['tenpo-name'] }}の</p>
-  {% for key in target_day_list %}
-  <ul>'{{ key }}'</ul>
+  {% for date in target_day_list_jp %}
+  <ul class = 'day_list '>{{ date }}</ul>
   {% endfor %}
   <p>　の{{data['target_number']}}のつく日の直近{{serch_number}}回分データを今回集計しました。</p>
-
 </div>
 <h2>分析結果(直近の{{data['target_number']}}の日 {{serch_number}}回分)</h2>
-</h2>
-<div class="container" style="width:100%">
-  <canvas id="canvas"></canvas>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.3.0/Chart.bundle.min.js"></script>
+
+
+<div class="canvas" style="width:100%">
+    <canvas id="canvas"></canvas>
 </div>
 
 <script>
-  window.onload = function() {
-      ctx = document.getElementById("canvas").getContext("2d");
-      window.myBar = new Chart(ctx, {
-          type: 'bar',
-          data: barChartData,
-          options: complexChartOption
-      });
-  };
+
+window.onload = function() {
+    Chart.defaults.global.defaultFontSize = 30;
+    Chart.defaults.global.defaultFontFamily = "'Noto Sans JP', sans-serif";
+    ctx = document.getElementById("canvas").getContext("2d");
+    window.myBar = new Chart(ctx, {
+        type: 'bar',
+        data: barChartData,
+        options: complexChartOption
+    });
+};
 </script>
 
 <script>
-  // とある4週間分のデータログ
-  var barChartData = {
-      labels: {{ target_day_list|safe }},
-      datasets: [
-      {
-          type: 'line',
-          label: '平均差枚',
-          data:{{ samai_list | safe}},
-          borderColor : "rgba(254,97,132,0.8)",
-                  pointBackgroundColor    : "rgba(254,97,132,0.8)",
-                  fill: false,
-          yAxisID: "y-axis-1",// 追加
-      },
-      {
-          type: 'bar',
-          label: '平均G数',
-          data:{{ gamesuu_list| safe}},
-          borderColor : "rgba(54,164,235,0.8)",
-          backgroundColor : "rgba(54,164,235,0.5)",
-          yAxisID: "y-axis-2",
-      },
-      ],
-  };
+// とある4週間分のデータログ
+var barChartData = {
+    labels: {{ target_day_list_jp|safe }},
+    datasets: [
+    {
+        type: 'line',
+        label: '平均差枚',
+        data: {{ samai_list|safe }},
+        borderColor : "rgba(254,97,132,0.8)",
+                pointBackgroundColor    : "rgba(254,97,132,0.8)",
+                fill: false,
+        yAxisID: "y-axis-1",// 追加
+        borderWidth: 15,
+        pointHoverRadius: 18,
+        pointBackgroundColor: "rgba(254,97,132,0.8)",
+        
+    },
+    {
+        type: 'bar',
+        label: '平均G数',
+        data: {{ gamesuu_list| safe}},
+        borderColor : "rgba(54,164,235,0.8)",
+        backgroundColor : "rgba(54,164,235,0.5)",
+        yAxisID: "y-axis-2",
+    },],
+};
 </script>
 
 <script>
-  var complexChartOption = {
-      responsive: true,
-      scales: {
-          yAxes: [{
-              id: "y-axis-1",
-              type: "linear", 
-              position: "left",
-              ticks: {
-                  max: 500,
-                  min: -200,
-                  stepSize: 100
-              },
-          }, {
-              id: "y-axis-2",
-              type: "linear", 
-              position: "right",
-              ticks: {
-                  max: 6000,
-                  min: 0,
-                  stepSize: 1000
-              },
-              gridLines: {
-                  drawOnChartArea: false,
-              },
-          }],
-      }
-  };
-  </script>
+var complexChartOption = {
+    responsive: true,
+    scales: {
+      
+        yAxes: [{
+            id: "y-axis-1",
+            type: "linear", 
+            position: "left",
+            ticks: {
+                max: 500,
+                min: -300,
+                stepSize: 100,
+                fontSize: 34,
+                callback: function(value, index, values) {
+                  return '平均' + value + '枚';}
+            },
+        }, {
+            id: "y-axis-2",
+            type: "linear", 
+            position: "right",
+            ticks: {
+                max: 6000,
+                min: 1000,
+                stepSize: 1000,
+                fontSize: 34,
+                callback: function(value, index, values) {
+                  return  value + 'G';}
+            },
+            gridLines: {
+                drawOnChartArea: false, 
+                borderWidth: 3,
+            },
+        }],
+    }
+
+};
+</script>
 
 
-<h2>日別データ</h2>
-<section>
-  <div class="accordion">
-    <p class="menu js-menu">日別データ</p>
-    <div class="contents">{{samai_table|safe}}</div>
+
+<h1><p>{{ user_data['tenpo-name'] }}  {{data['target_number']}}のつく日<br>直近過去{{serch_number}}回で最も出ていたお勧め機種TOP10</p></h1>
+<h2>※バラエティ機種は除く</h2><h2>※合計{{serch_number}}回分の合計データです</h2>
+<div class='design16 .table-wrap'>
+  <div class="scroll_area" style="width:100%;max-width:1000px;overflow-x:scroll;">
+    <table style="width:100%;">
+  {{groupby_kisyu_table|safe}}
+    </table>
   </div>
-</section>
-<!-- トリガーの部分 -->
-
-<script>
-  const menu = document.querySelectorAll(".js-menu");
-
-  function toggle() {
-    const content = this.nextElementSibling;
-    this.classList.toggle("is-active");
-    content.classList.toggle("is-open");
-  }
-
-  for (let i = 0; i < menu.length; i++) {
-    menu[i].addEventListener("click", toggle);
-  }
-</script>
-
-<h4><p>{{ user_data['tenpo-name'] }}  {{data['target_number']}}のつく日直近過去{{serch_number}}回で最も出ていた機種TOP15</p></h4>
-
-<table class="tb01">
-{{groupby_kisyu_table|safe}}
 </div>
-<h2>日別機種別データ</h2>
-<table>
-    <thead>
-      <tr>
-        {% for col in column_names %}
-        <th>
-          {{col}}
-        </th>
+
+
+<h2>日別機種別差枚順データTOP30</h2>
+<div class="scroll_area" style="width:100%;max-width:1000px;overflow-x:scroll;">
+  <table class='design16' style="width:100%;">
+      <thead>
+        <tr>
+          {% for col in column_names %}
+          <th>
+            {{col}}
+          </th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in row_data %}
+        <tr>
+          {% for col, row_ in zip(column_names, row) %}
+          <td>{{row_}}</td>
+          {% endfor %}
+        </tr>
         {% endfor %}
-      </tr>
-    </thead>
-    <tbody>
-      {% for row in row_data %}
-      <tr>
-        {% for col, row_ in zip(column_names, row) %}
-        <td>{{row_}}</td>
-        {% endfor %}
-      </tr>
-      {% endfor %}
+      </tbody>
+  </div>
+</div>
 
-
-</tbody>
-
-  </table>
 {% endblock %}

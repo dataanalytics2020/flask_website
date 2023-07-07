@@ -85,6 +85,11 @@ def get_concat_v_multi_resize(im_list, resample=Image.BICUBIC):
         pos_y += im.height
     return dst
 
+def convert_date(date):
+    date:str = str(date).split('-')
+    date = date[1].lstrip('0') + '/' + date[2].lstrip('0')
+    return date
+
 #テーブルタイプの画像出力
 def create_df_cell_image(_df,image_name):
     global create_df_cell_image_path
@@ -471,7 +476,46 @@ def clicked_tenpo_name(prefecture,tenpo_name):
                 concat_df = concat_df.drop([column_name],axis=1)
             except:
                 pass
-        concat_df = concat_df.groupby(['日付','機種名']).mean().sort_values('差枚',ascending=False)#機種毎に集計
+ 
+        ######
+        groupby_date_kisyubetu_df = pre_concat_df.groupby(['日付','機種名']).sum()
+        groupby_date_kisyubetu_df['総台数'] = pre_concat_df.groupby(['日付','機種名']).size()
+        groupby_date_kisyubetu_df = groupby_date_kisyubetu_df.reset_index(drop=False).reset_index().rename(columns={'index': '機種順位','ゲーム数': 'G数'})
+        groupby_date_kisyubetu_df[['日付','機種名','機種名','総台数','G数','差枚']]
+        kisyubetu_win_daissuu_list = []
+        groupby_date_kisyubetu_df_list = []
+        for kisyu_name,day in zip(groupby_date_kisyubetu_df['機種名'],groupby_date_kisyubetu_df['日付']):
+            kisyu_df = pre_concat_df.query('機種名 == @kisyu_name & 日付 == @day')
+            groupby_date_kisyubetu_df_list.append(kisyu_df)
+            kisyu_win_daisuu = len(kisyu_df[kisyu_df['差枚'] > 0])
+            kisyubetu_win_daissuu_list.append(kisyu_win_daisuu)
+        groupby_date_kisyubetu_df['勝率'] = kisyubetu_win_daissuu_list
+        groupby_date_kisyubetu_df['勝率'] = groupby_date_kisyubetu_df['勝率'].astype(str)
+        groupby_date_kisyubetu_df['総台数'] = groupby_date_kisyubetu_df['総台数'].astype(int)
+        groupby_date_kisyubetu_df['平均G数'] = groupby_date_kisyubetu_df['G数'] / groupby_date_kisyubetu_df['総台数']
+        groupby_date_kisyubetu_df['平均G数'] = groupby_date_kisyubetu_df['平均G数'].astype(int)
+        groupby_date_kisyubetu_df = groupby_date_kisyubetu_df[groupby_date_kisyubetu_df['総台数'] >= 2 ]
+        groupby_date_kisyubetu_df['差枚'] = groupby_date_kisyubetu_df['差枚'].astype(int)
+        groupby_date_kisyubetu_df['平均差枚'] = groupby_date_kisyubetu_df['差枚'] / groupby_date_kisyubetu_df['総台数']
+        groupby_date_kisyubetu_df['平均差枚'] = groupby_date_kisyubetu_df['平均差枚'].astype(int)
+        groupby_date_kisyubetu_df['総台数'] = groupby_date_kisyubetu_df['総台数'].astype(str)
+        groupby_date_kisyubetu_df['勝率'] = groupby_date_kisyubetu_df['勝率'] + '/' + groupby_date_kisyubetu_df['総台数']
+        groupby_date_kisyubetu_df['勝率'] = groupby_date_kisyubetu_df['勝率'].map(lambda x : '(' + x + '台) ' + str(round(int(x.split('/')[0])/int(x.split('/')[1])*100,1))  + '%')
+        groupby_date_kisyubetu_df = groupby_date_kisyubetu_df[['日付','機種順位','機種名','勝率','平均G数','平均差枚','差枚','G数','総台数']]
+        groupby_date_kisyubetu_df = groupby_date_kisyubetu_df.sort_values('平均差枚',ascending=False)
+        groupby_date_kisyubetu_df['機種平均出率'] =(((groupby_date_kisyubetu_df['G数'] * 3) + groupby_date_kisyubetu_df['差枚']) / (groupby_date_kisyubetu_df['G数'] * 3) )*100
+        groupby_date_kisyubetu_df['機種平均出率'] = groupby_date_kisyubetu_df['機種平均出率'].map(lambda x : round(x,1))
+        groupby_date_kisyubetu_df['機種平均出率'] = groupby_date_kisyubetu_df['機種平均出率'].astype(str) + '%'
+        groupby_date_kisyubetu_df = groupby_date_kisyubetu_df.rename(columns={'G数': '合計G数','差枚': '合計差枚'})
+        groupby_date_kisyubetu_df = groupby_date_kisyubetu_df[['日付','機種名','勝率','機種平均出率','平均G数','平均差枚','合計差枚','合計G数','総台数']]
+        groupby_date_kisyubetu_df['平均G数'] = groupby_date_kisyubetu_df['平均G数'].astype(str) + 'G'
+        groupby_date_kisyubetu_df['平均差枚'] = groupby_date_kisyubetu_df['平均差枚'].astype(str) + '枚'
+        groupby_date_kisyubetu_df['合計差枚'] = groupby_date_kisyubetu_df['合計差枚'].astype(str) + '枚'
+        groupby_date_kisyubetu_df['合計G数'] = groupby_date_kisyubetu_df['合計G数'].astype(str) + 'G'
+        groupby_date_kisyubetu_df['総台数'] = groupby_date_kisyubetu_df['総台数'].astype(str) + '台'
+
+        ########
+        concat_df =  concat_df.groupby(['日付','機種名']).mean().sort_values('差枚',ascending=False)#機種毎に集計
         for column_name in ['差枚','G数','BB','RB','ART']:
             try:
                 concat_df[column_name] = concat_df[column_name].astype(int)
@@ -492,15 +536,21 @@ def clicked_tenpo_name(prefecture,tenpo_name):
 
         record = [groupby_samai_game_mean_df['差枚'].tolist(),groupby_samai_game_mean_df['G数'].tolist()]
         print(record)
-        ave_tenpo_df = pd.DataFrame(record, columns=target_day_list,index=['平均差枚','平均G数'])
+        
+        target_day_list_jp = []
+        for day in target_day_list:
+            day = day.split('-')[1].lstrip('0') + '月' + day.split('-')[2].lstrip('0') + '日'
+            target_day_list_jp.append(day)
+
+        
+        ave_tenpo_df = pd.DataFrame(record, columns=target_day_list_jp,index=['平均差枚','平均G数'])
         ave_tenpo_df[0:1]  =  ave_tenpo_df[0:1]  + '枚'
         ave_tenpo_df[1:2]  =  ave_tenpo_df[1:2]  + 'G'
 
         groupby_kisyubetu_df = pre_concat_df.groupby(['機種名']).sum()
         groupby_kisyubetu_df['総台数'] = pre_concat_df.groupby(['機種名']).size()
         groupby_kisyubetu_df = groupby_kisyubetu_df.reset_index(drop=False).reset_index().rename(columns={'index': '機種順位','ゲーム数': 'G数'})
-        groupby_kisyubetu_df['機種順位'] = groupby_kisyubetu_df['機種順位'] + 1
-        groupby_kisyubetu_df[['機種順位','機種名','総台数','G数','差枚']]
+        groupby_kisyubetu_df[['機種名','総台数','G数','差枚']]
         kisyubetu_win_daissuu_list = []
         groupby_kisyubetu_df_list = []
         for kisyu_name in groupby_kisyubetu_df['機種名']:
@@ -516,31 +566,44 @@ def clicked_tenpo_name(prefecture,tenpo_name):
         groupby_kisyubetu_df = groupby_kisyubetu_df[groupby_kisyubetu_df['総台数'] >= 2 ]
         groupby_kisyubetu_df['差枚'] = groupby_kisyubetu_df['差枚'].astype(int)
         groupby_kisyubetu_df['平均差枚'] = groupby_kisyubetu_df['差枚'] / groupby_kisyubetu_df['総台数']
-        groupby_kisyubetu_df['平均差枚'] = groupby_kisyubetu_df['平均差枚'].astype(int) 
-        groupby_kisyubetu_df['総台数'] = groupby_kisyubetu_df['総台数'].astype(str) 
+        groupby_kisyubetu_df['平均差枚'] = groupby_kisyubetu_df['平均差枚'].astype(int)
+        groupby_kisyubetu_df['総台数'] = groupby_kisyubetu_df['総台数'].astype(str)
         groupby_kisyubetu_df['勝率'] = groupby_kisyubetu_df['勝率'] + '/' + groupby_kisyubetu_df['総台数']
         groupby_kisyubetu_df['勝率'] = groupby_kisyubetu_df['勝率'].map(lambda x : '(' + x + '台) ' + str(round(int(x.split('/')[0])/int(x.split('/')[1])*100,1))  + '%')
         groupby_kisyubetu_df = groupby_kisyubetu_df[['機種順位','機種名','勝率','平均G数','平均差枚','差枚','G数','総台数']]
         groupby_kisyubetu_df = groupby_kisyubetu_df.sort_values('平均差枚',ascending=False)
-        groupby_kisyubetu_df['機種順位'] = list(range(1,len(groupby_kisyubetu_df)+1))
         groupby_kisyubetu_df['機種平均出率'] =(((groupby_kisyubetu_df['G数'] * 3) + groupby_kisyubetu_df['差枚']) / (groupby_kisyubetu_df['G数'] * 3) )*100
         groupby_kisyubetu_df['機種平均出率'] = groupby_kisyubetu_df['機種平均出率'].map(lambda x : round(x,1))
         groupby_kisyubetu_df['機種平均出率'] = groupby_kisyubetu_df['機種平均出率'].astype(str) + '%'
         groupby_kisyubetu_df = groupby_kisyubetu_df.rename(columns={'G数': '合計G数','差枚': '合計差枚'})
         groupby_kisyubetu_df = groupby_kisyubetu_df[['機種順位','機種名','勝率','機種平均出率','平均G数','平均差枚','合計差枚','合計G数','総台数']]
         groupby_kisyubetu_df['平均G数'] = groupby_kisyubetu_df['平均G数'].astype(str) + 'G'
-        groupby_kisyubetu_df['平均G数'] = groupby_kisyubetu_df['平均差枚'].astype(str) + '枚'
-        groupby_kisyubetu_df = groupby_kisyubetu_df[:5]
-        #groupby_kisyubetu_df.to_csv('csv/test_groupby_kisyubetu_df.csv',index=False)
-        concat_df = concat_df[:10]
+        groupby_kisyubetu_df['平均差枚'] = groupby_kisyubetu_df['平均差枚'].astype(str) + '枚'
+        groupby_kisyubetu_df['合計差枚'] = groupby_kisyubetu_df['合計差枚'].astype(str) + '枚'
+        groupby_kisyubetu_df['合計G数'] = groupby_kisyubetu_df['合計G数'].astype(str) + 'G'
+        groupby_kisyubetu_df['総台数'] = groupby_kisyubetu_df['総台数'].astype(int)
+        groupby_kisyubetu_df= groupby_kisyubetu_df[groupby_kisyubetu_df['総台数'] > serch_number]
+        groupby_kisyubetu_df['総台数'] = groupby_kisyubetu_df['総台数'].astype(str) + '台'
+        groupby_kisyubetu_df = groupby_kisyubetu_df.reset_index(drop=False).reset_index().rename(columns={'index': '機種順位'})
+        groupby_kisyubetu_df['お勧め順位'] = list(range(1,len(groupby_kisyubetu_df)+1))
+        groupby_kisyubetu_df['お勧め順位'] = groupby_kisyubetu_df['お勧め順位'].astype(str) + '位'
+        groupby_kisyubetu_df = groupby_kisyubetu_df[['お勧め順位','機種名','勝率','機種平均出率','平均G数','平均差枚','合計差枚','合計G数','総台数']]
+        # groupby_kisyubetu_df = groupby_kisyubetu_df.rename(columns={'機種順位': 'お勧め順位'})
+        groupby_kisyubetu_df = groupby_kisyubetu_df[:10]
+        concat_df = groupby_date_kisyubetu_df[:30]
+        print(concat_df)
+        concat_df['日付'] = concat_df['日付'].map(convert_date)
+
         return render_template('target_date_recommend_report.html',data=data,serch_number=serch_number,\
                                             user_data=user_data,\
                                             column_names=concat_df.columns.values, \
                                             row_data=list(concat_df.values.tolist()),\
                                             zip=zip,target_day_list_str=str(target_day_list),\
-                                            target_day_list=target_day_list,\
-                                            samai_list=samai_list,\
-                                            gamesuu_list=gamesuu_list,\
+                                            target_day_list=target_day_list,
+                                            
+                                            target_day_list_jp=target_day_list_jp,\
+                                            samai_list=str(samai_list),\
+                                            gamesuu_list=str(gamesuu_list),\
                                             samai_table = ave_tenpo_df.to_html(justify='justify-all',classes='tb01'),\
                                             groupby_kisyu_table = groupby_kisyubetu_df.to_html(justify='justify-all',classes='tb01',index=False))
     else:
@@ -640,22 +703,31 @@ def target_date_analytics():
         kisyubetu_master_df['勝率'] = kisyubetu_master_df['勝率'].map(lambda x : '(' + x + '台) ' + str(round(int(x.split('/')[0])/int(x.split('/')[1])*100,1))  + '%')
         kisyubetu_master_df = kisyubetu_master_df[['機種順位','機種名','勝率','平均G数','平均差枚','差枚','G数','総台数']]
         kisyubetu_master_df = kisyubetu_master_df.sort_values('平均差枚',ascending=False)
-        kisyubetu_master_df['機種順位'] = list(range(1,len(kisyubetu_master_df)+1))
+        kisyubetu_master_df['機種順位'] = list(range(1,len(kisyubetu_master_df)+1)) + '位'
         kisyubetu_master_df['機種平均出率'] =(((kisyubetu_master_df['G数'] * 3) + kisyubetu_master_df['差枚']) / (kisyubetu_master_df['G数'] * 3) )*100
         kisyubetu_master_df['機種平均出率'] = kisyubetu_master_df['機種平均出率'].map(lambda x : round(x,1))
         kisyubetu_master_df['機種平均出率'] = kisyubetu_master_df['機種平均出率'].astype(str) + '%'
-        kisyubetu_master_df = kisyubetu_master_df.rename(columns={'G数': '合計G数','差枚': '合計差枚'})
+        kisyubetu_master_df = kisyubetu_master_df.rename(columns={'機種順位':'お勧め順位','G数': '合計G数','差枚': '合計差枚'})
         kisyubetu_master_df
 
+        target_day_list_jp = []
+        for day in target_day_list:
+            day = day.split('-')[1] + '/' + day.split('-')[2] 
+            target_day_list_jp.append(day)
+        target_day_list_jp.reverse
+        
         
         return render_template('values.html',
                                             user_data=user_data,\
                                             column_names=concat_df_1.columns.values, \
                                             row_data=list(concat_df_1.values.tolist()),\
-                                            zip=zip,target_day_list=str(target_day_list))
+                                            zip=zip,target_day_list=str(target_day_list),
+                                            target_day_list_jp=str(target_day_list_jp))
     else:
         return render_template('index.html')
 
 
 if __name__ == '__main__':
     app.run(debug=True)
+    
+    
