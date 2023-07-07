@@ -531,7 +531,8 @@ def clicked_tenpo_name(prefecture,tenpo_name):
         groupby_kisyubetu_df['平均G数'] = groupby_kisyubetu_df['平均G数'].astype(str) + 'G'
         groupby_kisyubetu_df['平均G数'] = groupby_kisyubetu_df['平均差枚'].astype(str) + '枚'
         groupby_kisyubetu_df = groupby_kisyubetu_df[:5]
-        groupby_kisyubetu_df.to_csv('csv/test_groupby_kisyubetu_df.csv',index=False)
+        #groupby_kisyubetu_df.to_csv('csv/test_groupby_kisyubetu_df.csv',index=False)
+        concat_df = concat_df[:10]
         return render_template('target_date_recommend_report.html',data=data,serch_number=serch_number,\
                                             user_data=user_data,\
                                             column_names=concat_df.columns.values, \
@@ -645,11 +646,12 @@ def target_date_analytics():
         kisyubetu_master_df['機種平均出率'] = kisyubetu_master_df['機種平均出率'].astype(str) + '%'
         kisyubetu_master_df = kisyubetu_master_df.rename(columns={'G数': '合計G数','差枚': '合計差枚'})
         kisyubetu_master_df
+
         
         return render_template('values.html',
                                             user_data=user_data,\
-                                            column_names=concat_df.columns.values, \
-                                            row_data=list(concat_df.values.tolist()),\
+                                            column_names=concat_df_1.columns.values, \
+                                            row_data=list(concat_df_1.values.tolist()),\
                                             zip=zip,target_day_list=str(target_day_list))
     else:
         return render_template('index.html')
