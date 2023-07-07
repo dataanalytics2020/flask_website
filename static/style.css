@@ -10,29 +10,19 @@ body {
   }
   
 
-table {
-  width: 100%; /* テーブルの横幅を指定する */
-  }
-  table th, table td {
-  padding: 10px; /* セルの余白を指定する(上下左右) */
-  border: 1px solid #666; /* セルの境界線を実線で指定する */
-  }
-  table th {
-  background-color: #AAA; /* ボックスの背景色を指定する */
-  width: 30%; /* テーブルの見出しの横幅を指定する */
-  text-align: center; /* セル内のテキストの位置を指定（真ん中）する */
+
+.table-wrap {
+    overflow-x: scroll;
+    width: 100%;
+    min-width: 600px;
+    border-collapse: collapse;
   }
 
-  @media only screen and (max-width:480px){
-  table {
-  margin: 10px 5px; /* テーブルの余白を指定する */
-  }
-  table th, table td {
-  width: 90%; /* テーブルの見出しの横幅を指定する */
-  display: block; /* ブロックレベル要素化する */
-  border-top: 1px solid #666; /* セルの境界線を実線で指定する */
-  }
-  }
+.table-wrap th,
+.table-wrap td {
+    border: 2px solid #eee;
+    padding: 4px 8px;
+}
 
 .close{
     display: none;
@@ -215,6 +205,30 @@ h1 {
  .design16 th:nth-child(3) {
   background: #26de81;
  }
+
+ .design16 th:nth-child(4) {
+  background: #7733ff;
+ }
+
+ .design16 th:nth-child(5) {
+  background: #ff5959;
+ }
+
+ .design16 th:nth-child(6) {
+  background: #ff59d5;
+ }
+
+ .design16 th:nth-child(7) {
+  background: #ffe659;
+ }
+
+ .design16 th:nth-child(8) {
+  background: #ddffbd;
+ }
+
+ .design16 th:nth-child(9) {
+  background: #ffaaaa;
+ }
  .design16 td {
   padding: 10px;
   border: solid 1px #ffffff;
@@ -227,6 +241,30 @@ h1 {
  }
  .design16 td:nth-child(3) {
   background: #70e9ac;
+ }
+
+ .design16 td:nth-child(4) {
+  background: #b48eff;
+ }
+
+ .design16 td:nth-child(5) {
+  background: #ff5959;
+ }
+
+ .design16 td:nth-child(6) {
+  background: #ff59d5;
+ }
+
+ .design16 td:nth-child(7) {
+  background: #ffe659;
+ }
+
+ .design16 td:nth-child(8) {
+  background: #ddffbd;
+ }
+
+ .design16 td:nth-child(9) {
+  background: #ffaaaa;
  }
 
  h2 {
@@ -267,4 +305,78 @@ h3 {
   background-image: radial-gradient(#0175d5 13%, transparent 13%), radial-gradient(#0175d5 13%, transparent 13%);
   background-size: 50px 50px;
   background-position: 0 0, 25px 25px;
+}
+
+
+
+.table-wrap {
+  overflow-x: scroll;
+
+}
+
+table {
+overflow-x: scroll;
+border-collapse: collapse;
+border: 1px solid #ccc;
+line-height: 1.1;
+text-align:center;
+overflow-x: scroll;
+width: 100%;
+min-width: 300px;
+border-collapse: collapse;
+overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+}
+table th  {
+padding: 7px;
+font-weight: bold;
+vertical-align: top;
+background: #000;
+color: #fff;
+
+
+  background-image: linear-gradient(to top,
+		#cae6fa 0%,
+		#1f48ea 100%);
+}
+
+table td {
+padding: 10px;
+vertical-align: top;
+}
+table tr:nth-child(even) {
+background: #e9fcfd;
+}
+
+table > thead > tr > td,
+table > thead > tr > th,
+table > tr > td,
+table > tr > th {
+	background-color: #419acd;
+}
+
+.scroll_area{
+  width:600px;
+  overflow-x:scroll;
+}
+.scroll_area table{
+  width:900px;
+}
+
+
+.day_list {
+  padding: 0;
+  position: relative;
+  color: #2d8fdd;
+  border-left: solid 6px #2d8fdd;/*左側の線*/
+  background: #f1f8ff;/*背景色*/
+  margin-bottom: 3px;/*下のバーとの余白*/
+   line-height: 1.5;
+  padding: 0.5em;
+  list-style-type: none!important;/*ポチ消す*/
+}
+
+.canvas{
+  font-size: 5rem;
 }
