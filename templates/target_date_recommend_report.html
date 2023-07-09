@@ -120,6 +120,9 @@ var complexChartOption = {
   </div>
 </div>
 
+<div class="canvas" style="width:100%">
+  <canvas id="bubblechart" ></canvas>
+</div>
 
 <h2>日別機種別差枚順データTOP30</h2>
 <div class="scroll_area" style="width:100%;max-width:1000px;overflow-x:scroll;">
@@ -144,5 +147,89 @@ var complexChartOption = {
       </tbody>
   </div>
 </div>
+
+
+<script>
+$(function(){
+  // バブルチャートのデータ
+  var bubleChartData = {
+      datasets: [
+          {
+             // データ(1個目)
+             data: [{"x":10 ,"y":10, "r":30} ,],
+             // 色（1個目）
+             backgroundColor:[ "rgb(141,63,223)" ],
+             // ラベル
+             label: ["test1"] 
+          },
+          {
+              // データ(2個目)
+              data: [{"x":20 ,"y":20, "r":50} ,],
+              // 色（2個目）
+              backgroundColor:[ "rgb(141,29,73)"],
+              // ラベル（2個目）
+              label: ["test2"]  
+          },
+          {
+              // データ(3個目)
+              data: [{"x":30 ,"y":30, "r":70} ,],
+              // 色（3個目）
+              backgroundColor:["rgb(16,230,73)"],
+              // ラベル（3個目）
+              label: ["test3"]  
+          }
+      ]};
+
+  // オプション
+  var options = {
+        legend: {
+          labels: {
+              fontColor: '#000'
+              
+          }
+        },
+        // タイトル
+        title: {
+          display: true,
+          text: 'バブルチャートテスト'
+        },
+        // スケール
+        scales: {
+            // 平均G数
+            xAxes: [{
+                ticks: {max: 50, min: 0,stepSize: 10}
+            }],
+            // 平均差枚
+            yAxes: [{
+                ticks: {max: 50,min: 0,stepSize: 10}
+            }]
+        },
+        // tooltip
+        tooltips: {
+            callbacks: {
+               label: function(t, d) {
+                  var rLabel = d.datasets[t.datasetIndex].data[t.index].r;
+                  return d.datasets[t.datasetIndex].label + 
+                         ': (平均G数:' + t.xLabel + ', 平均差枚:' + t.yLabel + ', 総差枚:' + rLabel + ')';
+               }
+            }
+         }
+  };
+
+  // コンテキストのオブジェクト
+  var ctx = $("#bubblechart")[0].getContext("2d");
+  // バブルチャートの描画
+  Chart.defaults.global.defaultFontSize = 40;
+  Chart.defaults.global.defaultFontFamily = "'Noto Sans JP', sans-serif";
+  var bubbleChart = new Chart(ctx, 
+          {
+             type: 'bubble',
+             data: bubleChartData,
+             options: options
+          });
+  Chart.defaults.global.defaultFontFamily = "Noto Sans JP"
+});
+
+</script>
 
 {% endblock %}
