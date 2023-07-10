@@ -120,9 +120,9 @@ var complexChartOption = {
   </div>
 </div>
 
-<div class="canvas" style="width:100%">
-  <canvas id="bubblechart" ></canvas>
-</div>
+
+<canvas id="bubblechart" style="padding:40px;" ></canvas>
+
 
 <h2>日別機種別差枚順データTOP30</h2>
 <div class="scroll_area" style="width:100%;max-width:1000px;overflow-x:scroll;">
@@ -154,38 +154,25 @@ $(function(){
   // バブルチャートのデータ
   var bubleChartData = {
       datasets: [
+      {% for index, row in output_bubble_chart_df.iterrows() %}
           {
-             // データ(1個目)
-             data: [{"x":10 ,"y":10, "r":30} ,],
-             // 色（1個目）
-             backgroundColor:[ "rgb(141,63,223)" ],
-             // ラベル
-             label: ["test1"] 
+            data: [{"x":{{ row['平均G数']  }} ,"y":{{ row['平均差枚'] }}, "r":{{ row['合計差枚'] /500}}} ,],
+            // 色（2個目）
+            backgroundColor:["rgb(0,29,73)"],
+            // ラベル（2個目）
+            {% autoescape false %}
+            label: ["{{ row['機種名'] }}"]  
+            {% endautoescape %}
           },
-          {
-              // データ(2個目)
-              data: [{"x":20 ,"y":20, "r":50} ,],
-              // 色（2個目）
-              backgroundColor:[ "rgb(141,29,73)"],
-              // ラベル（2個目）
-              label: ["test2"]  
-          },
-          {
-              // データ(3個目)
-              data: [{"x":30 ,"y":30, "r":70} ,],
-              // 色（3個目）
-              backgroundColor:["rgb(16,230,73)"],
-              // ラベル（3個目）
-              label: ["test3"]  
-          }
+      {% endfor %}
       ]};
 
   // オプション
-  var options = {
+  var bubble_chart_options = {
+        pointHoverRadius: 1,
         legend: {
           labels: {
               fontColor: '#000'
-              
           }
         },
         // タイトル
@@ -197,12 +184,13 @@ $(function(){
         scales: {
             // 平均G数
             xAxes: [{
-                ticks: {max: 50, min: 0,stepSize: 10}
+                ticks: {max: 7000, min: 0,stepSize: 1000}
             }],
             // 平均差枚
             yAxes: [{
-                ticks: {max: 50,min: 0,stepSize: 10}
-            }]
+                ticks: {max: 3000,min: 0,stepSize: 1000}
+            }],
+
         },
         // tooltip
         tooltips: {
@@ -210,7 +198,7 @@ $(function(){
                label: function(t, d) {
                   var rLabel = d.datasets[t.datasetIndex].data[t.index].r;
                   return d.datasets[t.datasetIndex].label + 
-                         ': (平均G数:' + t.xLabel + ', 平均差枚:' + t.yLabel + ', 総差枚:' + rLabel + ')';
+                         ':平均G数:' + t.xLabel + 'G, 平均差枚:' + t.yLabel + '枚,\n総差枚:' + rLabel*1000 + '枚';
                }
             }
          }
@@ -219,15 +207,13 @@ $(function(){
   // コンテキストのオブジェクト
   var ctx = $("#bubblechart")[0].getContext("2d");
   // バブルチャートの描画
-  Chart.defaults.global.defaultFontSize = 40;
   Chart.defaults.global.defaultFontFamily = "'Noto Sans JP', sans-serif";
   var bubbleChart = new Chart(ctx, 
           {
              type: 'bubble',
              data: bubleChartData,
-             options: options
+             options: bubble_chart_options
           });
-  Chart.defaults.global.defaultFontFamily = "Noto Sans JP"
 });
 
 </script>

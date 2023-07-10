@@ -364,7 +364,6 @@ table > tr > th {
   width:900px;
 }
 
-
 .day_list {
   padding: 0;
   position: relative;
@@ -377,6 +376,11 @@ table > tr > th {
   list-style-type: none!important;/*ポチ消す*/
 }
 
-.canvas{
-  font-size: 5rem;
+.wrapper {
+  max-width: 900px;
+  max-height: 480px;
+}
+
+canvas {
+  user-select: none;
 }
