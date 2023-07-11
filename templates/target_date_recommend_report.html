@@ -3,7 +3,7 @@
 {% block head %}
 <title>データの出力</title>
 {% endblock %}
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.3.0/Chart.bundle.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.3.0/chart.min.js"></script>
 
 
 {% block content %}
@@ -19,7 +19,7 @@
 </div>
 <h2>分析結果(直近の{{data['target_number']}}の日 {{serch_number}}回分)</h2>
 
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.3.0/Chart.bundle.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.0/chart.min.js"></script>
 
 
 <div class="canvas" style="width:100%">
@@ -120,13 +120,173 @@ var complexChartOption = {
   </div>
 </div>
 
+<script>
+  
+  $(function(){
+    // バブルチャートのデータ
+    var bubleChartData = {
+        datasets: [
+        {% for index, row in output_bubble_chart_df.iterrows() %}
+            {
+              data: [{"x":{{ row['平均G数']  }} ,"y":{{ row['平均差枚'] }}, "r":{{ row['合計差枚'] /1000}}} ,],
+              // 色（2個目）
+              {% autoescape false %}
+                backgroundColor:["{{ row['color'] }}"],
+              {% endautoescape %}
+              // ラベル（2個目）
+              {% autoescape false %}
+                label: ["{{ row['機種名'] }}"]  
+              {% endautoescape %}
+            },
+        {% endfor %}
+        ]};
 
-<canvas id="bubblechart" style="padding:40px;" ></canvas>
+    // オプション
+    var bubble_chart_options = {
+          layout: {
+            font: {
+                size: 30,
+                weight: 'bold'
+            },
+            padding: {
+                left: 0,
+                right: 0,
+                top: 0,
+                bottom: 0
+              }
+            },
+          responsive: true,
+          maintainAspectRatio: true,
+          legend: {
+            labels: {
+                fontColor: '#000'
+            }
+          },
+          // タイトル
+          plugins: {
+            tooltip: {
+              callbacks: {
+                label: function(context)  {
+                  console.log(context);
+                  return  context.label + ' 平均差枚: ' + context.raw.y　+ '枚' + ' 平均G数: ' + context.raw.x + 'G' + ' 合計差枚: ' + context.raw.r/10 + '万枚';
+                }
+              }
+            },
+            legend: {
+              display: false,
+              labels: {
+                  // This more specific font property overrides the global property
+                  font: {
+                      size: 26
+                  }
+              }
+            },
+            // グラフタイトル
+            title: {
+              display: false,
+              text: 'お勧め機種総差枚バブルチャート',
+              align: 'center',
+              color: 'black',
+              font: {
+                size: 34
+              },
+              padding: {
+                bottom: 1  // top OR bottom のみ
+              },
+          // スケール
+            },
+          },
+              // 平均G数
+          scales: {
+              x: {
+                  ticks: {
+                    padding:10,    // 個別設定不可
+                    stepSize: 1000,
+                    font: {
+                      size: 30,
+                    },
+                    showLabelBackdrop: true,
+                    backdropPadding: { x: 1, y: 2 },
+                    major: {
+                      enabled: true,
+                    },
+                    align: 'center',
+                    crossAlign: 'center',
+                    sampleSize: 24,
+                  },
+                  title: {
+                    display: true,
+                    text: '平均G数',
+                    padding: {
+                      top: 0,    // 右側
+                      bottom: 0  // 左側
+                    },
+                    font: {
+                      size: 14,
+                      weight: 'bold'
+                    },
+                    color: '#000'},
+              },
+              y: {
+                title: {
+                  display: true,
+                  text: '平均差枚',
+                  padding: {
+                    top: 0,    // 右側
+                    bottom: 0  // 左側
+                  },
+                  font: {
+                    size: 14,
+                    weight: 'bold'
+                  },
+                  color: '#000'},
+                // 最小値・最大値
+                // 目盛ラベル
+                ticks: {
+                  padding: 15,    // 個別設定不可
+                  stepSize: 1000,
+                  font: {
+                    size: 24,
+                    weight: 'bold'
+                  },
+                  showLabelBackdrop: true,
+                  backdropPadding: { x: 4, y: 2 },
+                  major: {
+                    enabled: true,
+                  },
+                  align: 'center',
+                  crossAlign: 'center',
+                  sampleSize: 24,
+                },
+              },
+          },
+    };
+
+    // コンテキストのオブジェクト
+    
+    var ctx = $("#bubblechart")[0].getContext("2d");
+    // バブルチャートの描画
+    var bubbleChart = new Chart(ctx, 
+            {
+               type: 'bubble',
+               data: bubleChartData,
+               options: bubble_chart_options
+            });
+  });
+  Chart.defaults.global.defaultFontFamily = "sans-serif";
+  Chart.defaults.global.defaultFontSize = 28;
+
+  </script>
+ 
+<h1>お勧め機種総差枚バブルチャート</h1>
+<h2>どこに出玉の塊があるかが一目瞭然！</h2>
+<canvas id="bubblechart"></canvas>
+
 
 
 <h2>日別機種別差枚順データTOP30</h2>
 <div class="scroll_area" style="width:100%;max-width:1000px;overflow-x:scroll;">
-  <table class='design16' style="width:100%;">
+  <table class='design17' style="width:100%;">
       <thead>
         <tr>
           {% for col in column_names %}
@@ -149,73 +309,6 @@ var complexChartOption = {
 </div>
 
 
-<script>
-$(function(){
-  // バブルチャートのデータ
-  var bubleChartData = {
-      datasets: [
-      {% for index, row in output_bubble_chart_df.iterrows() %}
-          {
-            data: [{"x":{{ row['平均G数']  }} ,"y":{{ row['平均差枚'] }}, "r":{{ row['合計差枚'] /500}}} ,],
-            // 色（2個目）
-            backgroundColor:["rgb(0,29,73)"],
-            // ラベル（2個目）
-            {% autoescape false %}
-            label: ["{{ row['機種名'] }}"]  
-            {% endautoescape %}
-          },
-      {% endfor %}
-      ]};
 
-  // オプション
-  var bubble_chart_options = {
-        pointHoverRadius: 1,
-        legend: {
-          labels: {
-              fontColor: '#000'
-          }
-        },
-        // タイトル
-        title: {
-          display: true,
-          text: 'バブルチャートテスト'
-        },
-        // スケール
-        scales: {
-            // 平均G数
-            xAxes: [{
-                ticks: {max: 7000, min: 0,stepSize: 1000}
-            }],
-            // 平均差枚
-            yAxes: [{
-                ticks: {max: 3000,min: 0,stepSize: 1000}
-            }],
-
-        },
-        // tooltip
-        tooltips: {
-            callbacks: {
-               label: function(t, d) {
-                  var rLabel = d.datasets[t.datasetIndex].data[t.index].r;
-                  return d.datasets[t.datasetIndex].label + 
-                         ':平均G数:' + t.xLabel + 'G, 平均差枚:' + t.yLabel + '枚,\n総差枚:' + rLabel*1000 + '枚';
-               }
-            }
-         }
-  };
-
-  // コンテキストのオブジェクト
-  var ctx = $("#bubblechart")[0].getContext("2d");
-  // バブルチャートの描画
-  Chart.defaults.global.defaultFontFamily = "'Noto Sans JP', sans-serif";
-  var bubbleChart = new Chart(ctx, 
-          {
-             type: 'bubble',
-             data: bubleChartData,
-             options: bubble_chart_options
-          });
-});
-
-</script>
 
 {% endblock %}

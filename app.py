@@ -594,14 +594,19 @@ def clicked_tenpo_name(prefecture,tenpo_name):
         concat_df = groupby_date_kisyubetu_df[:30]
         print(concat_df)
         concat_df['日付'] = concat_df['日付'].map(convert_date)
-
+        bubble_chart_color_dict = {'purple':'rgb(255,0,255)','red':'rgb(255,0,0)','green':'rgb(0,128,0)','lime':'rgb(0,255,0)','yellow':'rgb(255,255,0)',\
+    'blue':'rgb(0,0,255)','aqua':'rgb(0,255,255)','gray':'rgb(128,128,128)','white':'rgb(192,192,192)','black':'rgb(0,0,0)'}
+        bubble_chart_color_list = list(bubble_chart_color_dict .values())
+        output_bubble_chart_df = output_bubble_chart_df[:10]
+        output_bubble_chart_df['color'] = bubble_chart_color_list
+        
         return render_template('target_date_recommend_report.html',data=data,serch_number=serch_number,\
                                             user_data=user_data,\
                                             column_names=concat_df.columns.values, \
                                             row_data=list(concat_df.values.tolist()),\
                                             zip=zip,target_day_list_str=str(target_day_list),\
                                             target_day_list=target_day_list,
-                                            output_bubble_chart_df = output_bubble_chart_df[:10],
+                                            output_bubble_chart_df = output_bubble_chart_df,
                                             target_day_list_jp=target_day_list_jp,\
                                             samai_list=str(samai_list),\
                                             gamesuu_list=str(gamesuu_list),\
