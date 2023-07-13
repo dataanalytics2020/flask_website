@@ -40,8 +40,89 @@ window.onload = function() {
 };
 </script>
 
+
 <script>
-// とある4週間分のデータログ
+  function 複数軸グラフ() {
+      var ctx = document.getElementById("複数軸グラフ表示場所").getContext('2d');
+      var myChart = new Chart(ctx, {
+          type: "bar", 
+          data: {
+              labels:  ["00年", "05年", "10年", "15年", "20年"],
+              datasets: [
+                  {
+                      label: "生産量",
+                      data: [100, 200, 250, 150, 200],
+                      backgroundColor: "rgba(255, 0, 0, 0.5)",
+                      yAxisID: "Ｙ左軸"       // option でのＹ左軸の定義に従う
+                  },
+                  {
+                      type: "line",
+                      label: "構成比",
+                      data: [ 20, 50, 10,  30,  40],
+                      borderWidth: 2,
+                      borderColor: "blue",
+                      tension: 0,
+                      fill: false,
+                      backgroundColor: "blue",
+                      yAxisID: "Ｙ右軸"       // option でのＹ右軸の定義に従う
+                  }
+              ]
+          },
+          options: {
+              responsive: false,
+              legend: {
+                 display: false
+              },                
+              scales: {
+                  yAxes: [
+                      {     //
+                         id: "Ｙ左軸",         // Ｙ左軸の定義
+                         position: "left",     //
+                         gridLines: {
+                             color: "rgba(255, 0, 0, 0.2)"
+                         },
+                         scaleLabel: {         // 軸ラベル設定
+                             display: true,          //表示設定
+                             labelString: "生産量（個）",  //ラベル
+                             fontColor: "red",
+                             fontSize: 14               //フォントサイズ
+                          },                        
+                          ticks: {
+                              fontColor: "red",             //
+                              min: 0,           //
+                              max:300,          //
+                              stepSize: 50      // 
+                          }
+                      },
+                      {
+                          id: "Ｙ右軸",         // Ｙ右軸の定義
+                          position: "right",        // 図の右側に配置
+                          gridLines: {              // 補助線の定義
+                              color: "rgba(0, 0, 255, 0.2)"
+                          },
+                          scaleLabel: {             // 右側のラベル
+                             display: true, 
+                             labelString: "構成比（％）",
+                             fontColor: "blue",
+                             fontSize: 14
+                          },                        
+                          ticks: {                  // 右側の目盛り
+                              fontColor: "blue",
+                              min: 0,
+                              max:80,
+                              stepSize: 20 
+                          }
+                      }
+                  ]
+              }
+  
+          }
+      });
+  }
+  </script>
+  
+
+<script>
 var barChartData = {
     labels: {{ target_day_list_jp|safe }},
     datasets: [
@@ -56,7 +137,7 @@ var barChartData = {
         borderWidth: 15,
         pointHoverRadius: 18,
         pointBackgroundColor: "rgba(254,97,132,0.8)",
-        
+
     },
     {
         type: 'bar',
