@@ -531,6 +531,7 @@ def clicked_tenpo_name(prefecture,tenpo_name):
         groupby_samai_game_mean_df['差枚'] = groupby_samai_game_mean_df['差枚'].astype(str)
         groupby_samai_game_mean_df['G数'] = groupby_samai_game_mean_df['G数'].astype(str)
         samai_list:str = str(groupby_samai_game_mean_df['差枚'].tolist())
+        print('samai_list',samai_list)
         gamesuu_list:str = str(groupby_samai_game_mean_df['G数'].tolist())
         concat_df = concat_df.rename(columns={'差枚': '平均差枚', 'G数': '平均G数'})
 
@@ -577,7 +578,9 @@ def clicked_tenpo_name(prefecture,tenpo_name):
         groupby_kisyubetu_df['機種平均出率'] = groupby_kisyubetu_df['機種平均出率'].astype(str) + '%'
         groupby_kisyubetu_df = groupby_kisyubetu_df.rename(columns={'G数': '合計G数','差枚': '合計差枚'})
         groupby_kisyubetu_df = groupby_kisyubetu_df[['機種順位','機種名','勝率','機種平均出率','平均G数','平均差枚','合計差枚','合計G数','総台数']]
-        output_bubble_chart_df = groupby_kisyubetu_df[['機種名','平均差枚','平均G数','合計差枚']]
+        output_bubble_chart_df = groupby_kisyubetu_df[['機種名','平均差枚','平均G数','合計差枚','総台数']]
+        output_bubble_chart_df['総台数'] = output_bubble_chart_df['総台数'].astype(int)
+        output_bubble_chart_df = output_bubble_chart_df[output_bubble_chart_df['総台数'] > serch_number]
         groupby_kisyubetu_df['平均G数'] = groupby_kisyubetu_df['平均G数'].astype(str) + 'G'
         groupby_kisyubetu_df['平均差枚'] = groupby_kisyubetu_df['平均差枚'].astype(str) + '枚'
         groupby_kisyubetu_df['合計差枚'] = groupby_kisyubetu_df['合計差枚'].astype(str) + '枚'

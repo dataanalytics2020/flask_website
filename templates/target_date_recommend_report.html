@@ -3,7 +3,6 @@
 {% block head %}
 <title>データの出力</title>
 {% endblock %}
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.3.0/chart.min.js"></script>
 
 
 {% block content %}
@@ -19,107 +18,52 @@
 </div>
 <h2>分析結果(直近の{{data['target_number']}}の日 {{serch_number}}回分)</h2>
 
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.0/chart.min.js"></script>
-
-
-<div class="canvas" style="width:100%">
-    <canvas id="canvas"></canvas>
-</div>
+<canvas id="canvas"></canvas>
 
 <script>
-
 window.onload = function() {
-    Chart.defaults.global.defaultFontSize = 30;
-    Chart.defaults.global.defaultFontFamily = "'Noto Sans JP', sans-serif";
-    ctx = document.getElementById("canvas").getContext("2d");
-    window.myBar = new Chart(ctx, {
-        type: 'bar',
-        data: barChartData,
-        options: complexChartOption
-    });
+  ctx = document.getElementById("canvas").getContext("2d");
+  window.myBar = new Chart(ctx, {
+      type: 'bar',
+      data: barChartData,
+      options: complexChartOption
+  });
 };
 </script>
 
-
 <script>
-  function 複数軸グラフ() {
-      var ctx = document.getElementById("複数軸グラフ表示場所").getContext('2d');
-      var myChart = new Chart(ctx, {
-          type: "bar", 
-          data: {
-              labels:  ["00年", "05年", "10年", "15年", "20年"],
-              datasets: [
-                  {
-                      label: "生産量",
-                      data: [100, 200, 250, 150, 200],
-                      backgroundColor: "rgba(255, 0, 0, 0.5)",
-                      yAxisID: "Ｙ左軸"       // option でのＹ左軸の定義に従う
-                  },
-                  {
-                      type: "line",
-                      label: "構成比",
-                      data: [ 20, 50, 10,  30,  40],
-                      borderWidth: 2,
-                      borderColor: "blue",
-                      tension: 0,
-                      fill: false,
-                      backgroundColor: "blue",
-                      yAxisID: "Ｙ右軸"       // option でのＹ右軸の定義に従う
-                  }
-              ]
+var complexChartOption = {
+  responsive: true,
+  scales: {
+      yAxes: [{
+          id: "y-axis-1",
+          type: "linear", 
+          position: "left",
+          ticks: {
+              max: 0.2,
+              min: 0,
+              stepSize: 0.1
           },
-          options: {
-              responsive: false,
-              legend: {
-                 display: false
-              },                
-              scales: {
-                  yAxes: [
-                      {     //
-                         id: "Ｙ左軸",         // Ｙ左軸の定義
-                         position: "left",     //
-                         gridLines: {
-                             color: "rgba(255, 0, 0, 0.2)"
-                         },
-                         scaleLabel: {         // 軸ラベル設定
-                             display: true,          //表示設定
-                             labelString: "生産量（個）",  //ラベル
-                             fontColor: "red",
-                             fontSize: 14               //フォントサイズ
-                          },                        
-                          ticks: {
-                              fontColor: "red",             //
-                              min: 0,           //
-                              max:300,          //
-                              stepSize: 50      // 
-                          }
-                      },
-                      {
-                          id: "Ｙ右軸",         // Ｙ右軸の定義
-                          position: "right",        // 図の右側に配置
-                          gridLines: {              // 補助線の定義
-                              color: "rgba(0, 0, 255, 0.2)"
-                          },
-                          scaleLabel: {             // 右側のラベル
-                             display: true, 
-                             labelString: "構成比（％）",
-                             fontColor: "blue",
-                             fontSize: 14
-                          },                        
-                          ticks: {                  // 右側の目盛り
-                              fontColor: "blue",
-                              min: 0,
-                              max:80,
-                              stepSize: 20 
-                          }
-                      }
-                  ]
-              }
-  
-          }
-      });
+      }, {
+          id: "y-axis-2",
+          type: "linear", 
+          position: "right",
+          ticks: {
+              max: 1.5,
+              min: 0,
+              stepSize: .5
+          },
+          gridLines: {
+              drawOnChartArea: false, 
+          },
+      }],
   }
-  </script>
+};
+</script>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.bundle.min.js"></script>
+
+
   
 
 <script>
@@ -187,12 +131,14 @@ var complexChartOption = {
     }
 
 };
+element.style.width = '800px';
 </script>
 
 
 
 <h1><p>{{ user_data['tenpo-name'] }}  {{data['target_number']}}のつく日<br>直近過去{{serch_number}}回で最も出ていたお勧め機種TOP10</p></h1>
-<h2>※バラエティ機種は除く</h2><h2>※合計{{serch_number}}回分の合計データです</h2>
+<h2>※バラエティ機種は除く</h2>
+<h2>※合計{{serch_number}}回分の合計データです</h2>
 <div class='design16 .table-wrap'>
   <div class="scroll_area" style="width:100%;max-width:1000px;overflow-x:scroll;">
     <table style="width:100%;">
@@ -209,7 +155,7 @@ var complexChartOption = {
         datasets: [
         {% for index, row in output_bubble_chart_df.iterrows() %}
             {
-              data: [{"x":{{ row['平均G数']  }} ,"y":{{ row['平均差枚'] }}, "r":{{ row['合計差枚'] /1000}}} ,],
+              data: [{"x":{{ row['平均G数']  }} ,"y":{{ row['平均差枚'] }}, "r":{{ row['合計差枚'] /750}}} ,],
               // 色（2個目）
               {% autoescape false %}
                 backgroundColor:["{{ row['color'] }}"],
@@ -244,38 +190,15 @@ var complexChartOption = {
             }
           },
           // タイトル
-          plugins: {
-            tooltip: {
-              callbacks: {
-                label: function(context)  {
-                  console.log(context);
-                  return  context.label + ' 平均差枚: ' + context.raw.y　+ '枚' + ' 平均G数: ' + context.raw.x + 'G' + ' 合計差枚: ' + context.raw.r/10 + '万枚';
-                }
-              }
-            },
-            legend: {
-              display: false,
-              labels: {
-                  // This more specific font property overrides the global property
-                  font: {
-                      size: 26
-                  }
-              }
-            },
-            // グラフタイトル
-            title: {
-              display: false,
-              text: 'お勧め機種総差枚バブルチャート',
-              align: 'center',
-              color: 'black',
-              font: {
-                size: 34
-              },
-              padding: {
-                bottom: 1  // top OR bottom のみ
-              },
-          // スケール
-            },
+
+          tooltips: {
+            callbacks: {
+               label: function(t, d) {
+                  var rLabel = d.datasets[t.datasetIndex].data[t.index].r;
+                  return d.datasets[t.datasetIndex].label + 
+                         ': (平均:' + t.xLabel + 'G 平均差枚:' + t.yLabel + '枚 総差枚:' + rLabel + '万枚';
+               }
+            }
           },
               // 平均G数
           scales: {
