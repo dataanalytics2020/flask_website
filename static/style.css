@@ -22,6 +22,7 @@ body {
 .table-wrap td {
     border: 2px solid #eee;
     padding: 4px 8px;
+    word-wrap: break-word;
 }
 
 .close{
@@ -450,6 +451,7 @@ h3 {
  }
  .design17 td:nth-child(2) {
   background: #fee585;
+  min-width: 10em;
  }
  .design17 td:nth-child(3) {
   background: #70e9ac;
@@ -498,7 +500,6 @@ width: 100%;
 min-width: 300px;
 border-collapse: collapse;
 overflow-x: auto;
-    white-space: nowrap;
     -webkit-overflow-scrolling: touch;
 }
 table th  {
@@ -550,14 +551,12 @@ table > tr > th {
 }
 
 .wrapper {
-  max-width: 900px;
+  max-width: 800px;
   max-height: 480px;
 }
 
 
 #bubblechart {
-  padding: 30px !important; 
-  width: 980px !important; 
-  height: 750px !important;
+  height: 800px !important;
   position: relative !important;
 }
