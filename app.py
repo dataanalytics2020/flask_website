@@ -601,6 +601,8 @@ def clicked_tenpo_name(prefecture,tenpo_name):
     'blue':'rgb(0,0,255)','aqua':'rgb(0,255,255)','gray':'rgb(128,128,128)','white':'rgb(192,192,192)','black':'rgb(0,0,0)'}
         bubble_chart_color_list = list(bubble_chart_color_dict .values())
         output_bubble_chart_df = output_bubble_chart_df[:10]
+        output_bubble_chart_df['順位'] = ['1位','2位','3位','4位','5位','6位','7位','8位','9位','10位']
+        output_bubble_chart_df['機種名'] = output_bubble_chart_df['順位'] +' ' + output_bubble_chart_df['機種名']
         output_bubble_chart_df['color'] = bubble_chart_color_list
         
         return render_template('target_date_recommend_report.html',data=data,serch_number=serch_number,\

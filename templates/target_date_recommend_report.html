@@ -184,9 +184,10 @@ element.style.width = '800px';
             },
           responsive: true,
           maintainAspectRatio: true,
-          legend: {
-            labels: {
-                fontColor: '#000'
+          legend: {             // 凡例の設定
+            position: "bottom",     // 表示位置
+            labels: {              // 凡例文字列の設定
+                fontSize: 22,
             }
           },
           // タイトル
@@ -196,7 +197,7 @@ element.style.width = '800px';
                label: function(t, d) {
                   var rLabel = d.datasets[t.datasetIndex].data[t.index].r;
                   return d.datasets[t.datasetIndex].label + 
-                         ': (平均:' + t.xLabel + 'G 平均差枚:' + t.yLabel + '枚 総差枚:' + rLabel + '万枚';
+                         ': (平均:' + t.xLabel + 'G 平均差枚:' + t.yLabel + '枚 総差枚:' + rLabel.toFixed(1) + '万枚';
                }
             }
           },
@@ -217,6 +218,9 @@ element.style.width = '800px';
                     align: 'center',
                     crossAlign: 'center',
                     sampleSize: 24,
+                    callback: function(label, index, labels) {
+                      return label + 'G';
+                  }
                   },
                   title: {
                     display: true,
@@ -230,6 +234,7 @@ element.style.width = '800px';
                       weight: 'bold'
                     },
                     color: '#000'},
+ 
               },
               y: {
                 title: {
@@ -261,7 +266,11 @@ element.style.width = '800px';
                   align: 'center',
                   crossAlign: 'center',
                   sampleSize: 24,
+                  callback: function(label, index, labels) {
+                    return label + '枚';
+                  }
                 },
+
               },
           },
     };
