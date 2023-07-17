@@ -28,6 +28,7 @@ f = open('akasaka.key', 'w')
 f.write(os.getenv('SSH_PKEY').replace('\\n', '\n'))  # 何も書き込まなくてファイルは作成されました
 f.close()
 df  = pd.read_csv(r'csv/2022-12-09_touhou.csv')
+heroku_port = int(os.environ.get("PORT", 5000))
 
 def get_driver(heroku_port):
     server = sshtunnel.SSHTunnelForwarder((os.getenv('SSH_USERNAME'), 10022), 
