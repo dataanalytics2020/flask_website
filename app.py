@@ -52,6 +52,7 @@ def get_driver():
 
     print(f"local bind port: {server.local_bind_port}")
     # データベース接続
+    print('WORDPRESS_DB_ID,DB_PASSWORD,WORDPRESS_DB_NAME'.os.getenv('WORDPRESS_DB_ID'), os.getenv('DB_PASSWORD'), os.getenv('WORDPRESS_DB_NAME'))
     cnx = mysql.connector.connect(
         host="127.0.0.1", 
         port=server.local_bind_port, 
