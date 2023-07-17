@@ -29,7 +29,7 @@ f.write(os.getenv('SSH_PKEY').replace('\\n', '\n'))  # 何も書き込まなく�
 f.close()
 df  = pd.read_csv(r'csv/2022-12-09_touhou.csv')
 
-def get_driver():
+def get_driver(heroku_port):
     server = sshtunnel.SSHTunnelForwarder((os.getenv('SSH_USERNAME'), 10022), 
         ssh_username="pachislot777", 
         ssh_private_key_password=os.getenv('SSH_PRIVATE_KEY_PASSWORD'), 
@@ -54,10 +54,12 @@ def get_driver():
     # データベース接続
     print(vars(server))
     print(dir(server))
+    
     print('WORDPRESS_DB_ID,DB_PASSWORD,WORDPRESS_DB_NAME',os.getenv('WORDPRESS_DB_ID'), os.getenv('DB_PASSWORD'), os.getenv('WORDPRESS_DB_NAME'))
+    print('heroku_port',heroku_port)
     cnx = mysql.connector.connect(
-        host="0.0.0.0", 
-        port=server.local_bind_port, 
+        host="localhost", 
+        port=heroku_port, 
         user=os.getenv('WORDPRESS_DB_ID'), 
         password=os.getenv('DB_PASSWORD'), 
         database=os.getenv('WORDPRESS_DB_NAME'), 
@@ -748,7 +750,7 @@ def target_date_analytics():
 
 
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port,debug=True)
+    heroku_port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=heroku_port,debug=True)
     
     
