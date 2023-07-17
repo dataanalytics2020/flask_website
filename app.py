@@ -57,7 +57,7 @@ def get_driver():
     print('WORDPRESS_DB_ID,DB_PASSWORD,WORDPRESS_DB_NAME',os.getenv('WORDPRESS_DB_ID'), os.getenv('DB_PASSWORD'), os.getenv('WORDPRESS_DB_NAME'))
     cnx = mysql.connector.connect(
         host="183.181.84.207", 
-        port=3306, 
+        port=server.local_bind_port, 
         user=os.getenv('WORDPRESS_DB_ID'), 
         password=os.getenv('DB_PASSWORD'), 
         database=os.getenv('WORDPRESS_DB_NAME'), 
