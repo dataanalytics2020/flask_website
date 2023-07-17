@@ -21,7 +21,7 @@ import mysql.connector
 import sshtunnel
 from sshtunnel import SSHTunnelForwarder
 import datetime
-df  = pd.read_csv(r'csv\2022-12-09_touhou.csv')
+df  = pd.read_csv(r'csv/2022-12-09_touhou.csv')
 
 def get_driver():
     server = sshtunnel.SSHTunnelForwarder((os.getenv('SSH_USERNAME'), 10022), 
@@ -285,7 +285,7 @@ def top():
             im.putalpha(100)
             # 描画準備
             draw = ImageDraw.Draw(im)
-            font = ImageFont.truetype('font\LightNovelPOPv2.otf',19)
+            font = ImageFont.truetype('font/LightNovelPOPv2.otf',19)
             if len(extract_syuzai_df_1)==1:
                 syuzai_name_text = '◆' + tenpo_name + f'\n {extract_syuzai_df_1["取材名"].values[0]}'
             else:
@@ -739,6 +739,7 @@ def target_date_analytics():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(debug=True,host="0.0.0.0", port=port)
     
     
