@@ -243,7 +243,7 @@ def top():
         print(prefecture,target_day)
         
         #イベント日,店舗名,取材名,媒体名,アナスロ店舗名
-        cursor, cnx, server = get_driver()
+        cursor, cnx, server = get_driver(heroku_port)
         sql = f"""SELECT イベント日,店舗名,取材名,媒体名,アナスロ店舗名,経度,緯度,取材ランク
                 FROM schedule as schedule2
                 left join maptable as maptable2
