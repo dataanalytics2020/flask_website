@@ -21,13 +21,19 @@ import mysql.connector
 import sshtunnel
 from sshtunnel import SSHTunnelForwarder
 import datetime
+from dotenv import load_dotenv
+load_dotenv()
+
+f = open('akasaka.key', 'w')
+f.write(os.getenv('SSH_PKEY').replace('\\n', '\n'))  # 何も書き込まなくてファイルは作成されました
+f.close()
 df  = pd.read_csv(r'csv/2022-12-09_touhou.csv')
 
 def get_driver():
     server = sshtunnel.SSHTunnelForwarder((os.getenv('SSH_USERNAME'), 10022), 
         ssh_username="pachislot777", 
         ssh_private_key_password=os.getenv('SSH_PRIVATE_KEY_PASSWORD'), 
-        ssh_pkey="sercret/akasaka.key", 
+        ssh_pkey="akasaka.key", 
         remote_bind_address=("mysql8055.xserver.jp", 3306 )) 
     # SSH接続確認
 
@@ -740,6 +746,6 @@ def target_date_analytics():
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
-    app.run(debug=True,host="0.0.0.0", port=port)
+    app.run(host="0.0.0.0", port=port,debug=True)
     
     
