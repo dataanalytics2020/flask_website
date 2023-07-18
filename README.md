@@ -37,6 +37,9 @@ pip install -r requirements.txt
 ## サーバー起動
 python app.py --reload
 
+## postgressql起動コマンド
+heroku pg:psql postgresql-cubic-54628 --app flask-mapwebsite
+
 ## Flaskのサンプルサイト
 https://github.com/topics/flask-template
 
