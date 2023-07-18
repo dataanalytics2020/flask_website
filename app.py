@@ -59,8 +59,8 @@ def get_driver(heroku_port):
     print('WORDPRESS_DB_ID,DB_PASSWORD,WORDPRESS_DB_NAME',os.getenv('WORDPRESS_DB_ID'), os.getenv('DB_PASSWORD'), os.getenv('WORDPRESS_DB_NAME'))
     print('heroku_port',heroku_port)
     cnx = mysql.connector.connect(
-        host="127.0.0.1", 
-        port=heroku_port, 
+        host="localhost", 
+        port=server.local_bind_port, 
         user=os.getenv('WORDPRESS_DB_ID'), 
         password=os.getenv('DB_PASSWORD'), 
         database=os.getenv('WORDPRESS_DB_NAME'), 
@@ -239,7 +239,7 @@ def top():
         print('user_data',user_data)
         data = {}
         prefecture = user_data['prefecture']
-        target_day = str(today.year) + '- ' + user_data['target_day'].split('月')[0] + '-' + user_data['target_day'].split('月')[1].split('日')[0]
+        target_day = str(today.year) + '-' + user_data['target_day'].split('月')[0] + '-' + user_data['target_day'].split('月')[1].split('日')[0]
         jpn_target_day = target_day.split('-')[1].lstrip('0') + '月' + target_day.split('-')[2].lstrip('0') + '日'
         print(prefecture,target_day)
         
@@ -249,7 +249,7 @@ def top():
                 FROM schedule as schedule2
                 left join maptable as maptable2
                 on schedule2.店舗名 = maptable2.アナスロ店舗名
-                        where schedule2.都道府県 = '{prefecture}' and schedule2.イベント日 IN ('2023-07-07') and schedule2.媒体名 != 'ホールナビ' 
+                        where schedule2.都道府県 = '{prefecture}' and schedule2.イベント日 IN ('{target_day}') and schedule2.媒体名 != 'ホールナビ' 
                 """
         print(sql)
         cursor.execute(sql)
