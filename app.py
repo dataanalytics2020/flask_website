@@ -61,8 +61,8 @@ def get_driver(heroku_port):
     print('WORDPRESS_DB_ID,DB_PASSWORD,WORDPRESS_DB_NAME',os.getenv('WORDPRESS_DB_ID'), os.getenv('DB_PASSWORD'), os.getenv('WORDPRESS_DB_NAME'))
     print('heroku_port',heroku_port)
     cnx = mysql.connector.connect(
-        host="localhost", 
-        port=heroku_port, #server.local_bind_port
+        host="0.0.0.0", 
+        port=server.local_bind_port, #
         user=os.getenv('WORDPRESS_DB_ID'), 
         password=os.getenv('DB_PASSWORD'), 
         database=os.getenv('WORDPRESS_DB_NAME'), 
