@@ -134,7 +134,7 @@ for prefecture in prefecture_list:
             (os.getenv('SSH_USERNAME'), 10022), 
             ssh_username="pachislot777", 
             ssh_private_key_password=os.getenv('SSH_PRIVATE_KEY_PASSWORD'), 
-            ssh_pkey=r"sercret\akasaka.key", 
+            ssh_pkey=r"akasaka2.key", 
             remote_bind_address=("mysql8055.xserver.jp", 3306 )
             ) as server:
 
