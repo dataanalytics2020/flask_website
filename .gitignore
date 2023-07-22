@@ -13,3 +13,4 @@ build/
 static/.webassets-cache/*
 .env
 akasaka.key
+akasaka2.key
