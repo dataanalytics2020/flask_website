@@ -15,7 +15,7 @@ import os
 
 import datetime
 
-
+import psycopg2
 import sshtunnel
 from sshtunnel import SSHTunnelForwarder
 
@@ -179,11 +179,12 @@ furture_syuzai_list_df_1['イベント日'] = pd.to_datetime(furture_syuzai_list
 furture_syuzai_list_df_1 = furture_syuzai_list_df_1 [['都道府県','イベント日','曜日',	'店舗名','取材名','媒体名','取材ランク']]
 furture_syuzai_list_df_1
 
+browser.quit()
 
 server = sshtunnel.SSHTunnelForwarder((os.getenv('SSH_USERNAME'), 10022), 
     ssh_username="pachislot777", 
-    ssh_private_key_password=os.getenv('SSH_PRIVATE_KEY_PASSWORD'), 
-    ssh_pkey="sercret/akasaka.key", 
+    ssh_private_key_password='akasaka2', 
+    ssh_pkey="akasaka2.key", 
     remote_bind_address=("mysql8055.xserver.jp", 3306 )) 
 # SSH接続確認
 
@@ -216,8 +217,6 @@ cnx = mysql.connector.connect(
 print(f"sql connection status: {cnx.is_connected()}")
 cursor = cnx.cursor()
 
-
-
 prefectures ="("
 prefecture_list = ['東京都','千葉県','埼玉県','神奈川県','茨城県','群馬県','栃木県']
 for i,text in enumerate(prefecture_list):
@@ -228,20 +227,7 @@ for i,text in enumerate(prefecture_list):
 prefectures += ')'
 print(prefectures)
 
-sql = f"""
-        SELECT *
-        FROM schedule
-        WHERE イベント日 BETWEEN '{yesterday}' AND '{eight_days_after}'
-        AND  都道府県 in {prefectures}
-        """
-print(sql)
-cursor.execute(sql)
-#cols = [col[0] for col in cursor.description]
-sql_syuzai_report_all_df = pd.DataFrame(cursor.fetchall(),columns = ['id','都道府県','イベント日','曜日','店舗名','取材名','媒体名','取材ランク','取得時間'])
-sql_syuzai_report_all_df.sort_values('イベント日')
-sql_syuzai_report_all_df = sql_syuzai_report_all_df[['都道府県','イベント日','曜日','店舗名','取材名','媒体名','取材ランク',]]
-
-concat_df = pd.concat([sql_syuzai_report_all_df,furture_syuzai_list_df_1])
+concat_df = furture_syuzai_list_df_1
 concat_df['イベント日'] = concat_df['イベント日'].astype(str)   
 concat_df = concat_df[~concat_df.duplicated(keep=False)]
 concat_df['取得時間'] = today_str
@@ -252,7 +238,7 @@ concat_df
 sql = f"""
         DELETE
         FROM schedule
-        WHERE イベント日 BETWEEN '{yesterday}' AND '{eight_days_after}'
+        WHERE イベント日 BETWEEN '{today_str}' AND '{eight_days_after}'
         AND  都道府県 in {prefectures}
         """
 print(sql)
@@ -262,7 +248,55 @@ cnx.commit()
 insert_data_bulk(concat_df ,cnx)
 cnx.commit()
 server.stop()
-post_line_text(f'{len(concat_df)}件の関東の取材予定追加おわり',os.getenv('LINE_TOKEN'))
+post_line_text(f'{len(concat_df)}件のxサーバーへの関東の取材予定追加おわり',os.getenv('LINE_TOKEN'))
 print(f'{len(concat_df)}件の関東の取材予定追加おわり')
 
-browser.quit()
+
+## Postgresへのデータ登録
+
+def insert_data_bulk(df,cnx):
+    insert_sql = """INSERT INTO schedule (id,都道府県, イベント日, 曜日, 店舗名, 取材名, 媒体名, 取材ランク,取得時間) values (%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
+    cur = cnx.cursor()
+    cur.executemany(insert_sql, df.values.tolist())
+    print("Insert bulk data")
+
+concat_df = furture_syuzai_list_df_1
+concat_df['イベント日'] = concat_df['イベント日'].astype(str)   
+concat_df = concat_df[~concat_df.duplicated(keep=False)]
+concat_df['取得時間'] = today_str
+concat_df['取得時間'] = concat_df['取得時間'].astype(str)   
+
+concat_df['id'] = 0
+cols = concat_df.columns.tolist()
+cols = cols[-1:] + cols[:-1]
+concat_df = concat_df[cols] 
+concat_df
+
+users = os.getenv('HEROKU_PSGR_USER')    # DBにアクセスするユーザー名(適宜変更)
+dbnames = os.getenv('HEROKU_PSGR_DATABASE')   # 接続するデータベース名(適宜変更)
+passwords = os.getenv('HEROKU_PSGR_PASSWORD')  # DBにアクセスするユーザーのパスワード(適宜変更)
+host = os.getenv('HEROKU_PSGR_HOST')     # DBが稼働しているホスト名(適宜変更)
+port = 5432        # DBが稼働しているポート番号(適宜変更)
+
+# PostgreSQLへ接続
+conn = psycopg2.connect("user=" + users +" dbname=" + dbnames +" password=" + passwords, host=host, port=port)
+
+# PostgreSQLにデータ登録
+cursor = conn.cursor()
+
+#UPSERTするために現在のデータを削除
+sql = f"""
+        DELETE
+        FROM schedule
+        WHERE イベント日 BETWEEN '{today_str}' AND '{eight_days_after}'
+        AND  都道府県 in {prefectures}
+        """
+print(sql)
+cursor.execute(sql)
+conn.commit()
+
+insert_data_bulk(concat_df ,conn)
+conn.commit()
+post_line_text(f'{len(concat_df)}件のpostgresへの関東の取材予定追加おわり',os.getenv('LINE_TOKEN'))
+print(f'{len(concat_df)}件の関東の取材予定追加おわり')
+

@@ -15,7 +15,7 @@ import mysql.connector
 import os
 
 import datetime
-
+import psycopg2
 
 from dotenv import load_dotenv
 load_dotenv(".env")
@@ -182,7 +182,6 @@ cnx = mysql.connector.connect(
                         host=os.getenv('DB_HOST'), 
                         port='3306',
                         database=os.getenv('DB_NAME'))
-
 cursor = cnx.cursor()
 
 sql = f"""
@@ -212,6 +211,51 @@ for i,row in insert_pledge_df.iterrows():
         text += f'\n{row["取材名"]}-{row["媒体名"]} '
         cursor.execute("INSERT INTO pledge VALUES (%s, %s,%s, %s, %s)", (None,row['取材名'],row['媒体名'],None,datetime.datetime.now()))
         cnx.commit()
+    else:
+        #print('追加なし')
+        pass
+
+post_line_text(text,os.getenv('LINE_TOKEN'))
+
+
+
+users = os.getenv('HEROKU_PSGR_USER')    # DBにアクセスするユーザー名(適宜変更)
+dbnames = os.getenv('HEROKU_PSGR_DATABASE')   # 接続するデータベース名(適宜変更)
+passwords = os.getenv('HEROKU_PSGR_PASSWORD')  # DBにアクセスするユーザーのパスワード(適宜変更)
+host = os.getenv('HEROKU_PSGR_HOST')     # DBが稼働しているホスト名(適宜変更)
+port = 5432        # DBが稼働しているポート番号(適宜変更)
+
+# PostgreSQLへ接続
+conn = psycopg2.connect("user=" + users +" dbname=" + dbnames +" password=" + passwords, host=host, port=port)
+
+# PostgreSQLにデータ登録
+cursor = conn.cursor()
+sql = f"""
+        SELECT *
+        FROM pledge
+        """
+print(sql)
+cursor.execute(sql)
+#cols = [col[0] for col in cursor.description]
+sql_syuzai_report_all_df = pd.DataFrame(cursor.fetchall(),columns = ['id','取材名','媒体名','公約内容','取得時間'])
+sql_syuzai_report_all_df
+insert_pledge_df = furture_syuzai_list_df_1[['取材名','媒体名']]
+insert_pledge_df = insert_pledge_df.drop_duplicates()
+insert_pledge_df['公約内容'] = None
+insert_pledge_df = insert_pledge_df.reset_index(drop=True)
+insert_pledge_df
+count = 0
+concat_pledge_df = pd.DataFrame(index=[], columns=[])
+text = f'{area_name} {count}件のpostgresへの公約レコードの追加が終了しました。'
+for i,row in insert_pledge_df.iterrows():
+    dicision_df = sql_syuzai_report_all_df[sql_syuzai_report_all_df['取材名'] == row['取材名']]
+    #display(dicision_df)
+    if len(dicision_df) == 0:
+        count += 1
+        print('追加',row['取材名'],row['媒体名'],None)
+        text += f'\n{row["取材名"]}-{row["媒体名"]} '
+        cursor.execute("INSERT INTO pledge VALUES (%s, %s,%s, %s, %s)", (0,row['取材名'],row['媒体名'],None,datetime.datetime.now()))
+        conn.commit()
     else:
         #print('追加なし')
         pass

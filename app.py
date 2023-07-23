@@ -21,6 +21,7 @@ import mysql.connector
 import sshtunnel
 from sshtunnel import SSHTunnelForwarder
 import datetime
+import psycopg2
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -32,48 +33,18 @@ with open('akasaka2.key', mode='w', encoding='utf-8', newline="\n") as f:
 df  = pd.read_csv(r'csv/2022-12-09_touhou.csv')
 heroku_port = int(os.environ.get("PORT", 5000))
 
-def get_driver(heroku_port):
-    server = sshtunnel.SSHTunnelForwarder((os.getenv('SSH_USERNAME'), 10022), 
-        ssh_username="pachislot777", 
-        ssh_private_key_password=os.getenv('SSH_PRIVATE_KEY_PASSWORD'), 
-        ssh_pkey="akasaka2.key", 
-        remote_bind_address=("mysql8055.xserver.jp", 3306 )) 
-    # SSH接続確認
+def get_driver():
+    users = os.getenv('HEROKU_PSGR_USER')    # DBにアクセスするユーザー名(適宜変更)
+    dbnames = os.getenv('HEROKU_PSGR_DATABASE')   # 接続するデータベース名(適宜変更)
+    passwords = os.getenv('HEROKU_PSGR_PASSWORD')  # DBにアクセスするユーザーのパスワード(適宜変更)
+    host = os.getenv('HEROKU_PSGR_HOST')     # DBが稼働しているホスト名(適宜変更)
+    port = 5432        # DBが稼働しているポート番号(適宜変更)
+    # PostgreSQLへ接続
+    conn = psycopg2.connect("user=" + users +" dbname=" + dbnames +" password=" + passwords, host=host, port=port)
 
-
-    # 現在時刻
-    today = datetime.datetime.now()
-    print(today)
-    #[結果] 2021-08-23 07:12:20.806648
-    # 1日後
-    today_str:str = today.strftime('%Y-%m-%d')
-    eight_days_after:str = (today + datetime.timedelta(days=8)).strftime('%Y-%m-%d')
-    yesterday:str = (today + datetime.timedelta(days=-2)).strftime('%Y-%m-%d')
-    #### Create dataframe from resultant table ####
-
-    server.start()
-
-    print(f"local bind port: {server.local_bind_port}")
-    # データベース接続
-    print(vars(server))
-    print(dir(server))
-    
-    print('WORDPRESS_DB_ID,DB_PASSWORD,WORDPRESS_DB_NAME',os.getenv('WORDPRESS_DB_ID'), os.getenv('DB_PASSWORD'), os.getenv('WORDPRESS_DB_NAME'))
-    print('heroku_port',heroku_port)
-    cnx = mysql.connector.connect(
-        host="0.0.0.0", 
-        port=server.local_bind_port, #
-        user=os.getenv('WORDPRESS_DB_ID'), 
-        password=os.getenv('DB_PASSWORD'), 
-        database=os.getenv('WORDPRESS_DB_NAME'), 
-        charset='utf8',
-        use_pure=True
-        )
-
-    # 接続確認
-    print(f"sql connection status: {cnx.is_connected()}")
-    cursor = cnx.cursor()
-    return cursor, cnx, server
+    # PostgreSQLにデータ登録
+    cursor = conn.cursor()
+    return cursor
 
 def get_concat_h_multi_resize(im_list, resample=Image.BICUBIC):
     min_height = min(im.height for im in im_list)
@@ -246,20 +217,22 @@ def top():
         print(prefecture,target_day)
         
         #イベント日,店舗名,取材名,媒体名,アナスロ店舗名
-        cursor, cnx, server = get_driver(heroku_port)
-        sql = f"""SELECT イベント日,店舗名,取材名,媒体名,アナスロ店舗名,経度,緯度,取材ランク
+        cursor = get_driver()
+        sql = f"""SELECT イベント日,店舗名,取材名,媒体名,店舗名,latitude,longitude,取材ランク
                 FROM schedule as schedule2
                 left join maptable as maptable2
-                on schedule2.店舗名 = maptable2.アナスロ店舗名
-                        where schedule2.都道府県 = '{prefecture}' and schedule2.イベント日 IN ('{target_day}') and schedule2.媒体名 != 'ホールナビ' 
+                on schedule2.店舗名 = maptable2.anaslo_name
+                where schedule2.都道府県 = '{prefecture}' and schedule2.イベント日 IN ('{target_day}') and schedule2.媒体名 != 'ホールナビ' 
                 """
         print(sql)
         cursor.execute(sql)
         cols = [col[0] for col in cursor.description]
+        print('cols',cols)
         report_df =  pd.DataFrame(cursor.fetchall(),columns = cols )
+        report_df = report_df.loc[:,~report_df.columns.duplicated()]
         report_df = report_df.drop_duplicates(keep='first')
-        report_df =report_df.dropna(subset=['経度'])
-        map_report_df = report_df[['店舗名','取材名','媒体名']].sort_values('店舗名').drop_duplicates(keep='first')
+        report_df =report_df.dropna(subset=['latitude'])
+        map_report_df = report_df[['店舗名','取材名','媒体名']].drop_duplicates(keep='first')
         
         if prefecture == '神奈川県':
             prefecture_latitude = 35.44778
@@ -282,22 +255,23 @@ def top():
         folium_map = folium.Map(location=[prefecture_latitude,prefecture_longitude], zoom_start=12)
         # 地図表示
         # マーカープロット（ポップアップ設定，色変更，アイコン変更）
-        for tenpo_name in report_df['アナスロ店舗名'].unique():
+        print(report_df)
+        for tenpo_name in report_df['店舗名'].unique():
             print(tenpo_name)
-            extract_syuzai_df_1 = report_df[report_df['アナスロ店舗名'] == tenpo_name]
+            extract_syuzai_df_1 = report_df[report_df['店舗名'] == tenpo_name]
             #display(extract_syuzai_df_1)
+            print(extract_syuzai_df_1)
             syuzai_rank_list = list(extract_syuzai_df_1['取材ランク'].unique())
             #print(syuzai_rank_list)
-            
-            latitude = extract_syuzai_df_1.iloc[0]['緯度']
-            longitude = extract_syuzai_df_1.iloc[0]['経度']
-
+            longitude = extract_syuzai_df_1.iloc[0]['longitude']
+            latitude = extract_syuzai_df_1.iloc[0]['latitude']
+            print('latitude,longitude',latitude,longitude)
             # グレースケールの画像データを作成
-            im = Image.new("L", (260, 50),color=(55))
-
-            # 画像の表示
-            im.putalpha(100)
-            # 描画準備
+            im= Image.new("L", (280, 100),color=(0))
+            im.putalpha(0)
+            im2= Image.new("L", (260, 50),color=(50))
+            im2.putalpha(128)
+            im3 = Image.open('icon.png')
             draw = ImageDraw.Draw(im)
             font = ImageFont.truetype('font/LightNovelPOPv2.otf',19)
             if len(extract_syuzai_df_1)==1:
@@ -305,8 +279,14 @@ def top():
             else:
                 syuzai_name_text = '◆' + tenpo_name + f'\n {extract_syuzai_df_1["取材名"].values[0]}、他{len(extract_syuzai_df_1)-1}件'
             #print(syuzai_name_text)
+            draw = ImageDraw.Draw(im)
+            font = ImageFont.truetype('font/LightNovelPOPv2.otf',19)
+
+            # 画像を表示
+            im.paste(im3, (-15,-14))
+            im.paste(im2, (25,48))
             draw.multiline_text(
-                (130, 0),
+                (150, 50),
                 f'{syuzai_name_text}',
                 font=font,
                 fill='white',
@@ -314,7 +294,7 @@ def top():
                 spacing=0,
                 anchor='ma'
             )
-            # 画像を表示
+
             im.save('syuzai_image.png', quality=95)
             img = 'syuzai_image.png'
             popup_df = folium.Popup(
@@ -328,7 +308,7 @@ def top():
                 popup=popup_df,
                 icon = CustomIcon(
                             icon_image = img,
-                            icon_size = (260, 50),
+                            icon_size = (280, 100),
                             icon_anchor = (0, 0),
                             #shadow_image = shadow_img, # 影効果（今回は使用せず コメントアウト
                             #shadow_size = (30, 30),
