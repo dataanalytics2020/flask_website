@@ -1,5 +1,6 @@
 ## 製作過程のスクショ一覧
-
+### 2023/07/25時点取材予定マップ表示画面
+![スクリーンショット 2023-07-25 045339](https://github.com/dataanalytics2020/flask_website/assets/117744645/21b8786e-4df0-41ac-a0bc-3ce15610a83d)
 ### 2023/07/16 時点の店舗N回分析結果画面
 ![image](https://github.com/dataanalytics2020/flask_website/assets/117744645/db0ea310-7eda-4fd7-8505-b29b9364bac0)
 ![image](https://github.com/dataanalytics2020/flask_website/assets/117744645/2366f448-bff7-4357-8529-e7068277646c)
