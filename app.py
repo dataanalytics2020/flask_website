@@ -347,6 +347,7 @@ def test():
 
 @app.route('/recommend/<prefecture>', methods=['GET', 'POST'])
 def test2(prefecture):
+    print(prefecture)
     tenpo_url_df:pd.DataFrame = pd.read_csv('csv/tenpo_url_flask_web_site.csv')
     group_name_list:list[str] ='''123,BBステーション,SAP,アビバ,グランドホール,ともえ,トワーズ,アスカ,アリーナ,ラ・カータ,DAS,Dステーション,MGM,PIA,やすだ,ウエスタン,エスパス,\
 エンジェル,オゼック,オリエンタルパサージュ,オーパス・ワン,カレイド,キコーナ,\
@@ -731,7 +732,4 @@ def target_date_analytics():
 
 
 if __name__ == '__main__':
-    heroku_port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=heroku_port,debug=True)
-    
-    
+    app.run(host="0.0.0.0",debug=True, port=int(os.environ.get('PORT', 5000)))
