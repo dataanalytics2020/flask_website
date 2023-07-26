@@ -22,6 +22,8 @@ import sshtunnel
 from sshtunnel import SSHTunnelForwarder
 import datetime
 import psycopg2
+from folium import plugins
+import branca
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -292,13 +294,14 @@ def top():
 
             im.save('syuzai_image.png', quality=95)
             img = 'syuzai_image.png'
-            popup_df = folium.Popup(
-            extract_syuzai_df_1[['店舗名','取材名','媒体名']].sort_values('店舗名').to_html(), width=1500, height=600)
+            popup_df = extract_syuzai_df_1[['店舗名','取材名','媒体名']].sort_values('店舗名').reset_index(drop=True).T
+            popup_df = popup_df.to_html(escape=False)
+            popup_data = folium.Popup(popup_df,  max_width=1500,show=True,size=(700, 300))
 
             folium.Marker(location=[latitude ,longitude],
                 tiles='https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png',
                 attr='国土地理院',
-                popup=popup_df,
+                popup=popup_data,
                 icon = CustomIcon(
                             icon_image = img,
                             icon_size = (280, 100),
@@ -308,10 +311,17 @@ def top():
                             shadow_anchor = (-4, -40),
                             popup_anchor = (3, 3))).add_to(folium_map)
             #break
-  
+        
         # set the iframe width and height
+        plugins.Fullscreen(
+                            position="topright",
+                            title="拡大する",
+                            title_cancel="元に戻す",
+                            force_separate_button=True,
+                        ).add_to(folium_map)
         folium_map.get_root().width = "1000px"
         folium_map.get_root().height = "800px"
+        
         iframe = folium_map.get_root()._repr_html_()
         
         
@@ -582,6 +592,17 @@ def clicked_tenpo_name(prefecture,tenpo_name):
         # groupby_kisyubetu_df = groupby_kisyubetu_df.rename(columns={'機種順位': 'お勧め順位'})
         groupby_kisyubetu_df = groupby_kisyubetu_df[:10]
         concat_df = groupby_date_kisyubetu_df[:30]
+        print('concat_df',concat_df)
+        display_day_df_list = []
+        
+        for target_day in target_day_list:
+            #target_day = target_day.split('-')[1].lstrip('0') + '/' + target_day.split('-')[2].lstrip('0') 
+            print('target_day',target_day)
+            extract_groupby_day_df = groupby_date_kisyubetu_df[groupby_date_kisyubetu_df['日付'] == target_day]
+            print(extract_groupby_day_df)
+            extract_groupby_day_df['日付'] = extract_groupby_day_df['日付'].map(convert_date)
+            extract_groupby_day_df = extract_groupby_day_df.to_html(justify='justify-all',index=False)
+            display_day_df_list.append(extract_groupby_day_df)
         print(concat_df)
         concat_df['日付'] = concat_df['日付'].map(convert_date)
         bubble_chart_color_dict = {'purple':'rgb(255,0,255)','red':'rgb(255,0,0)','green':'rgb(0,128,0)','lime':'rgb(0,255,0)','yellow':'rgb(255,255,0)',\
@@ -592,6 +613,8 @@ def clicked_tenpo_name(prefecture,tenpo_name):
         output_bubble_chart_df['機種名'] = output_bubble_chart_df['順位'] +' ' + output_bubble_chart_df['機種名']
         output_bubble_chart_df['color'] = bubble_chart_color_list
         
+        
+        
         return render_template('target_date_recommend_report.html',data=data,serch_number=serch_number,\
                                             user_data=user_data,\
                                             column_names=concat_df.columns.values, \
@@ -600,6 +623,7 @@ def clicked_tenpo_name(prefecture,tenpo_name):
                                             target_day_list=target_day_list,
                                             output_bubble_chart_df = output_bubble_chart_df,
                                             target_day_list_jp=target_day_list_jp,\
+                                            display_day_df_list=display_day_df_list,\
                                             samai_list=str(samai_list),\
                                             gamesuu_list=str(gamesuu_list),\
                                             samai_table = ave_tenpo_df.to_html(justify='justify-all',classes='tb01'),\
