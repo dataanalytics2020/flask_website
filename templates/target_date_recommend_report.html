@@ -299,12 +299,13 @@ element.style.width = '800px';
   </script>
  
 <h1>お勧め機種総差枚バブルチャート</h1>
-<h2>このグラフでどこに出玉の塊があるかが分かります</h2>
+<h2>このグラフでどの機種に出玉の配分があるかがすぐ分かります</h2>
 <canvas id="bubblechart"></canvas>
 
 
 
-<h2>日別機種別差枚順データTOP30</h2>
+<h1>日別機種別差枚順過去{{serch_number}}回合計データTOP30</h1>
+<h2>全台系はここから見ると👍</h2>
 <div class="scroll_area" style="width:100%;max-width:1000px;overflow-x:scroll;">
   <table class='design17' style="width:100%;">
       <thead>
@@ -325,9 +326,21 @@ element.style.width = '800px';
         </tr>
         {% endfor %}
       </tbody>
+  </table>
   </div>
 </div>
-
+<h1>日別機種別差枚順データTOP30</h1>
+<h2>日毎のデータはここでチェック</h2>
+{% for day_df , date in zip(display_day_df_list,target_day_list_jp) %}
+  <ul class = 'day_list '>{{ date }}</ul>
+  <div class='design16 .table-wrap'>
+    <div class="scroll_area" style="width:100%;max-width:1000px;overflow-x:scroll;">
+      <table style="width:100%;">
+        {{day_df|safe}}
+      </table>
+    </div>
+  </div>
+{% endfor %}
 
 
 
