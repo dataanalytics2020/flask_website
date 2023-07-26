@@ -20,6 +20,13 @@
 
 <canvas id="canvas"></canvas>
 
+
+<div class="scroll_area" style="width:100%;max-width:1000px;overflow-x:scroll;">
+  <table style="width:100%;">
+    {{samai_table|safe}}
+  </table>
+</div>
+
 <script>
 window.onload = function() {
   ctx = document.getElementById("canvas").getContext("2d");
@@ -136,7 +143,7 @@ element.style.width = '800px';
 
 
 
-<h1><p>{{ user_data['tenpo-name'] }}  {{data['target_number']}}のつく日<br>直近過去{{serch_number}}回で最も出ていたお勧め機種TOP10</p></h1>
+<h1><p>{{ user_data['tenpo-name'] }}  {{data['target_number']}}のつく日<br>直近過去{{serch_number}}回合計分で最も出ていたお勧め機種TOP10</p></h1>
 <h2>※バラエティ機種は除く</h2>
 <h2>※合計{{serch_number}}回分の合計データです</h2>
 <div class='design16 .table-wrap'>
@@ -292,7 +299,7 @@ element.style.width = '800px';
   </script>
  
 <h1>お勧め機種総差枚バブルチャート</h1>
-<h2>どこに出玉の塊があるかが一目瞭然！</h2>
+<h2>このグラフでどこに出玉の塊があるかが分かります</h2>
 <canvas id="bubblechart"></canvas>
 
 

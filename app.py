@@ -25,11 +25,6 @@ import psycopg2
 from dotenv import load_dotenv
 load_dotenv()
 
-
-with open('akasaka2.key', mode='w', encoding='utf-8', newline="\n") as f:
-    strs = os.getenv('SSH_PKEY').replace('\\n','\n')
-    f.write(strs)
-    
 df  = pd.read_csv(r'csv/2022-12-09_touhou.csv')
 heroku_port = int(os.environ.get("PORT", 5000))
 
@@ -539,8 +534,7 @@ def clicked_tenpo_name(prefecture,tenpo_name):
         
         ave_tenpo_df = pd.DataFrame(record, columns=target_day_list_jp,index=['平均差枚','平均G数'])
         ave_tenpo_df[0:1]  =  ave_tenpo_df[0:1]  + '枚'
-        ave_tenpo_df[1:2]  =  ave_tenpo_df[1:2]  + 'G'
-
+        ave_tenpo_df[1:2]  =  ave_tenpo_df[1:2]  + 'G'  
         groupby_kisyubetu_df = pre_concat_df.groupby(['機種名']).sum()
         groupby_kisyubetu_df['総台数'] = pre_concat_df.groupby(['機種名']).size()
         groupby_kisyubetu_df = groupby_kisyubetu_df.reset_index(drop=False).reset_index().rename(columns={'index': '機種順位','ゲーム数': 'G数'})
@@ -681,6 +675,8 @@ def target_date_analytics():
                 pass
 
         concat_df = concat_df.reset_index()
+        
+        print('concat_df',concat_df, flush=True)
         kisyubetu_master_df = concat_df.groupby(['機種名']).sum()
         kisyubetu_master_df['総台数'] = concat_df.groupby(['機種名']).size()
         kisyubetu_master_df = kisyubetu_master_df.reset_index(drop=False).reset_index().rename(columns={'index': '機種順位','ゲーム数': 'G数'})
@@ -732,4 +728,4 @@ def target_date_analytics():
 
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0",debug=False, port=int(os.environ.get('PORT', 5000)))
+    app.run(host="0.0.0.0",debug=True, port=int(os.environ.get('PORT', 5000)))

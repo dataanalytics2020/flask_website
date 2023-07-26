@@ -17,11 +17,18 @@
       {% endfor %}
       </select>
     </p>
+    
     <div>
       <label for="user-age">過去何回分分析するか
       <input type="number" id="n-times" name="n-times" min="1" max="5" value="3" required>回
       </label>
+    <h2>※過去合計1~5回まで分析可能です</h2>
     </div>
-    <button class="btn btn-primary">送信</button>
+    <div class="d-grid gap-2 col-6 mx-auto">
+      <button class="btn-lg btn-primary">検索</button>
+    </div>
+    <div class="d-grid gap-2 col-10 mx-auto">
+      <p>※検索に10秒ほどかかります。少しお待ちください</p>
+    </div>
   </form>
 {% endblock %}

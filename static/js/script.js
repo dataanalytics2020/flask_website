@@ -25,7 +25,10 @@ $(function(){
         if($(this).data('id')){
             var id = $(this).data('id');
             //都道府県IDに応じて別ページに飛ばす
-            window.location.href = 'https://flask-mapwebsite-39e24dd66606.herokuapp.com/recommend/' + id;
+            console.log('window.location.href')
+            console.log(window.location.href)
+            let domain_url = window.location.href.replace('/top','')
+            window.location.href =  domain_url  + '/recommend/' + id;
             prefReset();
         }
     });
