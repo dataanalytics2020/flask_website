@@ -198,7 +198,7 @@ print(path)
 # db = SQLAlchemy(app)
 
 @app.route('/', methods=['GET', 'POST'])
-def main():
+def root():
     return redirect("/top")
 
 @app.route('/top', methods=['GET', 'POST'])
