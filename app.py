@@ -341,17 +341,9 @@ def top():
             jp_str_day_list.append(jp_str_day)
         return render_template('top.html',date_list=jp_str_day_list,prefecture_list=prefecture_list)
 
-@app.route('/form', methods=['GET', 'POST'])
-def form():
-    return render_template('form.html')
-
-@app.route('/test', methods=['GET', 'POST'])
-def test():
-    print('test')
-    return render_template('test.html')
 
 @app.route('/recommend/<prefecture>', methods=['GET', 'POST'])
-def test2(prefecture):
+def select_tenpo_name(prefecture):
     print(prefecture)
     tenpo_url_df:pd.DataFrame = pd.read_csv('csv/tenpo_url_flask_web_site.csv')
     group_name_list:list[str] ='''123,BBステーション,SAP,アビバ,グランドホール,ともえ,トワーズ,アスカ,アリーナ,ラ・カータ,DAS,Dステーション,MGM,PIA,やすだ,ウエスタン,エスパス,\
@@ -612,9 +604,6 @@ def clicked_tenpo_name(prefecture,tenpo_name):
         output_bubble_chart_df['順位'] = ['1位','2位','3位','4位','5位','6位','7位','8位','9位','10位']
         output_bubble_chart_df['機種名'] = output_bubble_chart_df['順位'] +' ' + output_bubble_chart_df['機種名']
         output_bubble_chart_df['color'] = bubble_chart_color_list
-        
-        
-        
         return render_template('target_date_recommend_report.html',data=data,serch_number=serch_number,\
                                             user_data=user_data,\
                                             column_names=concat_df.columns.values, \
@@ -633,122 +622,6 @@ def clicked_tenpo_name(prefecture,tenpo_name):
         date_list = [today + timedelta(days=day) for day in range(1,9)]
         date_list = [date.strftime("%Y-%m-%d") for date in date_list]
         return render_template('target_date_recommend_schedule.html',date_list=date_list,tenpo_name=tenpo_name)
-
-@app.route('/target-date-analytics', methods=['GET', 'POST'])
-def target_date_analytics():
-    from datetime import date, timedelta
-    if request.method == 'POST':
-        user_data = request.form
-        print(user_data)
-        print(user_data['tenpo-name'],user_data['n-times'],user_data['target-date'])
-        target_day_list = []
-        number = 0
-        today = date.today()
-        target_number:int = str(user_data['target-date'][-1])
-        for i in range(int(user_data['n-times'])):
-            while True:
-                #print(str(date.today() - timedelta(days=number))[-1])
-                if target_number == str(today - timedelta(days=number))[-1]:
-                    target_day = today - timedelta(days=number)
-                    print('取得日',target_day)
-                    target_day_str = target_day.strftime('%Y-%m-%d')
-                    target_day_list.append(target_day_str)
-                    number += 1
-                    break
-                else: 
-                    pass
-                number += 1
-        target_day_list.reverse()
-        print(target_day_list)
-        concat_df_list = []
-        urls = []
-        for serch_date in target_day_list:
-            search_url = url = f"https://ana-slo.com/{serch_date}-{user_data['tenpo-name']}-data/"
-            urls.append(search_url)
-
-        with ThreadPoolExecutor(3) as executor:
-            results = list(executor.map(requests.get, urls))
-        print(results)
-
-        concat_df_list = []
-        for search_response,target_day in zip(results, target_day_list):
-            soup = BeautifulSoup(search_response.text, "lxml")
-            elem = soup.select('#all_data_block')
-            dfs = pd.read_html(str(elem))
-            for df in dfs:
-                if '機種名' in list(df.columns):
-                    tmp_df = df
-                    #tmp_df['店舗名'] = user_data['tenpo-name']
-                    tmp_df['日付'] = target_day
-                    #tmp_df['機種名'] = tmp_df['機種名'].map(removal_text)
-                    break
-            concat_df_list.append(df)
-
-        concat_df = pd.concat(concat_df_list,axis=0)
-        for column_name in ['合成確率','BB確率','RB確率','台番号','ART確率']:
-            try:
-                concat_df = concat_df.drop([column_name],axis=1)
-            except:
-                pass
-        
-        concat_df = concat_df.groupby(['日付','機種名']).mean().sort_values('差枚',ascending=False)#機種毎に集計
-        for column_name in ['差枚','G数','BB','RB','ART']:
-            try:
-                concat_df[column_name] = concat_df[column_name].astype(int)
-            except:
-                pass
-
-        concat_df = concat_df.reset_index()
-        
-        print('concat_df',concat_df, flush=True)
-        kisyubetu_master_df = concat_df.groupby(['機種名']).sum()
-        kisyubetu_master_df['総台数'] = concat_df.groupby(['機種名']).size()
-        kisyubetu_master_df = kisyubetu_master_df.reset_index(drop=False).reset_index().rename(columns={'index': '機種順位','ゲーム数': 'G数'})
-        kisyubetu_master_df['機種順位'] = kisyubetu_master_df['機種順位'] + 1
-        kisyubetu_master_df[['機種順位','機種名','総台数','G数','差枚']]
-        kisyubetu_win_daissuu_list = []
-        kisyubetu_master_df_list = []
-        for kisyu_name in kisyubetu_master_df['機種名']:
-            kisyu_df = concat_df.query('機種名 == @kisyu_name')
-            kisyubetu_master_df_list.append(kisyu_df)
-            kisyu_win_daisuu = len(kisyu_df[kisyu_df['差枚'] > 0])
-            kisyubetu_win_daissuu_list.append(kisyu_win_daisuu)
-        kisyubetu_master_df['勝率'] = kisyubetu_win_daissuu_list
-        kisyubetu_master_df['勝率'] = kisyubetu_master_df['勝率'].astype(str)
-        kisyubetu_master_df['総台数'] = kisyubetu_master_df['総台数'].astype(int)
-        kisyubetu_master_df['平均G数'] = kisyubetu_master_df['G数'] / kisyubetu_master_df['総台数']
-        kisyubetu_master_df['平均G数'] = kisyubetu_master_df['平均G数'].astype(int)
-        kisyubetu_master_df = kisyubetu_master_df[kisyubetu_master_df['総台数'] >= 2 ]
-        kisyubetu_master_df['差枚'] = kisyubetu_master_df['差枚'].astype(int)
-        kisyubetu_master_df['平均差枚'] = kisyubetu_master_df['差枚'] / kisyubetu_master_df['総台数']
-        kisyubetu_master_df['平均差枚'] = kisyubetu_master_df['平均差枚'].astype(int) 
-        kisyubetu_master_df['総台数'] = kisyubetu_master_df['総台数'].astype(str) 
-        kisyubetu_master_df['勝率'] = kisyubetu_master_df['勝率'] + '/' + kisyubetu_master_df['総台数']
-        kisyubetu_master_df['勝率'] = kisyubetu_master_df['勝率'].map(lambda x : '(' + x + '台) ' + str(round(int(x.split('/')[0])/int(x.split('/')[1])*100,1))  + '%')
-        kisyubetu_master_df = kisyubetu_master_df[['機種順位','機種名','勝率','平均G数','平均差枚','差枚','G数','総台数']]
-        kisyubetu_master_df = kisyubetu_master_df.sort_values('平均差枚',ascending=False)
-        kisyubetu_master_df['機種順位'] = list(range(1,len(kisyubetu_master_df)+1)) + '位'
-        kisyubetu_master_df['機種平均出率'] =(((kisyubetu_master_df['G数'] * 3) + kisyubetu_master_df['差枚']) / (kisyubetu_master_df['G数'] * 3) )*100
-        kisyubetu_master_df['機種平均出率'] = kisyubetu_master_df['機種平均出率'].map(lambda x : round(x,1))
-        kisyubetu_master_df['機種平均出率'] = kisyubetu_master_df['機種平均出率'].astype(str) + '%'
-        kisyubetu_master_df = kisyubetu_master_df.rename(columns={'機種順位':'お勧め順位','G数': '合計G数','差枚': '合計差枚'})
-        kisyubetu_master_df
-
-        target_day_list_jp = []
-        for day in target_day_list:
-            day = day.split('-')[1] + '/' + day.split('-')[2] 
-            target_day_list_jp.append(day)
-        target_day_list_jp.reverse
-        
-        
-        return render_template('values.html',
-                                            user_data=user_data,\
-                                            column_names=concat_df_1.columns.values, \
-                                            row_data=list(concat_df_1.values.tolist()),\
-                                            zip=zip,target_day_list=str(target_day_list),
-                                            target_day_list_jp=str(target_day_list_jp))
-    else:
-        return render_template('index.html')
 
 
 if __name__ == '__main__':
