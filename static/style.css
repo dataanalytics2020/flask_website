@@ -7,6 +7,8 @@
 body {
       font-size: 4.266vw !important;
       font-size: 16px;
+      background: linear-gradient(to right, rgb(248, 248, 248), rgb(248, 248, 248));
+      font-family: Arial, Helvetica, sans-serif;
   }
   
 
@@ -140,9 +142,30 @@ body {
 @media screen and (max-width: 480px){
   /* スマホユーザー向けにボタン文字サイズを調整 */
   .japan_map .area_btn{
-      font-size: 4vw;
+      font-size: 3vw;
   }
 }
+
+/* @media (min-width: 1400px){
+  .container,.container-xxl ,.container-xl ,.container-lg, .container-md, .container-sm {
+      max-width: 720px;
+  }}
+
+@media (min-width: 1200px){
+  .container,.container-xl ,.container-lg, .container-md, .container-sm {
+      max-width: 720px;
+  }} */
+
+
+
+
+@media screen and (min-width:768px){
+    /*　画面サイズが768px以上の場合読み込む　*/
+    .container { max-width: 720px;}
+}
+
+
+
 
 li{
   position: relative;
