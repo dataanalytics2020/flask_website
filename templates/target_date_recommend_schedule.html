@@ -4,31 +4,40 @@
 {% endblock %}
 
 {% block content %}
-<h3>明日のおすすめ店舗過去N回分析</h3>
-  <form action="" method="post">
-    <div class="input-group input-group-lg">
-      <span class="input-group-text" id="inputGroup-sizing-lg">店舗名</span>
-      <input type="text" id="tenpo-name" name="tenpo-name" value="{{tenpo_name}}" required>
-    </div>
-    <p>行きたい日付を選択：
-      <select class="form-select form-select-lg mb-2"  name="recommend-day">
-      {% for target_day in date_list %}
-      <option value="{{ target_day }}">{{ target_day }}</option>
-      {% endfor %}
-      </select>
-    </p>
-    
-    <div>
-      <label for="user-age">過去何回分分析するか
-      <input type="number" id="n-times" name="n-times" min="1" max="5" value="3" required>回
-      </label>
-    <h2>※過去合計1~5回まで分析可能です</h2>
-    </div>
-    <div class="d-grid gap-2 col-6 mx-auto">
-      <button class="btn-lg btn-primary">検索</button>
-    </div>
-    <div class="d-grid gap-2 col-10 mx-auto">
-      <p>※検索に10秒ほどかかります。少しお待ちください</p>
-    </div>
-  </form>
+<div class="container">
+  <h3>明日のおすすめ店舗過去N回分析</h3>
+    <form action="" method="post">
+      <div class="input-group input-group-lg">
+        <span class="input-group-text" id="inputGroup-sizing-lg">店舗名</span>
+        <input type="text" id="tenpo-name" name="tenpo-name" value="{{tenpo_name}}" required>
+      </div>
+      <p>行きたい日付を選択：
+        <select class="form-select form-select-lg mb-2"  name="recommend-day">
+        {% for target_day in date_list %}
+        <option value="{{ target_day }}">{{ target_day }}</option>
+        {% endfor %}
+        </select>
+      </p>
+      
+      <div>
+        <label for="user-age">過去何回分分析するか
+        <input type="number" id="n-times" name="n-times" min="1" max="5" value="3" required>回
+        </label>
+      <h2>※過去合計1~5回まで分析可能です</h2>
+      </div>
+      <div class="d-grid gap-2 col-6 mx-auto">
+        <button class="btn-lg btn-primary">検索</button>
+      </div>
+      <div class="d-grid gap-2 col-10 mx-auto">
+        <p>※検索に10秒ほどかかります。少しお待ちください</p>
+      </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block footer %}
+<footer class="footer mt-auto py-3 bg-light">
+  <div class="container">
+    <span class="text-muted">© 2023 SloMap</span>
+  </div>
 {% endblock %}

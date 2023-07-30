@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+
+
+<div class ='container'>
+    <div class="row">
+        <div class="col-12">
+            <h1 class="text-center">店舗一覧</h1>
+            <h2>都道府県:{{ prefecture }}</h2>
+                <nav id="accordion">
+                    {% for group_name_list,display_group_name,group_num in zip(web_group_name_list,display_group_name_list,group_num_list) %}
+                        {% if group_num != 0 %}
+                        <li class="menu"><span>{{ display_group_name }} {{ group_num }}店舗  <i class="fa-solid fa-angle-down fa-lg" style="color: #005eff;"></i></span>
+                            <ul class="close">
+                                {% for tenpo_name in group_name_list %}
+                                <li class="menu"><a href="{{ url_for('clicked_tenpo_name', tenpo_name=tenpo_name,prefecture=prefecture)}}">{{ tenpo_name }}<span class="fas fa-link"></span></a></li>
+                                {% endfor %}     
+                            </ul>
+                        </li>
+                        {% endif %}
+                    {% endfor %}
+                </nav>
+            </div>
+        </div>
+    </div>
+{% endblock %}
