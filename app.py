@@ -7,7 +7,6 @@ from bs4 import BeautifulSoup
 from concurrent.futures import ThreadPoolExecutor
 from flask_assets import Environment, Bundle
 from flask_bootstrap import Bootstrap
-from flask_bootstrap import Bootstrap
 import os
 from PIL  import ImageDraw , ImageFont , Image
 import unicodedata
@@ -404,7 +403,7 @@ def select_tenpo_name(prefecture):
     sorted_group_name_count_dict['その他'] = len(others_extract_tokyo_tenpo_url_df)
     group_num_list = list(sorted_group_name_count_dict.values())
     display_group_name_list = list(sorted_group_name_count_dict.keys())
-    return render_template('test2.html',prefecture=prefecture,zip=zip,web_group_name_list=web_group_name_list,group_num_list=group_num_list,display_group_name_list=display_group_name_list,)
+    return render_template('select_prefecture.html',prefecture=prefecture,zip=zip,web_group_name_list=web_group_name_list,group_num_list=group_num_list,display_group_name_list=display_group_name_list,)
 
 @app.route('/<prefecture>/<tenpo_name>', methods=['GET', 'POST'])
 def clicked_tenpo_name(prefecture,tenpo_name):
