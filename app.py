@@ -318,7 +318,7 @@ def top():
                             title_cancel="元に戻す",
                             force_separate_button=True,
                         ).add_to(folium_map)
-        folium_map.get_root().width = "1000px"
+        folium_map.get_root().width = "700px"
         folium_map.get_root().height = "800px"
         
         iframe = folium_map.get_root()._repr_html_()
