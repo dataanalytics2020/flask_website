@@ -351,7 +351,9 @@ def select_tenpo_name(prefecture):
 ジャンジャンマールゴット,デルパラ,ドキわくランド,ニラク,パラッツォ,\
 パーラースーパーセブン,パーラーフィオーレ,ヒノマル,ヒロキ,ビックディッパー,\
 ピーアーク,フルハウス,プレゴ,ベガスベガス,マルハン,ミカド,ミリオン,ガイア,\
-メッセ,国際センター,UNO,楽園,オーシャン,金時'''.split(',')
+メッセ,国際センター,UNO,楽園,オーシャン,金時,ヴィーナス,メトロ,ジュラク,アムディ,アミューズ,PLAZA,ダイナム,\
+SKIP,ザシティ/ベルシティ,ジアス,ジャパンニューアルファ,プレスト,東横フェスタ,グランドオータ,エランドール,オータ,\
+ジャムフレンドクラブ,スカイプラザ,第一プラザ,虹のある街,チャレンジャー'''.split(',')
     others_extract_tokyo_tenpo_url_df = extract_tokyo_tenpo_url_df = tenpo_url_df[tenpo_url_df['都道府県'] == prefecture]
     extract_tokyo_tenpo_url_df = extract_tokyo_tenpo_url_df.sort_values('店舗名')
 
