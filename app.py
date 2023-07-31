@@ -295,7 +295,7 @@ def top():
             img = 'syuzai_image.png'
             popup_df = extract_syuzai_df_1[['店舗名','取材名','媒体名']].sort_values('店舗名').reset_index(drop=True).T
             popup_df = popup_df.to_html(escape=False)
-            popup_data = folium.Popup(popup_df,  max_width=1500,show=True,size=(700, 300))
+            popup_data = folium.Popup(popup_df,  max_width=1500,show=False,size=(700, 300))
 
             folium.Marker(location=[latitude ,longitude],
                 tiles='https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png',
