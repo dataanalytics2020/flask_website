@@ -229,7 +229,8 @@ def top():
         report_df = report_df.drop_duplicates(keep='first')
         report_df =report_df.dropna(subset=['latitude'])
         map_report_df = report_df[['店舗名','取材名','媒体名']].drop_duplicates(keep='first')
-        
+        map_report_df = map_report_df.sort_values(['店舗名','媒体名']).reset_index(drop=True)
+
         if prefecture == '神奈川県':
             prefecture_latitude = 35.44778
             prefecture_longitude = 139.64250
