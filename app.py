@@ -248,7 +248,7 @@ def top():
         else:
             pass
 
-        folium_map = folium.Map(location=[prefecture_latitude,prefecture_longitude], zoom_start=12)
+        folium_map = folium.Map(location=[prefecture_latitude,prefecture_longitude], zoom_start=12, width="100%", height="100%")
         # 地図表示
         # マーカープロット（ポップアップ設定，色変更，アイコン変更）
         print(report_df)
@@ -318,12 +318,11 @@ def top():
                             title_cancel="元に戻す",
                             force_separate_button=True,
                         ).add_to(folium_map)
-        folium_map.get_root().width = "700px"
-        folium_map.get_root().height = "800px"
+        folium_map.get_root().width = "500px"
+        folium_map.get_root().height = "600px"
         
         iframe = folium_map.get_root()._repr_html_()
-        
-        
+ 
         return render_template('schedule_map.html',data=data,jpn_target_day=jpn_target_day,\
                                             user_data=user_data,iframe=iframe,\
                                             zip=zip,\
@@ -351,9 +350,9 @@ def select_tenpo_name(prefecture):
 ジャンジャンマールゴット,デルパラ,ドキわくランド,ニラク,パラッツォ,\
 パーラースーパーセブン,パーラーフィオーレ,ヒノマル,ヒロキ,ビックディッパー,\
 ピーアーク,フルハウス,プレゴ,ベガスベガス,マルハン,ミカド,ミリオン,ガイア,\
-メッセ,国際センター,UNO,楽園,オーシャン,金時,ヴィーナス,メトロ,ジュラク,アムディ,アミューズ,PLAZA,ダイナム,\
-SKIP,ザシティ/ベルシティ,ジアス,ジャパンニューアルファ,プレスト,東横フェスタ,グランドオータ,エランドール,オータ,\
-ジャムフレンドクラブ,スカイプラザ,第一プラザ,虹のある街,チャレンジャー'''.split(',')
+メッセ,国際センター,UNO,楽園,オーシャン,金時,ヴィーナス,メトロ,アムディ,アミューズ,PLAZA,ダイナム,\
+SKIP,ザシティ/ベルシティ,ジアス,ジャパンニューアルファ,プレスト,東横フェスタ,グランドオータ,エランドール,\
+ジャムフレンドクラブ,スカイプラザ,第一プラザ,チャレンジャー'''.split(',')
     others_extract_tokyo_tenpo_url_df = extract_tokyo_tenpo_url_df = tenpo_url_df[tenpo_url_df['都道府県'] == prefecture]
     extract_tokyo_tenpo_url_df = extract_tokyo_tenpo_url_df.sort_values('店舗名')
 
@@ -399,8 +398,12 @@ SKIP,ザシティ/ベルシティ,ジアス,ジャパンニューアルファ,�
     for group_name in sorted_group_name_count_dict:
         extract_groupname_df = extract_tokyo_tenpo_url_df[extract_tokyo_tenpo_url_df['店舗名'].str.contains(group_name)]
         for tenpo_name in extract_groupname_df['店舗名']:
-            target = extract_tokyo_tenpo_url_df.index[(extract_tokyo_tenpo_url_df['店舗名'] == tenpo_name)]
-            others_extract_tokyo_tenpo_url_df = others_extract_tokyo_tenpo_url_df.drop(target)
+            try:
+                target = extract_tokyo_tenpo_url_df.index[(extract_tokyo_tenpo_url_df['店舗名'] == tenpo_name)]
+                others_extract_tokyo_tenpo_url_df = others_extract_tokyo_tenpo_url_df.drop(target)
+            except Exception as e:
+                print('error',tenpo_name,e)
+                pass
     web_group_name_list.append(list(others_extract_tokyo_tenpo_url_df['店舗名'].unique()))
     sorted_group_name_count_dict['その他'] = len(others_extract_tokyo_tenpo_url_df)
     group_num_list = list(sorted_group_name_count_dict.values())
