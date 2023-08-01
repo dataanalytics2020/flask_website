@@ -4,41 +4,50 @@
 <title>データの出力</title>
 {% endblock %}
 
+
+
 {% block content %}
-<h1>{{data['target_number']}}のつく日の直近{{serch_number}}回分 分析結果</h1>
-<div>
-  <h2>行きたい日付： {{ user_data['recommend-day'] }}</h2>
-  <br><h2>比較した日付</h2>
-  <p>比較するデータは{{ user_data['tenpo-name'] }}の</p>
-  {% for date in target_day_list_jp %}
-  <ul class = 'day_list '>{{ date }}</ul>
-  {% endfor %}
-  <p>　の{{data['target_number']}}のつく日の直近{{serch_number}}回分データを今回集計しました。</p>
-</div>
-<h2>分析結果(直近の{{data['target_number']}}の日 {{serch_number}}回分)</h2>
+<div class ='container'>
+    <div class="row">
+      <div class="col-12">
+        <h1>{{data['target_number']}}のつく日の直近{{serch_number}}回分 分析結果</h1>
+        <div>
+          <h2>行きたい日付： {{ user_data['recommend-day'] }}</h2>
+            <br><h2>比較した日付</h2>
+          <p>比較するデータは{{ user_data['tenpo-name'] }}の</p>
+            {% for date in target_day_list_jp %}
+              <ul class = 'day_list '>{{ date }}</ul>
+            {% endfor %}
+          <p>　の{{data['target_number']}}のつく日の直近{{serch_number}}回分データを今回集計しました。</p>
+        </div>
+      </div>
+    </div>
 
-<canvas id="canvas"></canvas>
+    <div class="col-12">
+      <canvas id="canvas"></canvas>
+    </div>
 
-
-<div class="scroll_area" style="width:100%;max-width:1000px;overflow-x:scroll;">
-  <table style="width:100%;">
-    {{samai_table|safe}}
-  </table>
+    <div class="col-12">
+      <div class="scroll_area" style="width:100%;max-width:700px;overflow-x:scroll;">
+        <table style="width:100%;">
+          {{samai_table|safe}}
+        </table>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
+
 window.onload = function() {
   ctx = document.getElementById("canvas").getContext("2d");
-  window.myBar = new Chart(ctx, {
-      type: 'bar',
-      data: barChartData,
-      options: complexChartOption
-  });
-};
-</script>
-
-<script>
-var complexChartOption = {
+    window.myBar = new Chart(ctx, {
+        type: 'bar',
+        data: barChartData,
+        options: complexChartOption
+    });
+  };
+  var complexChartOption = {
   responsive: true,
   scales: {
       yAxes: [{
@@ -84,8 +93,8 @@ var barChartData = {
                 pointBackgroundColor    : "rgba(254,97,132,0.8)",
                 fill: false,
         yAxisID: "y-axis-1",// 追加
-        borderWidth: 15,
-        pointHoverRadius: 18,
+        borderWidth: 5,
+        pointHoverRadius: 8,
         pointBackgroundColor: "rgba(254,97,132,0.8)",
 
     },
@@ -110,10 +119,10 @@ var complexChartOption = {
             type: "linear", 
             position: "left",
             ticks: {
-                max: 500,
+                max: 700,
                 min: -300,
                 stepSize: 100,
-                fontSize: 34,
+                fontSize: 10,
                 callback: function(value, index, values) {
                   return '平均' + value + '枚';}
             },
@@ -125,7 +134,7 @@ var complexChartOption = {
                 max: 6000,
                 min: 1000,
                 stepSize: 1000,
-                fontSize: 34,
+                fontSize: 10,
                 callback: function(value, index, values) {
                   return  value + 'G';}
             },
@@ -137,7 +146,8 @@ var complexChartOption = {
     }
 
 };
-element.style.width = '800px';
+element.style.width = '400px';
+element.style.height = '600px';
 </script>
 
 
