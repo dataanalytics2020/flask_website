@@ -153,8 +153,8 @@ element.style.height = '600px';
 
 
 <h1><p>{{ user_data['tenpo-name'] }}  {{data['target_number']}}のつく日<br>直近過去{{serch_number}}回合計分で最も出ていたお勧め機種TOP10</p></h1>
-<h2>※バラエティ機種は除く</h2>
-<h2>※合計{{serch_number}}回分の合計データです</h2>
+<h2>※合計{{serch_number}}回分(バラは除く)</h2>
+<h2>✅お勧め機種はここで確認しよう</h2>
 <div class='design16 .table-wrap'>
   <div class="scroll_area" style="width:100%;max-width:1000px;overflow-x:scroll;">
     <table style="width:100%;">
@@ -171,7 +171,7 @@ element.style.height = '600px';
         datasets: [
         {% for index, row in output_bubble_chart_df.iterrows() %}
             {
-              data: [{"x":{{ row['平均G数']  }} ,"y":{{ row['平均差枚'] }}, "r":{{ row['合計差枚'] /750}}} ,],
+              data: [{"x":{{ row['平均G数']  }} ,"y":{{ row['平均差枚'] }}, "r":{{ row['合計差枚'] * bubble_chart_division_calc_num }}} ,],
               // 色（2個目）
               {% autoescape false %}
                 backgroundColor:["{{ row['color'] }}"],
@@ -199,7 +199,7 @@ element.style.height = '600px';
               }
             },
           responsive: true,
-          maintainAspectRatio: true,
+          maintainAspectRatio: false,
           legend: {             // 凡例の設定
             position: "bottom",     // 表示位置
             labels: {              // 凡例文字列の設定
@@ -212,8 +212,8 @@ element.style.height = '600px';
             callbacks: {
                label: function(t, d) {
                   var rLabel = d.datasets[t.datasetIndex].data[t.index].r;
-                  return d.datasets[t.datasetIndex].label + 
-                         ': (平均:' + t.xLabel + 'G 平均差枚:' + t.yLabel + '枚 総差枚:' + rLabel.toFixed(1) + '万枚';
+                  return d.datasets[t.datasetIndex].label + '\n'
+                  + '平均' + t.xLabel + 'G 平差' + t.yLabel + '枚 総差' + (rLabel /{{bubble_chart_division_calc_num}} /10000).toFixed(1) + '万枚';
                }
             }
           },
@@ -235,8 +235,7 @@ element.style.height = '600px';
                     crossAlign: 'center',
                     sampleSize: 24,
                     callback: function(label, index, labels) {
-                      return label + 'G';
-                  }
+                        return '平均' + value + '枚';}
                   },
                   title: {
                     display: true,
@@ -308,7 +307,7 @@ element.style.height = '600px';
   </script>
  
 <h1>お勧め機種総差枚バブルチャート</h1>
-<h2>このグラフでどの機種に出玉の配分があるかがすぐ分かります</h2>
+<h2>✅どの機種に大きな出玉配分があるか可視化</h2>
 <canvas id="bubblechart"></canvas>
 
 

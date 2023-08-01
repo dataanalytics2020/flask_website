@@ -23,6 +23,7 @@ import datetime
 import psycopg2
 from folium import plugins
 import branca
+import sympy
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -504,11 +505,25 @@ def clicked_tenpo_name(prefecture,tenpo_name):
         groupby_date_kisyubetu_df = groupby_date_kisyubetu_df.rename(columns={'G数': '合計G数','差枚': '合計差枚'})
         groupby_date_kisyubetu_df = groupby_date_kisyubetu_df[['日付','機種名','勝率','機種平均出率','平均G数','平均差枚','合計差枚','合計G数','総台数']]
         groupby_date_kisyubetu_df['平均G数'] = groupby_date_kisyubetu_df['平均G数'].astype(str) + 'G'
+        bubble_chart_samai_division_list = list(groupby_date_kisyubetu_df['合計差枚'][:10])
         groupby_date_kisyubetu_df['平均差枚'] = groupby_date_kisyubetu_df['平均差枚'].astype(str) + '枚'
         groupby_date_kisyubetu_df['合計差枚'] = groupby_date_kisyubetu_df['合計差枚'].astype(str) + '枚'
         groupby_date_kisyubetu_df['合計G数'] = groupby_date_kisyubetu_df['合計G数'].astype(str) + 'G'
         groupby_date_kisyubetu_df['総台数'] = groupby_date_kisyubetu_df['総台数'].astype(str) + '台'
 
+        
+        #バブルチャートの大きさが相対的な値になるように調整
+        bubble_chart_division_top10_samai_ave = sum(bubble_chart_samai_division_list) / len(bubble_chart_samai_division_list)
+        bubble_chart_division_top10_samai_ave = int(bubble_chart_division_top10_samai_ave)
+        #xを変数xとして定義
+        print(bubble_chart_division_top10_samai_ave)
+        x = sympy.Symbol('x')
+        expr =   x*bubble_chart_division_top10_samai_ave - 10
+        print(sympy.solve(expr)[0])
+        calc_str = str(sympy.solve(expr)[0])
+        bubble_chart_division_calc_num = int(calc_str.split("/")[0]) / int(calc_str.split("/")[1])
+        print(bubble_chart_division_calc_num)
+        
         ########
         concat_df =  concat_df.groupby(['日付','機種名']).mean().sort_values('差枚',ascending=False)#機種毎に集計
         for column_name in ['差枚','G数','BB','RB','ART']:
@@ -609,11 +624,12 @@ def clicked_tenpo_name(prefecture,tenpo_name):
         output_bubble_chart_df['順位'] = ['1位','2位','3位','4位','5位','6位','7位','8位','9位','10位']
         output_bubble_chart_df['機種名'] = output_bubble_chart_df['順位'] +' ' + output_bubble_chart_df['機種名']
         output_bubble_chart_df['color'] = bubble_chart_color_list
-        return render_template('target_date_recommend_report.html',data=data,serch_number=serch_number,\
+        return render_template('target_date_recommend_report.html',bubble_chart_division_calc_num = bubble_chart_division_calc_num,\
+                                            data=data,serch_number=serch_number,\
                                             user_data=user_data,\
                                             column_names=concat_df.columns.values, \
                                             row_data=list(concat_df.values.tolist()),\
-                                            zip=zip,target_day_list_str=str(target_day_list),\
+                                            zip=zip,int=int,target_day_list_str=str(target_day_list),\
                                             target_day_list=target_day_list,
                                             output_bubble_chart_df = output_bubble_chart_df,
                                             target_day_list_jp=target_day_list_jp,\
