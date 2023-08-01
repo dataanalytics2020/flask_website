@@ -93,8 +93,8 @@ var barChartData = {
                 pointBackgroundColor    : "rgba(254,97,132,0.8)",
                 fill: false,
         yAxisID: "y-axis-1",// 追加
-        borderWidth: 5,
-        pointHoverRadius: 8,
+        borderWidth: 2,
+        pointHoverRadius: 2,
         pointBackgroundColor: "rgba(254,97,132,0.8)",
 
     },
@@ -122,7 +122,7 @@ var complexChartOption = {
                 max: 700,
                 min: -300,
                 stepSize: 100,
-                fontSize: 10,
+                fontSize: 13,
                 callback: function(value, index, values) {
                   return '平均' + value + '枚';}
             },
@@ -134,7 +134,7 @@ var complexChartOption = {
                 max: 6000,
                 min: 1000,
                 stepSize: 1000,
-                fontSize: 10,
+                fontSize: 13,
                 callback: function(value, index, values) {
                   return  value + 'G';}
             },
@@ -188,7 +188,7 @@ element.style.height = '600px';
     var bubble_chart_options = {
           layout: {
             font: {
-                size: 30,
+                size: 13,
                 weight: 'bold'
             },
             padding: {
@@ -203,7 +203,7 @@ element.style.height = '600px';
           legend: {             // 凡例の設定
             position: "bottom",     // 表示位置
             labels: {              // 凡例文字列の設定
-                fontSize: 22,
+                fontSize: 13,
             }
           },
           // タイトル
@@ -224,7 +224,7 @@ element.style.height = '600px';
                     padding:10,    // 個別設定不可
                     stepSize: 1000,
                     font: {
-                      size: 30,
+                      size: 13,
                     },
                     showLabelBackdrop: true,
                     backdropPadding: { x: 1, y: 2 },
@@ -246,7 +246,7 @@ element.style.height = '600px';
                       bottom: 0  // 左側
                     },
                     font: {
-                      size: 14,
+                      size: 13,
                       weight: 'bold'
                     },
                     color: '#000'},
@@ -261,7 +261,7 @@ element.style.height = '600px';
                     bottom: 0  // 左側
                   },
                   font: {
-                    size: 14,
+                    size: 13,
                     weight: 'bold'
                   },
                   color: '#000'},
@@ -271,7 +271,7 @@ element.style.height = '600px';
                   padding: 15,    // 個別設定不可
                   stepSize: 1000,
                   font: {
-                    size: 24,
+                    size: 13,
                     weight: 'bold'
                   },
                   showLabelBackdrop: true,
@@ -303,7 +303,7 @@ element.style.height = '600px';
             });
   });
   Chart.defaults.global.defaultFontFamily = "sans-serif";
-  Chart.defaults.global.defaultFontSize = 28;
+  Chart.defaults.global.defaultFontSize = 13;
 
   </script>
  
