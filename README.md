@@ -50,3 +50,15 @@ https://lmn-blog.com/jquery_accordion01/
 参考動画 Udemy
 https://www.udemy.com/share/107ggo3@Txcm81u9m0_R8WkgeEfxzhIgmQLev8Y-bo3XeWtZf-xpGNmtwNK2BWfe94n4SryHTg==/
 
+
+
+### GitHub Issueを用いた開発手順
+https://zenn.dev/ogakuzuko/articles/2250f7c7331106
+#### ブランチの切り方
+```git checkout -b 新規ブランチ名_#issue番号```
+
+#### キリの良いところで適宜コミット
+```git commit -m "コミットメッセージ #issue番号"```
+
+#### push
+```git push origin HEAD```
