@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+
+
+
+{% block content %}
+<div class ='container'>
+    <div class="row">
+        <div class="col-12">
+            <div class = 'heatmap .table-wrap'>
+                <div class="scroll_area" style="width:100%;max-width:2000px;overflow-x:scroll;">
+                    <table id="target" class="table table-striped">
+                        <thead>
+                            <tr>
+                                {% for col in column_names %}
+                                <th>
+                                {{col}}
+                                </th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in row_data %}
+                            <tr>
+                                {% for col, row_ in zip(column_names, row) %}
+                                <td>{{row_}}</td>
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+$(document).ready(function(){
+    $("#target").DataTable({
+        "language":{url:"https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json",},
+            // 件数切替機能 無効
+        lengthChange: false,
+        // 検索機能 無効
+        searching: true,
+        // ソート機能 無効
+        ordering: true,
+        // 情報表示 無効
+        info: true,
+        // ページング機能 無効
+        paging: false,
+        // 初期表示の並び替えなし
+        order: [],
+        // 横スクロールバーを有効にする (scrollXはtrueかfalseで有効無効を切り替えます)
+        scrollX: true,
+        // 縦スクロールバーを有効にする (scrollYは200, "200px"など「最大の高さ」を指定します)
+        scrollY: 500,
+
+        columnDefs: [
+        // 2列目(0から始まるため1になっています)の幅を100pxにする
+        { targets: [0,3,6], width: 150 }
+    ]
+
+
+    });
+});
+
+
+
+$(document).ready(function() {
+    // 配列内の最大値を取得する関数
+    Array.max = function(array) {
+        return Math.max.apply(Math, array);
+    };
+    // すべての値を取得
+    var counts = $('.heatmap td:nth-child(2)').map(function() {
+        return parseInt($(this).text());
+    }).get();
+    // 最大値を返す
+    var max = 5000;
+    // 色を指定する
+    xr = 255;
+    xg = 255;
+    xb = 255;
+    
+    yr = 0;
+    yg = 0;
+    yb = 255;
+    
+    n = 100;
+    // 各データポイントをループして、その％の値を計算する
+    $('.heatmap td:nth-child(3)').each(function() {
+        var val = parseInt($(this).text());
+        console.log(val);
+        var pos = parseInt((Math.round((val / max) * 100)).toFixed(0));
+        red = parseInt((xr + ((pos * (yr - xr)) / (n - 1))).toFixed(0));
+        green = parseInt((xg + ((pos * (yg - xg)) / (n - 1))).toFixed(0));
+        blue = parseInt((xb + ((pos * (yb - xb)) / (n - 1))).toFixed(0));
+        clr = 'rgb(' + red + ',' + green + ',' + blue + ')';
+        if (val > 3000) {
+            $(this).css({
+                backgroundColor: clr,
+                color: 'white',
+                fontWeight: 'bold'
+            });
+        } else {
+            $(this).css({
+                backgroundColor: clr
+            });
+        }
+    });
+    $('.heatmap td:nth-child(6)').each(function() {
+        var val = parseInt($(this).text());
+        console.log(val);
+        var pos = parseInt((Math.round((val / max) * 100)).toFixed(0));
+        red = parseInt((xr + ((pos * (yr - xr)) / (n - 1))).toFixed(0));
+        green = parseInt((xg + ((pos * (yg - xg)) / (n - 1))).toFixed(0));
+        blue = parseInt((xb + ((pos * (yb - xb)) / (n - 1))).toFixed(0));
+        clr = 'rgb(' + red + ',' + green + ',' + blue + ')';
+        if (val > 3000) {
+            $(this).css({
+                backgroundColor: clr,
+                color: 'white',
+                fontWeight: 'bold'
+            });
+        } else {
+            $(this).css({
+                backgroundColor: clr
+            });
+        }
+    });
+    $('.heatmap td:nth-child(9)').each(function() {
+        var val = parseInt($(this).text());
+        console.log(val);
+        var pos = parseInt((Math.round((val / max) * 100)).toFixed(0));
+        red = parseInt((xr + ((pos * (yr - xr)) / (n - 1))).toFixed(0));
+        green = parseInt((xg + ((pos * (yg - xg)) / (n - 1))).toFixed(0));
+        blue = parseInt((xb + ((pos * (yb - xb)) / (n - 1))).toFixed(0));
+        clr = 'rgb(' + red + ',' + green + ',' + blue + ')';
+        if (val > 3000) {
+            $(this).css({
+                backgroundColor: clr,
+                color: 'white',
+                fontWeight: 'bold'
+            });
+        } else {
+            $(this).css({
+                backgroundColor: clr
+            });
+        }
+    });
+    
+    $('.heatmap td:nth-child(2)').each(function() {
+        var val = parseInt($(this).text());
+        console.log(val);
+        var max = 10000;
+        var pos = parseInt((Math.round((val / max) * 100)).toFixed(0));
+        red = parseInt((xr + ((pos * (yr - xr)) / (n - 1))).toFixed(0));
+        green = parseInt((xg + ((pos * (yg - xg)) / (n - 1))).toFixed(0));
+        blue = parseInt((xb + ((pos * (yb - xb)) / (n - 1))).toFixed(0));
+        clr = 'rgb(' + red + ',' + green + ',' + blue + ')';
+        if (val > 6000) {
+            $(this).css({
+                backgroundColor: clr,
+                color: 'white',
+                fontWeight: 'bold'
+            });
+        } else {
+            $(this).css({
+                backgroundColor: clr
+            });
+        }
+    });
+    $('.heatmap td:nth-child(5)').each(function() {
+        var val = parseInt($(this).text());
+        console.log(val);
+        var max = 10000;
+        var pos = parseInt((Math.round((val / max) * 100)).toFixed(0));
+        red = parseInt((xr + ((pos * (yr - xr)) / (n - 1))).toFixed(0));
+        green = parseInt((xg + ((pos * (yg - xg)) / (n - 1))).toFixed(0));
+        blue = parseInt((xb + ((pos * (yb - xb)) / (n - 1))).toFixed(0));
+        clr = 'rgb(' + red + ',' + green + ',' + blue + ')';
+        if (val > 6000) {
+            $(this).css({
+                backgroundColor: clr,
+                color: 'white',
+                fontWeight: 'bold'
+            });
+        } else {
+            $(this).css({
+                backgroundColor: clr
+            });
+        }
+    });
+    $('.heatmap td:nth-child(8)').each(function() {
+        var val = parseInt($(this).text());
+        console.log(val);
+        var max = 10000;
+        var pos = parseInt((Math.round((val / max) * 100)).toFixed(0));
+        red = parseInt((xr + ((pos * (yr - xr)) / (n - 1))).toFixed(0));
+        green = parseInt((xg + ((pos * (yg - xg)) / (n - 1))).toFixed(0));
+        blue = parseInt((xb + ((pos * (yb - xb)) / (n - 1))).toFixed(0));
+        clr = 'rgb(' + red + ',' + green + ',' + blue + ')';
+        if (val > 6000) {
+            $(this).css({
+                backgroundColor: clr,
+                color: 'white',
+                fontWeight: 'bold'
+            });
+        } else {
+            $(this).css({
+                backgroundColor: clr
+            });
+        }
+    });
+});
+</script>
+{% endblock %}
+
