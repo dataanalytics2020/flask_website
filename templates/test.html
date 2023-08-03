@@ -1,14 +1,14 @@
 {% extends "base.html" %}
 
-
-
 {% block content %}
+<h1>ヒートマップ並び傾向分析</h1>
+<h2>✅6台並びやどの場所に入るか傾向があるか確認！</h2>
 <div class ='container'>
     <div class="row">
         <div class="col-12">
             <div class = 'heatmap .table-wrap'>
                 <div class="scroll_area" style="width:100%;max-width:2000px;overflow-x:scroll;">
-                    <table id="target" class="table table-striped">
+                    <table id="heatmap_table" class="table table-striped">
                         <thead>
                             <tr>
                                 {% for col in column_names %}
@@ -35,7 +35,7 @@
 </div>
 <script>
 $(document).ready(function(){
-    $("#target").DataTable({
+    $("#heatmap_table").DataTable({
         "language":{url:"https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json",},
             // 件数切替機能 無効
         lengthChange: false,
@@ -75,83 +75,234 @@ $(document).ready(function() {
         return parseInt($(this).text());
     }).get();
     // 最大値を返す
-    var max = 5000;
+    var plus_max = 5000;
+    var minus_max =-3000;
     // 色を指定する
     xr = 255;
     xg = 255;
     xb = 255;
     
-    yr = 0;
-    yg = 0;
-    yb = 255;
+    minnus_yr = 255;
+    minnus_yg = 0;
+    minnus_yb = 0;
+
+    plus_yr = 0;
+    plus_yg = 0;
+    plus_yb = 255;
+
+    yr = 255;
+    yg = 255;
+    yb = 0;
     
     n = 100;
     // 各データポイントをループして、その％の値を計算する
     $('.heatmap td:nth-child(3)').each(function() {
         var val = parseInt($(this).text());
         console.log(val);
-        var pos = parseInt((Math.round((val / max) * 100)).toFixed(0));
-        red = parseInt((xr + ((pos * (yr - xr)) / (n - 1))).toFixed(0));
-        green = parseInt((xg + ((pos * (yg - xg)) / (n - 1))).toFixed(0));
-        blue = parseInt((xb + ((pos * (yb - xb)) / (n - 1))).toFixed(0));
-        clr = 'rgb(' + red + ',' + green + ',' + blue + ')';
-        if (val > 3000) {
-            $(this).css({
-                backgroundColor: clr,
-                color: 'white',
-                fontWeight: 'bold'
-            });
+        if (val > 0) {
+            var pos = parseInt((Math.round((val / plus_max) * 100)).toFixed(0));
+            red = parseInt((xr + ((pos * (plus_yr - xr)) / (n - 1))).toFixed(0));
+            green = parseInt((xg + ((pos * (plus_yg - xg)) / (n - 1))).toFixed(0));
+            blue = parseInt((xb + ((pos * (plus_yb - xb)) / (n - 1))).toFixed(0));
+            clr = 'rgb(' + red + ',' + green + ',' + blue + ')';
+            if (val > 3000) {
+                $(this).css({
+                    backgroundColor: clr,
+                    color: 'white',
+                    fontWeight: 'bold'
+                });
+            } else {
+                $(this).css({
+                    backgroundColor: clr
+                });
+            }
         } else {
-            $(this).css({
-                backgroundColor: clr
-            });
+            var pos = parseInt((val / minus_max) * 100).toFixed(0);
+            green = parseInt((minnus_yr + ((pos * (0 - minnus_yr)) / 100))).toFixed(0);
+            blue = parseInt((minnus_yr + ((pos * (0 - minnus_yr)) / 100))).toFixed(0);
+            clr = 'rgb(' + 255 + ',' + green + ',' + blue + ')';
+            console.log(clr);
+            if (val < -3000) {
+                $(this).css({
+                    backgroundColor: clr,
+                    color: 'white',
+                    fontWeight: 'bold'
+                });
+            } else {
+                $(this).css({
+                    backgroundColor: clr
+                });
+            }
         }
     });
     $('.heatmap td:nth-child(6)').each(function() {
         var val = parseInt($(this).text());
         console.log(val);
-        var pos = parseInt((Math.round((val / max) * 100)).toFixed(0));
-        red = parseInt((xr + ((pos * (yr - xr)) / (n - 1))).toFixed(0));
-        green = parseInt((xg + ((pos * (yg - xg)) / (n - 1))).toFixed(0));
-        blue = parseInt((xb + ((pos * (yb - xb)) / (n - 1))).toFixed(0));
-        clr = 'rgb(' + red + ',' + green + ',' + blue + ')';
-        if (val > 3000) {
-            $(this).css({
-                backgroundColor: clr,
-                color: 'white',
-                fontWeight: 'bold'
-            });
+        if (val > 0) {
+            var pos = parseInt((Math.round((val / plus_max) * 100)).toFixed(0));
+            red = parseInt((xr + ((pos * (plus_yr - xr)) / (n - 1))).toFixed(0));
+            green = parseInt((xg + ((pos * (plus_yg - xg)) / (n - 1))).toFixed(0));
+            blue = parseInt((xb + ((pos * (plus_yb - xb)) / (n - 1))).toFixed(0));
+            clr = 'rgb(' + red + ',' + green + ',' + blue + ')';
+            if (val > 3000) {
+                $(this).css({
+                    backgroundColor: clr,
+                    color: 'white',
+                    fontWeight: 'bold'
+                });
+            } else {
+                $(this).css({
+                    backgroundColor: clr
+                });
+            }
         } else {
-            $(this).css({
-                backgroundColor: clr
-            });
+            var pos = parseInt((val / minus_max) * 100).toFixed(0);
+            green = parseInt((minnus_yr + ((pos * (0 - minnus_yr)) / 100))).toFixed(0);
+            blue = parseInt((minnus_yr + ((pos * (0 - minnus_yr)) / 100))).toFixed(0);
+            clr = 'rgb(' + 255 + ',' + green + ',' + blue + ')';
+            console.log(clr);
+            if (val < -3000) {
+                $(this).css({
+                    backgroundColor: clr,
+                    color: 'white',
+                    fontWeight: 'bold'
+                });
+            } else {
+                $(this).css({
+                    backgroundColor: clr
+                });
+            }
         }
     });
     $('.heatmap td:nth-child(9)').each(function() {
         var val = parseInt($(this).text());
         console.log(val);
-        var pos = parseInt((Math.round((val / max) * 100)).toFixed(0));
-        red = parseInt((xr + ((pos * (yr - xr)) / (n - 1))).toFixed(0));
-        green = parseInt((xg + ((pos * (yg - xg)) / (n - 1))).toFixed(0));
-        blue = parseInt((xb + ((pos * (yb - xb)) / (n - 1))).toFixed(0));
-        clr = 'rgb(' + red + ',' + green + ',' + blue + ')';
-        if (val > 3000) {
-            $(this).css({
-                backgroundColor: clr,
-                color: 'white',
-                fontWeight: 'bold'
-            });
+        if (val > 0) {
+            var pos = parseInt((Math.round((val / plus_max) * 100)).toFixed(0));
+            red = parseInt((xr + ((pos * (plus_yr - xr)) / (n - 1))).toFixed(0));
+            green = parseInt((xg + ((pos * (plus_yg - xg)) / (n - 1))).toFixed(0));
+            blue = parseInt((xb + ((pos * (plus_yb - xb)) / (n - 1))).toFixed(0));
+            clr = 'rgb(' + red + ',' + green + ',' + blue + ')';
+            if (val > 3000) {
+                $(this).css({
+                    backgroundColor: clr,
+                    color: 'white',
+                    fontWeight: 'bold'
+                });
+            } else {
+                $(this).css({
+                    backgroundColor: clr
+                });
+            }
         } else {
-            $(this).css({
-                backgroundColor: clr
-            });
+            var pos = parseInt((val / minus_max) * 100).toFixed(0);
+            green = parseInt((minnus_yr + ((pos * (0 - minnus_yr)) / 100))).toFixed(0);
+            blue = parseInt((minnus_yr + ((pos * (0 - minnus_yr)) / 100))).toFixed(0);
+            clr = 'rgb(' + 255 + ',' + green + ',' + blue + ')';
+            console.log(clr);
+            if (val < -3000) {
+                $(this).css({
+                    backgroundColor: clr,
+                    color: 'white',
+                    fontWeight: 'bold'
+                });
+            } else {
+                $(this).css({
+                    backgroundColor: clr
+                });
+            }
         }
     });
-    
+    $('.heatmap td:nth-child(12)').each(function() {
+        var val = parseInt($(this).text());
+        console.log(val);
+        if (val > 0) {
+            var pos = parseInt((Math.round((val / plus_max) * 100)).toFixed(0));
+            red = parseInt((xr + ((pos * (plus_yr - xr)) / (n - 1))).toFixed(0));
+            green = parseInt((xg + ((pos * (plus_yg - xg)) / (n - 1))).toFixed(0));
+            blue = parseInt((xb + ((pos * (plus_yb - xb)) / (n - 1))).toFixed(0));
+            clr = 'rgb(' + red + ',' + green + ',' + blue + ')';
+            if (val > 3000) {
+                $(this).css({
+                    backgroundColor: clr,
+                    color: 'white',
+                    fontWeight: 'bold'
+                });
+            } else {
+                $(this).css({
+                    backgroundColor: clr
+                });
+            }
+        } else {
+            var pos = parseInt((val / minus_max) * 100).toFixed(0);
+            green = parseInt((minnus_yr + ((pos * (0 - minnus_yr)) / 100))).toFixed(0);
+            blue = parseInt((minnus_yr + ((pos * (0 - minnus_yr)) / 100))).toFixed(0);
+            clr = 'rgb(' + 255 + ',' + green + ',' + blue + ')';
+            console.log(clr);
+            if (val < -3000) {
+                $(this).css({
+                    backgroundColor: clr,
+                    color: 'white',
+                    fontWeight: 'bold'
+                });
+            } else {
+                $(this).css({
+                    backgroundColor: clr
+                });
+            }
+        }
+    });
+    $('.heatmap td:nth-child(15)').each(function() {
+        var val = parseInt($(this).text());
+        console.log(val);
+        if (val > 0) {
+            var pos = parseInt((Math.round((val / plus_max) * 100)).toFixed(0));
+            red = parseInt((xr + ((pos * (plus_yr - xr)) / (n - 1))).toFixed(0));
+            green = parseInt((xg + ((pos * (plus_yg - xg)) / (n - 1))).toFixed(0));
+            blue = parseInt((xb + ((pos * (plus_yb - xb)) / (n - 1))).toFixed(0));
+            clr = 'rgb(' + red + ',' + green + ',' + blue + ')';
+            if (val > 3000) {
+                $(this).css({
+                    backgroundColor: clr,
+                    color: 'white',
+                    fontWeight: 'bold'
+                });
+            } else {
+                $(this).css({
+                    backgroundColor: clr
+                });
+            }
+        } else {
+            var pos = parseInt((val / minus_max) * 100).toFixed(0);
+            green = parseInt((minnus_yr + ((pos * (0 - minnus_yr)) / 100))).toFixed(0);
+            blue = parseInt((minnus_yr + ((pos * (0 - minnus_yr)) / 100))).toFixed(0);
+            clr = 'rgb(' + 255 + ',' + green + ',' + blue + ')';
+            console.log(clr);
+            if (val < -3000) {
+                $(this).css({
+                    backgroundColor: clr,
+                    color: 'white',
+                    fontWeight: 'bold'
+                });
+            } else {
+                $(this).css({
+                    backgroundColor: clr
+                });
+            }
+        }
+    });
+    xr = 255;
+    xg = 255;
+    xb = 255;
+
+    yr = 0;
+    yg = 0;
+    yb = 255;
+
     $('.heatmap td:nth-child(2)').each(function() {
         var val = parseInt($(this).text());
         console.log(val);
-        var max = 10000;
+        var max = 8000;
         var pos = parseInt((Math.round((val / max) * 100)).toFixed(0));
         red = parseInt((xr + ((pos * (yr - xr)) / (n - 1))).toFixed(0));
         green = parseInt((xg + ((pos * (yg - xg)) / (n - 1))).toFixed(0));
@@ -193,7 +344,49 @@ $(document).ready(function() {
     $('.heatmap td:nth-child(8)').each(function() {
         var val = parseInt($(this).text());
         console.log(val);
-        var max = 10000;
+        var max = 8000;
+        var pos = parseInt((Math.round((val / max) * 100)).toFixed(0));
+        red = parseInt((xr + ((pos * (yr - xr)) / (n - 1))).toFixed(0));
+        green = parseInt((xg + ((pos * (yg - xg)) / (n - 1))).toFixed(0));
+        blue = parseInt((xb + ((pos * (yb - xb)) / (n - 1))).toFixed(0));
+        clr = 'rgb(' + red + ',' + green + ',' + blue + ')';
+        if (val > 6000) {
+            $(this).css({
+                backgroundColor: clr,
+                color: 'white',
+                fontWeight: 'bold'
+            });
+        } else {
+            $(this).css({
+                backgroundColor: clr
+            });
+        }
+    });
+    $('.heatmap td:nth-child(11)').each(function() {
+        var val = parseInt($(this).text());
+        console.log(val);
+        var max = 8000;
+        var pos = parseInt((Math.round((val / max) * 100)).toFixed(0));
+        red = parseInt((xr + ((pos * (yr - xr)) / (n - 1))).toFixed(0));
+        green = parseInt((xg + ((pos * (yg - xg)) / (n - 1))).toFixed(0));
+        blue = parseInt((xb + ((pos * (yb - xb)) / (n - 1))).toFixed(0));
+        clr = 'rgb(' + red + ',' + green + ',' + blue + ')';
+        if (val > 6000) {
+            $(this).css({
+                backgroundColor: clr,
+                color: 'white',
+                fontWeight: 'bold'
+            });
+        } else {
+            $(this).css({
+                backgroundColor: clr
+            });
+        }
+    });
+    $('.heatmap td:nth-child(14)').each(function() {
+        var val = parseInt($(this).text());
+        console.log(val);
+        var max = 8000;
         var pos = parseInt((Math.round((val / max) * 100)).toFixed(0));
         red = parseInt((xr + ((pos * (yr - xr)) / (n - 1))).toFixed(0));
         green = parseInt((xg + ((pos * (yg - xg)) / (n - 1))).toFixed(0));

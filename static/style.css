@@ -648,40 +648,22 @@ table > tr > th {
  .heatmap td:nth-child(1) {
   background: #fec598;
  }
- .heatmap td:nth-child(2) {
-  background: #fee585;
- }
- .heatmap td:nth-child(3) {
-  background: #70e9ac;
- }
 
  .heatmap td:nth-child(4) {
-  background: #b48eff;
- }
-
- .heatmap td:nth-child(5) {
-  background: #ff5959;
- }
-
- .heatmap td:nth-child(6) {
-  background: #ff59d5;
+  background: #fec598;
  }
 
  .heatmap td:nth-child(7) {
-  background: #ffe659;
+  background: #fec598;
  }
 
- .heatmap td:nth-child(8) {
-  background: #ddffbd;
+ .heatmap td:nth-child(10) {
+  background: #fec598;
  }
 
- .heatmap td:nth-child(9) {
-  background: #ffaaaa;
-  }
-
-/* .heatmap tr:nth-child(1) td:nth-child(2){
-    background:#ff00a2;
-  }   */
+.heatmap td:nth-child(13) {
+    background: #fec598;
+ }
 
 .heatmap {
   width: 100%;
@@ -726,40 +708,31 @@ table > tr > th {
  .heatmap th:nth-child(9) {
   background: #3094fe;
  }
+ .heatmap th:nth-child(10) {
+  background: #fd9644;
+ }
+
+ .heatmap th:nth-child(11) {
+  background: #3094fe;
+ }
+
+ .heatmap th:nth-child(12) {
+  background: #3094fe;
+ }
+
+ .heatmap th:nth-child(13) {
+  background: #fd9644;
+ }
+
+ .heatmap th:nth-child(14) {
+  background: #3094fe;
+ }
+
+ .heatmap th:nth-child(15) {
+  background: #3094fe;
+ }
+
  .heatmap td {
   padding: 10px;
   border: solid 1px #ffffff;
  }
- .heatmap td:nth-child(1) {
-  background: #fec598;
- }
- .heatmap td:nth-child(2) {
-  background: #fee585;
- }
- .heatmap td:nth-child(3) {
-  background: #70e9ac;
- }
-
- .heatmap td:nth-child(4) {
-  background: #fec598;
- }
-
- .heatmap td:nth-child(5) {
-  background: #ff5959;
- }
-
- .heatmap td:nth-child(6) {
-  background: #ff59d5;
- }
-
- .heatmap td:nth-child(7) {
-  background: #fec598;
- }
-
- .heatmap td:nth-child(8) {
-  background: #ddffbd;
- }
-
- .heatmap td:nth-child(9) {
-  background: #ffaaaa;
-  }

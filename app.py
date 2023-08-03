@@ -282,8 +282,8 @@ def heatmap_test():#prefecture,tenpo_name
         horizon_concat_df_html = re.sub(' target', '" id="target', horizon_concat_df.to_html(classes='target',index=False))
         return render_template('test.html',horizon_concat_df = horizon_concat_df_html,\
                                             zip=zip,\
-                                            column_names=horizon_concat_df.columns.values, \
-                                            row_data=list(horizon_concat_df.values.tolist()) )
+                                            heatmap_column_names=horizon_concat_df.columns.values, \
+                                            heatmap_row_data=list(horizon_concat_df.values.tolist()) )
     else:
         today = date.today()
         date_list = [today + timedelta(days=day) for day in range(1,9)]
@@ -562,7 +562,31 @@ def clicked_tenpo_name(prefecture,tenpo_name):
             except:
                 pass
  
-        ######
+        ######3列同時比較用のデータフレーム作成
+        
+        horizon_concat_list =[]
+        for groupby_date_df in concat_df_list:
+            for column_name in ['合成確率','BB確率','RB確率','ART確率','BB','RB','ART']:
+                try:
+                    groupby_date_df = groupby_date_df.drop([column_name],axis=1)
+                except:
+                    pass
+            groupby_date_df['台番号'] = groupby_date_df['台番号'].astype(int)
+            groupby_date_df.sort_values(['台番号'],inplace=True)
+            groupby_date_df['台番号'] = groupby_date_df['台番号'].astype(str)
+            groupby_date_df['機種名'] = groupby_date_df['台番号'] + '_' + groupby_date_df['機種名']
+            groupby_date_df = groupby_date_df.drop(['台番号'],axis=1)
+            column_date_name:str = groupby_date_df['日付'].loc[0].split('-')[1].lstrip('0') + '/' + groupby_date_df['日付'].loc[0].split('-')[2].lstrip('0')
+            groupby_date_df = groupby_date_df.drop(['日付'],axis=1)
+            groupby_date_df = groupby_date_df.rename(columns={'機種名':column_date_name+'_台番号_機種名','G数':column_date_name+'_G数','差枚':column_date_name + '_差枚'})
+            #display(groupby_date_df)
+            groupby_date_df.reset_index(drop=True,inplace=True)
+            horizon_concat_list.append(groupby_date_df)
+
+        horizon_concat_df = pd.concat(horizon_concat_list,axis=1)
+        horizon_concat_df_html = re.sub(' target', '" id="target', horizon_concat_df.to_html(classes='target',index=False))
+
+
         groupby_date_kisyubetu_df = pre_concat_df.groupby(['日付','機種名']).sum()
         groupby_date_kisyubetu_df['総台数'] = pre_concat_df.groupby(['日付','機種名']).size()
         groupby_date_kisyubetu_df = groupby_date_kisyubetu_df.reset_index(drop=False).reset_index().rename(columns={'index': '機種順位','ゲーム数': 'G数'})
@@ -726,10 +750,12 @@ def clicked_tenpo_name(prefecture,tenpo_name):
                                             samai_list=str(samai_list),\
                                             gamesuu_list=str(gamesuu_list),\
                                             samai_table = ave_tenpo_df.to_html(justify='justify-all',classes='tb01'),\
-                                            groupby_kisyu_table = groupby_kisyubetu_df.to_html(justify='justify-all',classes='tb01',index=False))
+                                            groupby_kisyu_table = groupby_kisyubetu_df.to_html(justify='justify-all',classes='tb01',index=False),\
+                                            heatmap_column_names=horizon_concat_df.columns.values, \
+                                            heatmap_row_data=list(horizon_concat_df.values.tolist()) )
     else:
         today = date.today()
-        date_list = [today + timedelta(days=day) for day in range(1,9)]
+        date_list = [today + timedelta(days=day) for day in range(0,9)]
         date_list = [date.strftime("%Y-%m-%d") for date in date_list]
         return render_template('target_date_recommend_schedule.html',date_list=date_list,tenpo_name=tenpo_name)
 
