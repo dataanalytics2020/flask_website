@@ -2,7 +2,9 @@
 
 ### 2023/08/05時点の店舗N回分析結果画面アップデート
 生javascriptとjqueryのデータテーブルライブラリを使ってテーブルの行検索機能と差枚に応じたヒートマップで差枚がわかるようにアップデートしました。
+仕様サンプル動画リンク
 https://github.com/dataanalytics2020/flask_website/assets/117744645/1d1511e0-2732-409c-880a-2b0e5522d7dd
+![スクリーンショット 2023-08-05 025445](https://github.com/dataanalytics2020/flask_website/assets/117744645/e96ad36e-e491-45eb-bb15-83209ecd7937)
 
 ### 2023/07/25時点取材予定マップ表示画面
 ![スクリーンショット 2023-07-25 045339](https://github.com/dataanalytics2020/flask_website/assets/117744645/21b8786e-4df0-41ac-a0bc-3ce15610a83d)
