@@ -103,4 +103,6 @@ Werkzeug==2.3.3
 wsproto==1.2.0
 zipp==3.15.0
 psycopg2==2.9.2
-sympy ==1.12
+sympy==1.12
+Flask-Mail==0.9.1
+```

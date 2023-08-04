@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+<!-- ブロックの追加 -->
+{% block content %}
+<div class='container'>
+    <div class='row'>
+        <div class='col-12'>
+            <h1>お問い合わせ</h1>
+                <form method="POST" enctype="multipart/form-data" onSubmit="return check()">
+                    <div class="field">
+                        <div for="name">名前</div>
+                        <input id="students_form" type="text" name="name" placeholder="名前を入力してください" required>
+                    </div>
+                    <div>
+                        <div for="email">メールアドレス</div>
+                        <input id="students_form" type="email" name="email" placeholder="メールアドレスを入力してください" required>
+                    <div>
+                    <div for="category" required>問い合わせ内容について</div>
+                        <select name="category" required>
+                            <option value="バグ報告">バグ報告</option>
+                            <option value="要望">要望</option>
+                            <option value="質問">質問</option>
+                            <option value="広告について">広告について</option>
+                            <option value="仕事依頼">仕事依頼</option>
+                            <option value="その他">その他</option>
+                        </select>
+                    </div>
+                    <div>
+                        <div for="message" required>記入欄</div>
+                        <textarea name="about" required placeholder="記入欄" onkeyup="count_down(this);"></textarea>
+                    </div>
+                    <button type="submit">送信</button>
+                </form>
+        </div>
+    </div>
+
+
+<script language="JavaScript" type="text/JavaScript">
+    function check(){
+        if(window.confirm('送信してよろしいですか？')){ 
+    return true;
+    }
+    else{
+        window.alert('キャンセルされました'); 
+        return false; /
+    }
+}
+</script>
+
+{% endblock %}
