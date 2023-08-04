@@ -597,3 +597,142 @@ table > tr > th {
   height: 100%;
   width: 100%;
 }
+
+.heatmap {
+  width: 100%;
+  text-align: center;
+  border-collapse: collapse;
+  border-spacing: 0;
+ }
+ .heatmap th {
+  padding: 10px;
+  border: solid 1px #ffffff;
+ }
+ .heatmap th:nth-child(1) {
+  background: #000000;
+ }
+ .heatmap th:nth-child(2) {
+  background: #fed330;
+ }
+ .heatmap th:nth-child(3) {
+  background: #26de81;
+ }
+
+ .heatmap th:nth-child(4) {
+  background: #7733ff;
+ }
+
+ .heatmap th:nth-child(5) {
+  background: #ff5959;
+ }
+
+ .heatmap th:nth-child(6) {
+  background: #ff59d5;
+ }
+
+ .heatmap th:nth-child(7) {
+  background: #ffe659;
+ }
+
+ .heatmap th:nth-child(8) {
+  background: #ddffbd;
+ }
+
+ .heatmap th:nth-child(9) {
+  background: #ffaaaa;
+ }
+ .heatmap td {
+  padding: 10px;
+  border: solid 1px #ffffff;
+ }
+ .heatmap td:nth-child(1) {
+  background: #fec598;
+ }
+
+ .heatmap td:nth-child(4) {
+  background: #fec598;
+ }
+
+ .heatmap td:nth-child(7) {
+  background: #fec598;
+ }
+
+ .heatmap td:nth-child(10) {
+  background: #fec598;
+ }
+
+.heatmap td:nth-child(13) {
+    background: #fec598;
+ }
+
+.heatmap {
+  width: 100%;
+  text-align: center;
+  border-collapse: collapse;
+  border-spacing: 0;
+ }
+ .heatmap th {
+  padding: 10px;
+  border: solid 1px #ffffff;
+ }
+ .heatmap th:nth-child(1) {
+  background: #fd9644;
+ }
+ .heatmap th:nth-child(2) {
+  background: #3094fe;
+ }
+ .heatmap th:nth-child(3) {
+  background: #3094fe;
+ }
+
+ .heatmap th:nth-child(4) {
+  background: #fd9644;
+ }
+
+ .heatmap th:nth-child(5) {
+  background: #3094fe;
+ }
+
+ .heatmap th:nth-child(6) {
+  background: #3094fe;
+ }
+
+ .heatmap th:nth-child(7) {
+  background: #fd9644;
+ }
+
+ .heatmap th:nth-child(8) {
+  background: #3094fe;
+ }
+
+ .heatmap th:nth-child(9) {
+  background: #3094fe;
+ }
+ .heatmap th:nth-child(10) {
+  background: #fd9644;
+ }
+
+ .heatmap th:nth-child(11) {
+  background: #3094fe;
+ }
+
+ .heatmap th:nth-child(12) {
+  background: #3094fe;
+ }
+
+ .heatmap th:nth-child(13) {
+  background: #fd9644;
+ }
+
+ .heatmap th:nth-child(14) {
+  background: #3094fe;
+ }
+
+ .heatmap th:nth-child(15) {
+  background: #3094fe;
+ }
+
+ .heatmap td {
+  padding: 10px;
+  border: solid 1px #ffffff;
+ }

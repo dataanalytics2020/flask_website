@@ -1,6 +1,7 @@
 #utf-8
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect 
 from datetime import date, timedelta
+import re
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
@@ -200,6 +201,94 @@ print(path)
 @app.route('/', methods=['GET', 'POST'])
 def root():
     return redirect("/top")
+
+@app.route('/heatmap', methods=['GET', 'POST'])#<prefecture>/<tenpo_name>
+def heatmap_test():#prefecture,tenpo_name
+    from datetime import date, timedelta
+    if request.method == 'POST':
+        target_day_list = []
+        number = 0
+        today = date.today()
+        target_number:int = '7'
+        serch_number:int = 3
+        tenpo_name = 'マルハン亀有店'
+        for i in range(serch_number):
+            while True:
+                #print(str(date.today() - timedelta(days=number))[-1])
+                if target_number == str(today - timedelta(days=number))[-1]:
+                    target_day = today - timedelta(days=number)
+                    print('取得日',target_day)
+                    target_day_str = target_day.strftime('%Y-%m-%d')
+                    target_day_list.append(target_day_str)
+                    number += 1
+                    break
+                else: 
+                    pass
+                number += 1
+        target_day_list.reverse()
+        print(target_day_list)
+        concat_df_list = []
+        urls = []
+        for serch_date in target_day_list:
+            search_url = url = f"https://ana-slo.com/{serch_date}-マルハン亀有店-data/"
+            urls.append(search_url)
+
+        with ThreadPoolExecutor(serch_number) as executor:
+            results = list(executor.map(requests.get, urls))
+        print(results)
+
+        concat_df_list = []
+        for search_response,target_day in zip(results, target_day_list):
+            soup = BeautifulSoup(search_response.text, "lxml")
+            elem = soup.select('#all_data_block')
+            dfs = pd.read_html(str(elem))
+            for df in dfs:
+                if '機種名' in list(df.columns):
+                    tmp_df = df
+                    #tmp_df['店舗名'] = user_data['tenpo-name']
+                    tmp_df['日付'] = target_day
+                    #tmp_df['機種名'] = tmp_df['機種名'].map(removal_text)
+                    break
+            concat_df_list.append(df)
+
+        concat_df = pre_concat_df =pd.concat(concat_df_list,axis=0)
+        for column_name in ['合成確率','BB確率','RB確率','ART確率','BB','RB','ART']:
+            try:
+                concat_df = concat_df.drop([column_name],axis=1)
+            except:
+                pass
+
+        horizon_concat_list =[]
+        for groupby_date_df in concat_df_list:
+            for column_name in ['合成確率','BB確率','RB確率','ART確率','BB','RB','ART']:
+                try:
+                    groupby_date_df = groupby_date_df.drop([column_name],axis=1)
+                except:
+                    pass
+            groupby_date_df['台番号'] = groupby_date_df['台番号'].astype(int)
+            groupby_date_df.sort_values(['台番号'],inplace=True)
+            groupby_date_df['台番号'] = groupby_date_df['台番号'].astype(str)
+            groupby_date_df['機種名'] = groupby_date_df['台番号'] + '_' + groupby_date_df['機種名']
+            groupby_date_df = groupby_date_df.drop(['台番号'],axis=1)
+            column_date_name:str = groupby_date_df['日付'].loc[0].split('-')[1].lstrip('0') + '/' + groupby_date_df['日付'].loc[0].split('-')[2].lstrip('0')
+            groupby_date_df = groupby_date_df.drop(['日付'],axis=1)
+            groupby_date_df = groupby_date_df.rename(columns={'機種名':column_date_name+'_台番号_機種名','G数':column_date_name+'_G数','差枚':column_date_name + '_差枚'})
+            #display(groupby_date_df)
+            groupby_date_df.reset_index(drop=True,inplace=True)
+            horizon_concat_list.append(groupby_date_df)
+            
+
+        horizon_concat_df = pd.concat(horizon_concat_list,axis=1)
+        horizon_concat_df_html = re.sub(' target', '" id="target', horizon_concat_df.to_html(classes='target',index=False))
+        return render_template('test.html',horizon_concat_df = horizon_concat_df_html,\
+                                            zip=zip,\
+                                            heatmap_column_names=horizon_concat_df.columns.values, \
+                                            heatmap_row_data=list(horizon_concat_df.values.tolist()) )
+    else:
+        today = date.today()
+        date_list = [today + timedelta(days=day) for day in range(1,9)]
+        date_list = [date.strftime("%Y-%m-%d") for date in date_list]
+        return render_template('target_date_recommend_schedule.html',date_list=date_list,tenpo_name='マルハン亀有店')
 
 @app.route('/top', methods=['GET', 'POST'])
 def top():
@@ -473,7 +562,31 @@ def clicked_tenpo_name(prefecture,tenpo_name):
             except:
                 pass
  
-        ######
+        ######3列同時比較用のデータフレーム作成
+        
+        horizon_concat_list =[]
+        for groupby_date_df in concat_df_list:
+            for column_name in ['合成確率','BB確率','RB確率','ART確率','BB','RB','ART']:
+                try:
+                    groupby_date_df = groupby_date_df.drop([column_name],axis=1)
+                except:
+                    pass
+            groupby_date_df['台番号'] = groupby_date_df['台番号'].astype(int)
+            groupby_date_df.sort_values(['台番号'],inplace=True)
+            groupby_date_df['台番号'] = groupby_date_df['台番号'].astype(str)
+            groupby_date_df['機種名'] = groupby_date_df['台番号'] + '_' + groupby_date_df['機種名']
+            groupby_date_df = groupby_date_df.drop(['台番号'],axis=1)
+            column_date_name:str = groupby_date_df['日付'].loc[0].split('-')[1].lstrip('0') + '/' + groupby_date_df['日付'].loc[0].split('-')[2].lstrip('0')
+            groupby_date_df = groupby_date_df.drop(['日付'],axis=1)
+            groupby_date_df = groupby_date_df.rename(columns={'機種名':column_date_name+'_台番号_機種名','G数':column_date_name+'_G数','差枚':column_date_name + '_差枚'})
+            #display(groupby_date_df)
+            groupby_date_df.reset_index(drop=True,inplace=True)
+            horizon_concat_list.append(groupby_date_df)
+
+        horizon_concat_df = pd.concat(horizon_concat_list,axis=1)
+        horizon_concat_df_html = re.sub(' target', '" id="target', horizon_concat_df.to_html(classes='target',index=False))
+
+
         groupby_date_kisyubetu_df = pre_concat_df.groupby(['日付','機種名']).sum()
         groupby_date_kisyubetu_df['総台数'] = pre_concat_df.groupby(['日付','機種名']).size()
         groupby_date_kisyubetu_df = groupby_date_kisyubetu_df.reset_index(drop=False).reset_index().rename(columns={'index': '機種順位','ゲーム数': 'G数'})
@@ -637,10 +750,12 @@ def clicked_tenpo_name(prefecture,tenpo_name):
                                             samai_list=str(samai_list),\
                                             gamesuu_list=str(gamesuu_list),\
                                             samai_table = ave_tenpo_df.to_html(justify='justify-all',classes='tb01'),\
-                                            groupby_kisyu_table = groupby_kisyubetu_df.to_html(justify='justify-all',classes='tb01',index=False))
+                                            groupby_kisyu_table = groupby_kisyubetu_df.to_html(justify='justify-all',classes='tb01',index=False),\
+                                            heatmap_column_names=horizon_concat_df.columns.values, \
+                                            heatmap_row_data=list(horizon_concat_df.values.tolist()) )
     else:
         today = date.today()
-        date_list = [today + timedelta(days=day) for day in range(1,9)]
+        date_list = [today + timedelta(days=day) for day in range(0,9)]
         date_list = [date.strftime("%Y-%m-%d") for date in date_list]
         return render_template('target_date_recommend_schedule.html',date_list=date_list,tenpo_name=tenpo_name)
 
