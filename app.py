@@ -1,5 +1,8 @@
 #utf-8
 from flask import Flask, render_template, request, redirect 
+from flask_mail import Mail
+from email.mime.text import MIMEText
+import smtplib
 from datetime import date, timedelta
 import re
 import pandas as pd
@@ -759,6 +762,39 @@ def clicked_tenpo_name(prefecture,tenpo_name):
         date_list = [date.strftime("%Y-%m-%d") for date in date_list]
         return render_template('target_date_recommend_schedule.html',date_list=date_list,tenpo_name=tenpo_name)
 
+
+@app.route("/form", methods=['GET','POST'])
+def form():
+    if request.method == "POST":
+        accoun_mail = os.getenv('GMAIL_ACCOUNT')
+        password = os.getenv('GMAIL_PASSWORD')
+        second_password = os.getenv('GMAIL_SECOND_PASSWORD')
+        
+        name =  request.form.get('name')
+        from_email = request.form.get('email')
+        category = request.form.get('category')
+        about = request.form.get('about')
+        subject = category + ':'+ name  + 'お問い合わせ'
+        bodytext = "名前：" + name + "\n" + "メールアドレス：" + from_email + "\n問い合わせ内容："  +  about
+
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()
+        server.login(accoun_mail, second_password)
+
+        msg = MIMEText(bodytext)
+        msg['subject'] = subject
+        print('from_email',from_email)
+        msg['From'] = from_email
+        msg['To'] = accoun_mail
+
+        server.send_message(msg)
+        server.close()
+        return render_template('send.html', success=True)
+    return render_template("form.html")
+
+@app.route("/send")
+def send():
+    return render_template('send.html')
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0",debug=True, port=int(os.environ.get('PORT', 5000)))
