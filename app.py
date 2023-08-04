@@ -796,5 +796,9 @@ def form():
 def send():
     return render_template('send.html')
 
+@app.route("/privacy_policy")
+def privacy_policy():
+    return render_template('privacy_policy.html')
+
 if __name__ == '__main__':
     app.run(host="0.0.0.0",debug=True, port=int(os.environ.get('PORT', 5000)))
