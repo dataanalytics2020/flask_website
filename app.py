@@ -800,5 +800,9 @@ def send():
 def privacy_policy():
     return render_template('privacy_policy.html')
 
+@app.route("/sitemap.xml")
+def sitemap():
+    return app.send_static_file("sitemap.xml")
+
 if __name__ == '__main__':
-    app.run(host="0.0.0.0",debug=True, port=int(os.environ.get('PORT', 5000)))
+    app.run(host="0.0.0.0",debug=False, port=int(os.environ.get('PORT', 5000)))
