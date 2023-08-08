@@ -38,7 +38,7 @@ def post_line_text_and_image(message,image_path,token):
 
 def login_scraping_site(area_name):
     options = Options()
-    #options.add_argument('--headless')
+    options.add_argument('--headless')
     options.add_argument("--no-sandbox")
 
     browser = webdriver.Chrome(ChromeDriverManager(requests.get('https://chromedriver.storage.googleapis.com/LATEST_RELEASE').text).install(),options=options)#ChromeDriverManager().install() 
