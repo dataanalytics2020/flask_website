@@ -310,7 +310,7 @@ def top():
         sql = f"""SELECT イベント日,店舗名,取材名,媒体名,店舗名,latitude,longitude,取材ランク
                 FROM schedule as schedule2
                 left join maptable as maptable2
-                on schedule2.店舗名 = maptable2.anaslo_name
+                on schedule2.店舗名 = maptable2.hallnavi_name
                 where schedule2.都道府県 = '{prefecture}' and schedule2.イベント日 IN ('{target_day}') and schedule2.媒体名 != 'ホールナビ' 
                 """
         print(sql)
