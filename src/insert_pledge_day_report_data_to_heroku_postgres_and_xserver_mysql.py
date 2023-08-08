@@ -63,7 +63,7 @@ def login_scraping_site(area_name):
     #options.add_argument('--headless')
     options.add_argument("--no-sandbox")
 
-    browser = webdriver.Chrome(ChromeDriverManager().install(),options=options)#ChromeDriverManager().install() 
+    browser = webdriver.Chrome(ChromeDriverManager(requests.get('https://chromedriver.storage.googleapis.com/LATEST_RELEASE').text).install(),options=options)#ChromeDriverManager().install() 
     browser.implicitly_wait(10)
     url_login = f"https://{os.getenv('SCRAPING_SYUZAI_DOMAIN')}/login_form_mail"
     #admageを開く
@@ -181,6 +181,7 @@ furture_syuzai_list_df_1
 
 browser.quit()
 
+
 server = sshtunnel.SSHTunnelForwarder((os.getenv('SSH_USERNAME'), 10022), 
     ssh_username="pachislot777", 
     ssh_private_key_password='akasaka2', 
@@ -250,7 +251,6 @@ cnx.commit()
 server.stop()
 post_line_text(f'{len(concat_df)}件のxサーバーへの関東の取材予定追加おわり',os.getenv('LINE_TOKEN'))
 print(f'{len(concat_df)}件の関東の取材予定追加おわり')
-
 
 ## Postgresへのデータ登録
 
