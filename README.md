@@ -1,5 +1,14 @@
 ## 製作過程のスクショ一覧
 
+### 2023/08/09時点の明日のお勧め店舗画面
+#### エンドポイント　/tomorrow-recommend/
+![スクリーンショット 2023-08-09 002916](https://github.com/dataanalytics2020/flask_website/assets/117744645/1a46e321-431e-4110-b4f8-d852a74f438c)
+
+#### エンドポイント　/tomorrow-recommend/<area_name>
+![スクリーンショット 2023-08-09 002931](https://github.com/dataanalytics2020/flask_website/assets/117744645/63b823b9-fe38-4aa3-9944-4804c9534bb8)
+
+#### エンドポイント　/tomorrow-recommend/<area_name>/<date>-data
+![スクリーンショット 2023-08-09 002948](https://github.com/dataanalytics2020/flask_website/assets/117744645/3059c471-e7c0-475f-8c96-2a13d77f24af)
 ### 2023/08/05時点の店舗N回分析結果画面アップデート
 生javascriptとjqueryのデータテーブルライブラリを使ってテーブルの行検索機能と差枚に応じたヒートマップで差枚がわかるようにアップデートしました。
 仕様サンプル動画リンク
