@@ -69,3 +69,14 @@ https://zenn.dev/ogakuzuko/articles/2250f7c7331106
 
 #### push
 ```git push origin HEAD```
+
+### mainブランチに切り替えてmainブランチの内容をプルする
+```
+git checkout main
+git pull origin main
+```
+
+### ローカルにある作業ブランチを削除する
+```git branch -d 作業ブランチ名 ```
+### 最後にherokuも更新
+```git push heroku main```
