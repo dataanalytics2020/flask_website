@@ -291,7 +291,7 @@ def heatmap_test():#prefecture,tenpo_name
         today = date.today()
         date_list = [today + timedelta(days=day) for day in range(1,9)]
         date_list = [date.strftime("%Y-%m-%d") for date in date_list]
-        return render_template('target_date_recommend_schedule.html',date_list=date_list,tenpo_name='マルハン亀有店')
+        return render_template('target_date_recommend_schedule.html',date_list=date_list,tenpo_name=tenpo_name)
 
 @app.route('/top', methods=['GET', 'POST'])
 def top():
@@ -796,6 +796,37 @@ def form():
 def send():
     return render_template('send.html')
 
+
+@app.route("/tomorrow-recommend/")
+def tomorrow_recommend():
+    return render_template('tomorrow_recommend.html')
+
+@app.route("/tomorrow-recommend/<area_name>/")
+def tomorrow_recommend_area(area_name):
+    data = {}
+    today = date.today()
+    date_list = [today + timedelta(days=day) for day in range(0,9)]
+    date_list = [date.strftime("%Y-%m-%d") for date in date_list]
+    data['date_list'] = date_list
+    data['area_name'] = area_name
+    if area_name == 'kanto':
+        data['area_name_jp'] = '関東'
+    return render_template('tomorrow_recommend_area.html',data=data)
+
+@app.route("/tomorrow-recommend/<area_name>/<date>-data")
+def tomorrow_recommend_area_date(area_name,date):
+    data = {}
+    data['area_name'] = area_name
+    data['date'] = date
+    print(date)
+    date_jp = date.split('-')[1].lstrip('0') + '月' + date.split('-')[2].lstrip('0') + '日'
+    print(date_jp)
+    data['date_jp'] = date_jp
+    if area_name == 'kanto':
+        data['area_name_jp'] = '関東'
+    return render_template('tomorrow_recommend_area_date.html',data=data)
+
+
 @app.route("/privacy_policy")
 def privacy_policy():
     return render_template('privacy_policy.html')
@@ -805,4 +836,4 @@ def sitemap():
     return app.send_static_file("sitemap.xml")
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0",debug=False, port=int(os.environ.get('PORT', 5000)))
+    app.run(host="0.0.0.0",debug=True, port=int(os.environ.get('PORT', 5000)))
