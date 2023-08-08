@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>明日のお勧め{{data.area_name}}</title>
+{% endblock %}
+
+{% block content %}
+<div class="container-sm">
+    <div class="row">
+        <div class="input-group input-group-lg text-center">
+            <p>行きたい日付を選択：</p>
+                {% for date in data.date_list %}
+                    <div class="col-12">
+                        <li> <a href="/tomorrow-recommend/{{data.area_name}}/{{ date }}-data">{{ date }}</a></li>
+                    </div>
+                {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
