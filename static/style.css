@@ -174,7 +174,6 @@ li{
   line-height: 30px;
   font-size: calc(1.025rem + .1vw);
   font-weight: bold;
-  border-bottom: 1px dashed #5c9ee7;
 }
 
 li:last-child{
