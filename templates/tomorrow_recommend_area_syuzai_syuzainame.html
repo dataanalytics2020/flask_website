@@ -52,6 +52,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/themes/cupertino/jquery-ui.min.css">  <!-- テーマcupertinoを選択 -->\
 <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
 <script>
+
 $(document).ready(function(){
     $("#syuzai_table").DataTable({
         "language":{url:"https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json",},
@@ -68,6 +69,7 @@ $(document).ready(function(){
         // 初期表示の並び替えなし
         order: [],
     });
+    
 });
 </script>
 <script>
@@ -92,5 +94,6 @@ $(document).ready(function(){
     });
 
 
-</script>    
+
+</script>
 {% endblock %}
