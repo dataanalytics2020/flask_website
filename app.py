@@ -31,8 +31,37 @@ import sympy
 from dotenv import load_dotenv
 load_dotenv()
 
-df  = pd.read_csv(r'csv/2022-12-09_touhou.csv')
-heroku_port = int(os.environ.get("PORT", 5000))
+df:pd.DataFrame  = pd.read_csv(r'csv/2022-12-09_touhou.csv')
+heroku_port:int = int(os.environ.get("PORT", 5000))
+
+
+def get_area_sql_text(target_area_name):
+    print(target_area_name)
+    hokkaidoutouhoku_list = ['北海道', '青森県', '岩手県', '宮城県', '秋田県', '山形県', '福島県']
+    kitakantou_list = ['茨城県', '栃木県', '群馬県']
+    minamikantou_list = ['埼玉県', '千葉県', '東京都', '神奈川県']
+    hokurikukoushinetsu_list = ['新潟県', '富山県', '石川県', '福井県', '長野県', '山梨県']
+    toukai_list = ['愛知県', '岐阜県', '静岡県', '三重県']
+    kansai_list = ['大阪府', '京都府', '兵庫県', '奈良県', '滋賀県', '和歌山県']
+    chugokushikoku_list = ['鳥取県', '島根県', '岡山県', '広島県','徳島県', '香川県', '愛媛県', '高知県']
+    kyushu_list = [ '山口県','福岡県', '佐賀県', '長崎県', '大分県', '熊本県', '宮崎県', '鹿児島県','沖縄県']
+    prefecture_str_lists = ['hokkaidoutouhoku_list', 'kitakantou_list','minamikantou_list','hokurikukoushinetsu_list','toukai_list','kansai_list','chugokushikoku_list','kyushu_list'] 
+    for prefecture_list_name in prefecture_str_lists:
+        #print(prefecture_list_name)
+        if target_area_name == prefecture_list_name.replace('_list',''):
+            print('ok',target_area_name)
+            target_area_name_list = eval(prefecture_list_name)
+            #print(target_area_name_list)
+            break
+    area_sql_text = ''
+    for prefecture_name in target_area_name_list:
+        if len(area_sql_text) == 0:
+            area_sql_text += f"都道府県 = '{prefecture_name}'"
+        else:
+            area_sql_text += f" OR 都道府県 = '{prefecture_name}'"
+    #print(area_sql_text)
+    return area_sql_text
+
 
 def get_driver():
     users = os.getenv('HEROKU_PSGR_USER')    # DBにアクセスするユーザー名(適宜変更)
@@ -423,7 +452,18 @@ def top():
                                             column_names=map_report_df.columns.values, \
                                             row_data=list(map_report_df.values.tolist()))
     else:
-        prefecture_list =['神奈川県','千葉県','埼玉県']
+        data = {}
+        
+        data['prefecture_list'] =['北海道','青森県','岩手県','宮城県','秋田県','山形県',\
+                                '福島県','茨城県','栃木県','群馬県','埼玉県','千葉県',\
+                                '東京都','神奈川県','新潟県','富山県','石川県','福井県',\
+                                '山梨県','長野県','岐阜県','静岡県','愛知県','三重県',\
+                                '滋賀県','京都府','大阪府','兵庫県','奈良県',\
+                                '和歌山県','鳥取県','島根県','岡山県','広島県',\
+                                '山口県','徳島県','香川県','愛媛県','高知県',\
+                                '福岡県','佐賀県','長崎県','熊本県','大分県',\
+                                '宮崎県','鹿児島県','沖縄県']
+        data['kanto_prefecture_list'] = ['東京都','神奈川県','千葉県','埼玉県']
         w_list = ['(月)', '(火)', '(水)', '(木)', '(金)', '(土)', '(日)']
         today = date.today()
         jp_str_day_list = []
@@ -431,7 +471,8 @@ def top():
             day = today + timedelta(days=i)
             jp_str_day = day.strftime('%m').lstrip('0') + '月' + day.strftime('%d').lstrip('0') + '日' + w_list[day.weekday()]
             jp_str_day_list.append(jp_str_day)
-        return render_template('top.html',date_list=jp_str_day_list,prefecture_list=prefecture_list)
+        data['jp_str_day_list'] = jp_str_day_list
+        return render_template('top.html',data=data)
 
 
 @app.route('/recommend/<prefecture>', methods=['GET', 'POST'])
@@ -801,6 +842,91 @@ def send():
 def tomorrow_recommend():
     return render_template('tomorrow_recommend.html')
 
+
+@app.route("/tomorrow_recommend/<area_name>/syuzai/<syuzai_name>")
+def tomorrow_recommend_area_syuzai_syuzainame(area_name,syuzai_name):
+    data = {}
+    data['area_name'] = area_name
+    data['syuzai_name'] = syuzai_name
+    if area_name == 'minamikanto':
+        data['area_name_jp'] = '南関東'
+
+    area_sql_text = get_area_sql_text(area_name)
+    cursor = get_driver()
+    #首都圏のイベントの媒体別の予約数を集計
+    cursor.execute(f'''SELECT イベント日,都道府県,店舗名,媒体名,取材名
+                FROM schedule
+                WHERE イベント日 >= current_date
+                    AND イベント日 < current_date + 7
+                    AND 媒体名 != 'ホールナビ'
+                    AND 取材名 = '{syuzai_name}'
+                    AND ({area_sql_text})
+                    ORDER BY イベント日,都道府県 desc;''')
+    cols = [col.name for col in cursor.description]
+    extract_syuzai_name_df = pd.DataFrame(cursor.fetchall(),columns=cols)
+    data['extract_syuzai_name_df'] = extract_syuzai_name_df
+    data['extract_syuzai_name_df_column_names'] = extract_syuzai_name_df.columns.values
+    data['extract_syuzai_name_df_row_data'] = list(extract_syuzai_name_df.values.tolist())
+    return render_template('tomorrow_recommend_area_syuzai_syuzainame.html',data=data,zip=zip)
+
+
+@app.route("/tomorrow_recommend/<area_name>/hall/<hall_name>")
+def tomorrow_recommend_area_hall_hallname(area_name,hall_name):
+    data = {}
+    data['area_name'] = area_name
+    data['hall_name'] = hall_name
+    if area_name == 'minamikanto':
+        data['area_name_jp'] = '南関東'
+
+    area_sql_text = get_area_sql_text(area_name)
+    cursor = get_driver()
+    #首都圏のイベントの媒体別の予約数を集計
+    cursor.execute(f'''SELECT イベント日,都道府県,店舗名,媒体名,取材名
+                FROM schedule
+                WHERE イベント日 >= current_date
+                    AND イベント日 < current_date + 7
+                    AND 媒体名 != 'ホールナビ'
+                    AND 店舗名 = '{hall_name}'
+                    AND ({area_sql_text})
+                    ORDER BY イベント日,都道府県 desc;''')
+    cols = [col.name for col in cursor.description]
+    extract_hall_name_df = pd.DataFrame(cursor.fetchall(),columns=cols)
+    data['extract_hall_name_df'] = extract_hall_name_df
+    data['extract_hall_name_df_column_names'] = extract_hall_name_df.columns.values
+    data['extract_hall_name_df_row_data'] = list(extract_hall_name_df.values.tolist())
+    return render_template('tomorrow_recommend_area_hall_hallname.html',data=data,zip=zip)
+
+
+@app.route("/tomorrow_recommend/<area_name>/media/<media_name>")
+def tomorrow_recommend_area_media_medianame(area_name,media_name):
+    data = {}
+    today = date.today()
+    date_list = [today + timedelta(days=day) for day in range(0,6)]
+    date_list = [date.strftime("%Y-%m-%d") for date in date_list]
+    data['date_list'] = date_list
+    data['area_name'] = area_name
+    data['media_name'] = media_name
+    if area_name == 'minamikanto':
+        data['area_name_jp'] = '南関東'
+
+    cursor = get_driver()
+    area_sql_text = get_area_sql_text(area_name)
+    #首都圏のイベントの媒体別の予約数を集計
+    cursor.execute(f'''SELECT イベント日,都道府県,店舗名,取材名
+                FROM schedule
+                WHERE イベント日 >= current_date
+                    AND イベント日 < current_date + 7
+                    AND 媒体名 != 'ホールナビ'
+                    AND 媒体名 = '{media_name}'
+                    AND ({area_sql_text})
+                    ORDER BY イベント日,都道府県 desc;''')
+    cols = [col.name for col in cursor.description]
+    extract_media_name_df = pd.DataFrame(cursor.fetchall(),columns=cols)
+    data['extract_media_name_df'] = extract_media_name_df
+    data['extract_media_name_df_column_names'] = extract_media_name_df.columns.values
+    data['extract_media_name_df_row_data'] = list(extract_media_name_df.values.tolist())
+    return render_template('tomorrow_recommend_area_media_medianame.html',data=data,zip=zip)
+
 @app.route("/tomorrow-recommend/<area_name>/")
 def tomorrow_recommend_area(area_name):
     data = {}
@@ -809,9 +935,30 @@ def tomorrow_recommend_area(area_name):
     date_list = [date.strftime("%Y-%m-%d") for date in date_list]
     data['date_list'] = date_list
     data['area_name'] = area_name
-    if area_name == 'kanto':
-        data['area_name_jp'] = '関東'
-    return render_template('tomorrow_recommend_area.html',data=data)
+    if area_name == 'minamikanto':
+        data['area_name_jp'] = '南関東'
+
+    area_sql_text = get_area_sql_text(area_name)
+    cursor = get_driver()
+    #首都圏のイベントの媒体別の予約数を集計
+    cursor.execute(f'''SELECT COUNT(媒体名), 媒体名
+               FROM schedule
+               WHERE イベント日 >= current_date
+                AND イベント日 <= current_date + 6
+                AND 媒体名 != 'ホールナビ'
+                AND ({area_sql_text})
+                GROUP BY 媒体名
+                ORDER BY COUNT(媒体名) desc;''')
+    cols = [col.name for col in cursor.description]
+    groupby_media_name_count_df = pd.DataFrame(cursor.fetchall(),columns=cols)
+    groupby_media_name_count_df.rename(columns={'count': '取材数'},inplace=True)
+    data['groupby_media_name_count_df'] = groupby_media_name_count_df
+    data['groupby_media_name_count_df_column_names'] = groupby_media_name_count_df.columns.values
+    data['groupby_media_name_count_df_row_data'] = list(groupby_media_name_count_df.values.tolist())
+    return render_template('tomorrow_recommend_area.html',data=data,zip=zip)
+#           /tomorrow_recommend/minamikanto/media/BASHtv-data
+
+
 
 @app.route("/tomorrow-recommend/<area_name>/<date>-data")
 def tomorrow_recommend_area_date(area_name,date):

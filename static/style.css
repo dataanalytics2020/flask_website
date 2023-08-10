@@ -736,3 +736,76 @@ table > tr > th {
   padding: 10px;
   border: solid 1px #ffffff;
  }
+
+
+/*３つ横並び設定*/
+.top-btn{
+	display: flex;
+	flex-wrap:wrap;
+}
+.top-btn li {
+	width: calc(100%/3);/*3つ並べる場合*/
+	padding:0 2px;/*左右に余白を入れる場合*/
+	box-sizing:border-box;
+}
+.top-btn li img {
+	max-width:100%; /*はみだしを防ぐ*/
+	height: auto; /*縦横比を維持 */
+}
+/*リンクボタンデザイン設定*/
+.link-btn {
+    text-decoration: none!important;
+    justify-content: center; /*左右間で中央*/
+    align-items: center;/*上下間で中央*/
+    color: #fff!important;
+    display: flex!important;/*画面に合わせてサイズが変わる*/
+ 　 flex-wrap:wrap!important;/*要素の折り返し設定*/
+    font-weight: bold;
+    padding: 10px 4px;
+    border-radius: 10px;
+    box-shadow: none;
+    transition: .2s;
+    
+}
+.link-btn:hover {
+    box-shadow: none;
+    transform: translateY(2px);
+    opacity: .8;
+}
+/*ボタン色設定*/
+.colorname1 {
+    background: #46b5ff;
+}
+.colorname2 {
+    background: #ffffff;
+}
+.colorname3 {
+    background: #46b5ff;
+}
+
+/* 日曜日のカラー設定 */
+td.ui-datepicker-week-end:first-child a.ui-state-default{
+  background-color: #ffecec;   /* 背景色を設定 */
+  color: #f00!important;       /* 文字色を設定 */
+}
+/* 土曜日のカラー設定 */
+td.ui-datepicker-week-end:last-child a.ui-state-default{
+  background-color: #eaeaff;   /* 背景色を設定 */
+  color: #00f!important;       /* 文字色を設定 */
+}
+/* ホバー時の動作 */
+td.ui-datepicker-week-end a.ui-state-hover{
+  opacity: 0.8;
+}
+/* 当日を示す色はそのまま */
+td.ui-datepicker-week-end a.ui-state-highlight{
+  background-color: #fffa90!important;
+}
+
+#datepicker{
+  text-align:center;
+}
+#datepicker{
+  display:inline-block;
+  margin:0 auto;
+}

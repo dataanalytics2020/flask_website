@@ -3,19 +3,45 @@
 <div class="container">
     <div class="row">
         <div class="col">
+            <h2>エリアから行きたい日の取材予定を地図で探す</h2>
+            <div class="row">
+                <ul class="top-btn" style="list-style: none; padding: 0;  margin:0;">
+                    <li><a class="link-btn colorname1" href="/tomorrow-recommend/hokkaidoutouhoku">北海道・東北</a></li>
+                    <li><a class="link-btn colorname1" href="/tomorrow-recommend/kitakantou">北関東</a></li>
+                    <li><a class="link-btn colorname1" href="/tomorrow-recommend/minamikantou">南関東</a></li>
+                </ul>
+            </div>
+            <div class="row">
+                <ul class="top-btn" style="list-style: none; padding: 0;  margin:0;">
+                    <li><a class="link-btn colorname1" href="/tomorrow-recommend/hokurikukoushinetsu">北陸・甲信越</a></li>
+                    <li><a class="link-btn colorname1" href="/tomorrow-recommend/toukai">東海</a></li>
+                    <li><a class="link-btn colorname1" href="/tomorrow-recommend/kansai">関西</a></li>
+                </ul>
+            </div>
+            <div class="row">
+                <ul class="top-btn" style="list-style: none; padding: 0;  margin:0;">
+                    <li><a class="link-btn colorname1" href="/tomorrow-recommend/chugokushikoku">中国・四国</a></li>
+                    <li><a class="link-btn colorname1" href="/tomorrow-recommend/kyusyu">九州・山口</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col">
             <h2>都道府県から行きたい日の取材予定を地図で探す</h2>
             <form action="{{ url_for('top') }}" method="post">
                 <p>調べたい都道府県を選択：</p>
                     <select class="form-select form-select-lg mb-2" 　aria-label="Default select example" name="prefecture">
-                        <option selected>東京都</option>
-                        {% for prefecture in prefecture_list %}
+                        <option selected>都道府県を選択</option>
+                        {% for prefecture in data.kanto_prefecture_list %}
                             <option value="{{ prefecture }}">{{ prefecture }}</option>
                         {% endfor %}
                     </select>
 
                 <p>調べたい日付を選択：</p>
                 <select class="form-select form-select-lg mb-2" aria-label="Default select example" name="target_day">
-                {% for target_day in date_list %}
+                {% for target_day in data.jp_str_day_list %}
                     <option value="{{ target_day }}">{{ target_day }}</option>
                 {% endfor %}
                 </select>
@@ -25,6 +51,8 @@
                 </div>
             </form>
         </div>
+    </div>
+    <div class="row">
         <div class="col-sm-12">
             <h2>地図から行きたい店舗のお勧め機種を探す</h2>
             <div class="japan_map">
