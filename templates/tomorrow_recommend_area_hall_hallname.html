@@ -1,35 +1,20 @@
 {% extends "base.html" %}
-
 {% block head %}
-<title>明日のお勧め{{data.area_name}}</title>
+<title>明日のお勧め</title>
 {% endblock %}
-
 {% block content %}
 <div class="container">
-    <div class="row text-center">
-        <div class="col-12 ">
-            <h1>明日のお勧め{{data.area_name}}</h1>
-            <div class="mx-auto" style="width: 200px;">
-                <h2 >{{data.date}}日付から探す</h2>
-            </div>
-            <div id="datepicker"></div>
-            <div class="input-group-append">
-                <button class="btn btn-outline-secondary" type="button" id="button-addon2">検索</button>
-            </div>
-        </div>
-    </div>
     <div class="row">
         <div class="col-12 text-center">
             <div class="mx-auto" style="width: 200px;">
-                <h2>媒体名から探す</h2>
+                <h2>{{data.hall_name}}</h2>
             </div>
-
             <div class = 'heatmap .table-wrap'>
                 <div class="scroll_area" style="width:100%;max-width:2000px;overflow-x:scroll;">
-                    <table id="media_table" class="table table-striped">
+                    <table id="hall_table" class="table table-striped">
                         <thead>
                             <tr>
-                                {% for col in data.groupby_media_name_count_df_column_names %}
+                                {% for col in data.extract_hall_name_df_column_names %}
                                 <th>
                                 {{col}}
                                 </th>
@@ -37,10 +22,14 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for row in data.groupby_media_name_count_df_row_data %}
+                            {% for row in data.extract_hall_name_df_row_data %}
                             <tr>
-                                {% for col, row_ in zip(data.groupby_media_name_count_df_column_names, row) %}
-                                    {% if col == '媒体名' %}
+                                {% for col, row_ in zip(data.extract_hall_name_df_column_names, row) %}
+                                    {% if col == '取材名' %}
+                                        <td><a href="/tomorrow_recommend/{{data.area_name}}/syuzai/{{ row_ }}" >{{ row_ }}</a></td>
+                                    {% elif col == '店舗名' %}
+                                        <td><a href="/tomorrow_recommend/{{data.area_name}}/hall/{{ row_ }}" >{{ row_ }}</a></td>
+                                    {% elif col == '媒体名' %}
                                         <td><a href="/tomorrow_recommend/{{data.area_name}}/media/{{ row_ }}" >{{ row_ }}</a></td>
                                     {% else %}
                                         <td>{{row_}}</td>
@@ -64,7 +53,7 @@
 <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
 <script>
 $(document).ready(function(){
-    $("#media_table").DataTable({
+    $("#hall_table").DataTable({
         "language":{url:"https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json",},
             // 件数切替機能 無効
         lengthChange: false,
