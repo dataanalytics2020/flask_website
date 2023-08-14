@@ -90,7 +90,7 @@ for area_name in ['kanto']:
         try:
             elements = browser.find_elements(By.CLASS_NAME,"mgn_serch_list_bottom")
             baitai_name = elements[i].text.split(' ')[0]
-            baitai_name = baitai_name.replace('パチマガスロマガじゃ…','パチマガスロマガ').replace('パチンコ店長のホール…','パチンコ店長のホール攻略')
+            baitai_name = baitai_name.replace('パチマガスロマガじゃ…','パチマガスロマガ').replace('パチンコ店長のホール…','パチンコ店長のホール攻略').replace('よっしー社長プロデュ…','よっしー社長プロデュース')
 
             if  ('県' in baitai_name) or ('府' in baitai_name) or ('東京都' in baitai_name) or ('北海道' in baitai_name):
                 print('県がついているためパスを処理しました',baitai_name)
@@ -164,8 +164,7 @@ for area_name in ['kanto']:
         #### Create dataframe from resultant table ####
     # except Exception as e:
     #     post_line_text(f'取材予定エラー\n{e}',os.getenv('LINE_TOKEN'))
-
-
+    
     users = os.getenv('HEROKU_PSGR_USER')    # DBにアクセスするユーザー名(適宜変更)
     dbnames = os.getenv('HEROKU_PSGR_DATABASE')   # 接続するデータベース名(適宜変更)
     passwords = os.getenv('HEROKU_PSGR_PASSWORD')  # DBにアクセスするユーザーのパスワード(適宜変更)
@@ -184,27 +183,33 @@ for area_name in ['kanto']:
     print(sql)
     cursor.execute(sql)
     #cols = [col[0] for col in cursor.description]
-    sql_syuzai_report_all_df = pd.DataFrame(cursor.fetchall(),columns = ['id','取材名','媒体名','公約内容','取得時間'])
+    sql_syuzai_report_all_df = pd.DataFrame(cursor.fetchall(),columns = ['id','syuzai_name','media_name','pledge_text','created_at'])
     sql_syuzai_report_all_df
     insert_pledge_df = furture_syuzai_list_df_1[['取材名','媒体名']]
     insert_pledge_df = insert_pledge_df.drop_duplicates()
-    insert_pledge_df['公約内容'] = None
+    insert_pledge_df = insert_pledge_df[insert_pledge_df['媒体名'] != 'ホールナビ']
+    insert_pledge_df['pledge_text'] = None
     insert_pledge_df = insert_pledge_df.reset_index(drop=True)
-    insert_pledge_df
+    insert_pledge_df.rename(columns={'取材名':'syuzai_name','媒体名':'media_name'},inplace=True)
     count = 0
     concat_pledge_df = pd.DataFrame(index=[], columns=[])
+    increment_id = max(list(sql_syuzai_report_all_df['id']))
+    print(increment_id)
     text = f'{area_name} {count}件のpostgresへの公約レコードの追加が終了しました。'
     for i,row in insert_pledge_df.iterrows():
-        dicision_df = sql_syuzai_report_all_df[sql_syuzai_report_all_df['取材名'] == row['取材名']]
+        dicision_df = sql_syuzai_report_all_df[sql_syuzai_report_all_df['syuzai_name'] == row['syuzai_name']]
         #display(dicision_df)
+        increment_id += 1
+        
         if len(dicision_df) == 0:
             count += 1
-            print('追加',row['取材名'],row['媒体名'],None)
-            text += f'\n{row["取材名"]}-{row["媒体名"]} '
-            cursor.execute("INSERT INTO pledge VALUES (%s, %s,%s, %s, %s)", (0,row['取材名'],row['媒体名'],None,datetime.datetime.now()))
+            print('追加',row['syuzai_name'],row['media_name'],None)
+            text += f'\n{row["syuzai_name"]}-{row["media_name"]} '
+            cursor.execute("INSERT INTO pledge VALUES (%s, %s,%s, %s, %s)", (increment_id ,row['syuzai_name'],row['media_name'],row['pledge_text'],datetime.datetime.now()))
             conn.commit()
         else:
             #print('追加なし')
             pass
-
     post_line_text(text,os.getenv('LINE_TOKEN'))
+
+
