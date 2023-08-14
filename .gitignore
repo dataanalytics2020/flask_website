@@ -17,3 +17,8 @@ akasaka2.key
 .history/*
 syuzai_image.png
 csv/tenpo_master_data.csv
+sercret
+csv/kouyaku_df_type_2.csv
+csv/pledge_202308150153.csv
+.gitignore
+csv/test_pledge.csv
