@@ -22,3 +22,5 @@ csv/kouyaku_df_type_2.csv
 csv/pledge_202308150153.csv
 .gitignore
 csv/test_pledge.csv
+test/scraping_halldata_to_postgres.ipynb
+csv/kanto_test_halldata.csv
