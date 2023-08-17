@@ -1,5 +1,9 @@
 ## 製作過程のスクショ一覧
 
+
+### 2023/08/18時点の明日のお勧め店舗画面
+#### エンドポイント　/top
+![20230818_top](https://github.com/dataanalytics2020/flask_website/assets/117744645/779d3147-ab77-4b3a-be7f-f0ad6dc22eec)
 ### 2023/08/09時点の明日のお勧め店舗画面
 #### エンドポイント　/tomorrow-recommend/
 ![スクリーンショット 2023-08-09 002916](https://github.com/dataanalytics2020/flask_website/assets/117744645/1a46e321-431e-4110-b4f8-d852a74f438c)

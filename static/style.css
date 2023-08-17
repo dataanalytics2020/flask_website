@@ -808,3 +808,9 @@ td.ui-datepicker-week-end a.ui-state-highlight{
   display:inline-block;
   margin:0 auto;
 }
+
+
+.navbar-light .navbar-toggler {
+  border-color: rgba(0,0,0,0);
+}
+

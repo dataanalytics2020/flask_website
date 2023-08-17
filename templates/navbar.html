@@ -1,12 +1,30 @@
-<nav class="navbar navbar-expand-sm navbar-dark bg-primary mt-3 mb-3">
-  <a href="/" class="navbar-brand">
-    <img src="/static/img/icon.png" width="50" height="50" alt="icon"> SloMap
-  </a>
-  <div class="collapse navbar-collapse">
-      <ul class="navbar-nav">
+<nav class="navbar navbar-expand-sm bg-primary" data-bs-theme="dark">
+  <div class="container-fluid">
+    <a href="/" class="navbar-brand text-white ">
+      <img src="/static/img/icon.png" width="50" height="50" alt="icon"> SloMap
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="ナビゲーションの切替">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbar">
+      <ul class="navbar-nav me-auto mb-2 mb-sm-0">
         <li class="nav-item">
-          <a class="nav-link" href="{{ url_for('root') }}">Home</a>
+          <a class="nav-link active" aria-current="page" href="/">ホーム</a>
+        </li>
+        <li class="nav-item dropdown">
+          <a href="#" class="nav-link dropdown-toggle text-white" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">機能一覧</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="#">店舗名から探す</a></li>
+            <li><a class="dropdown-item" href="#">媒体名から探す</a></li>
+            <li><a class="dropdown-item" href="#">取材から探す</a></li>
+          </ul>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-white" href="/form">問い合わせ</a>
         </li>
       </ul>
+    </div>
   </div>
 </nav>
+
