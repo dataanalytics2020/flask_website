@@ -8,7 +8,13 @@
 <div class="container">
     <div class="row text-center">
         <div class="col-12 ">
-            <h1>明日のお勧め{{data.area_name}}</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                  <li class="breadcrumb-item"><a href="/">HOME</a></li>
+                  <li class="breadcrumb-item active" aria-current="page"><a href="/tomorrow-recommend/{{data.area_name}}">{{data.area_name_jp}}</a></li>
+                </ol>
+            </nav>
+            <h1>{{data.area_name_jp}}のパチンコ・スロット取材予定</h1>
             <div class="mx-auto" style="width: 200px;">
                 <h2 >{{data.date}}日付から探す</h2>
             </div>

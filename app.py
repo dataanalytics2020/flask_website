@@ -223,6 +223,8 @@ def create_df_cell_image(_df,image_name):
     get_concat_h_multi_resize(width_concat_lists).save(create_df_cell_image_path)
     return create_df_cell_image_path
 
+area_name_and_str_jp_area_name_dict = {'hokkaidoutouhoku':'北海道・東北', 'kitakantou':'北関東','minamikantou':'南関東','hokurikukoushinetsu':'北陸・甲信越','toukai':'東海','kansai':'関西','chugokushikoku':'中国・四国','kyushu':'九州・山口'}
+
 app = Flask(__name__, static_folder="static")
 bootstrap = Bootstrap(app)
 
@@ -582,6 +584,7 @@ def top():
         data['display_report_df'] = display_report_df 
         data['display_report_df_row_data'] = list(display_report_df.values.tolist())
         data['area_name'] = 'minamikantou'
+        data['area_name_jp'] = area_name_and_str_jp_area_name_dict['minamikantou']
         return render_template('top.html',data=data,zip=zip)
 
 
@@ -958,6 +961,7 @@ def tomorrow_recommend_area_syuzai_syuzainame(area_name,syuzai_name):
     data = {}
     data['area_name'] = area_name
     data['syuzai_name'] = syuzai_name
+    data['area_name_jp'] = area_name_and_str_jp_area_name_dict[area_name]
     if area_name == 'minamikantou':
         data['area_name_jp'] = '南関東'
 
@@ -985,9 +989,7 @@ def tomorrow_recommend_area_hall_hallname(area_name,hall_name):
     data = {}
     data['area_name'] = area_name
     data['hall_name'] = hall_name
-    if area_name == 'minamikantou':
-        data['area_name_jp'] = '南関東'
-
+    data['area_name_jp'] = area_name_and_str_jp_area_name_dict[area_name]
     area_sql_text = get_area_sql_text(area_name)
     cursor = get_driver()
     #首都圏のイベントの媒体別の予約数を集計
@@ -1016,9 +1018,7 @@ def tomorrow_recommend_area_media_medianame(area_name,media_name):
     data['date_list'] = date_list
     data['area_name'] = area_name
     data['media_name'] = media_name
-    if area_name == 'minamikantou':
-        data['area_name_jp'] = '南関東'
-
+    data['area_name_jp'] = area_name_and_str_jp_area_name_dict[area_name]
     cursor = get_driver()
     area_sql_text = get_area_sql_text(area_name)
     #首都圏のイベントの媒体別の予約数を集計
@@ -1043,10 +1043,9 @@ def tomorrow_recommend_area(area_name):
     today = date.today()
     date_list = [today + timedelta(days=day) for day in range(0,9)]
     date_list = [date.strftime("%Y-%m-%d") for date in date_list]
+    data['area_name_jp'] = area_name_and_str_jp_area_name_dict[area_name]
     data['date_list'] = date_list
     data['area_name'] = area_name
-    if area_name == 'minamikantou':
-        data['area_name_jp'] = '南関東'
 
     area_sql_text = get_area_sql_text(area_name)
     cursor = get_driver()

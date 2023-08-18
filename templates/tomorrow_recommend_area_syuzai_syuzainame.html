@@ -6,6 +6,13 @@
 <div class="container">
     <div class="row">
         <div class="col-12 text-center">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                  <li class="breadcrumb-item"><a href="/">HOME</a></li>
+                  <li class="breadcrumb-item"><a href="/tomorrow-recommend/{{data.area_name}}">{{data.area_name_jp}}</a></li>
+                  <li class="breadcrumb-item active" aria-current="page"><a href="/tomorrow-recommend/{{data.area_name}}/syuzai/{{data.syuzai_name}}">{{data.syuzai_name}}</a></li>
+                </ol>
+            </nav>
             <div class="mx-auto" style="width: 200px;">
                 <h2>{{data.syuzai_name}}</h2>
             </div>
