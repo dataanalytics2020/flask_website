@@ -39,7 +39,7 @@ def convert_sql_date_to_jp_date(sql_date:datetime.date) -> str:
     return sql_str_date.split('-')[1].lstrip('0') + '月' + sql_str_date.split('-')[2].lstrip('0') + '日'
 
 
-def get_area_sql_text(target_area_name):
+def get_area_sql_text(target_area_name='minamikantou'):
     print(target_area_name)
     hokkaidoutouhoku_list = ['北海道', '青森県', '岩手県', '宮城県', '秋田県', '山形県', '福島県']
     kitakantou_list = ['茨城県', '栃木県', '群馬県']
@@ -581,6 +581,7 @@ def top():
         data['display_report_df_column_names'] = display_report_df.columns.values
         data['display_report_df'] = display_report_df 
         data['display_report_df_row_data'] = list(display_report_df.values.tolist())
+        data['area_name'] = 'minamikantou'
         return render_template('top.html',data=data,zip=zip)
 
 
@@ -957,7 +958,7 @@ def tomorrow_recommend_area_syuzai_syuzainame(area_name,syuzai_name):
     data = {}
     data['area_name'] = area_name
     data['syuzai_name'] = syuzai_name
-    if area_name == 'minamikanto':
+    if area_name == 'minamikantou':
         data['area_name_jp'] = '南関東'
 
     area_sql_text = get_area_sql_text(area_name)
@@ -984,7 +985,7 @@ def tomorrow_recommend_area_hall_hallname(area_name,hall_name):
     data = {}
     data['area_name'] = area_name
     data['hall_name'] = hall_name
-    if area_name == 'minamikanto':
+    if area_name == 'minamikantou':
         data['area_name_jp'] = '南関東'
 
     area_sql_text = get_area_sql_text(area_name)
@@ -1015,7 +1016,7 @@ def tomorrow_recommend_area_media_medianame(area_name,media_name):
     data['date_list'] = date_list
     data['area_name'] = area_name
     data['media_name'] = media_name
-    if area_name == 'minamikanto':
+    if area_name == 'minamikantou':
         data['area_name_jp'] = '南関東'
 
     cursor = get_driver()
@@ -1044,7 +1045,7 @@ def tomorrow_recommend_area(area_name):
     date_list = [date.strftime("%Y-%m-%d") for date in date_list]
     data['date_list'] = date_list
     data['area_name'] = area_name
-    if area_name == 'minamikanto':
+    if area_name == 'minamikantou':
         data['area_name_jp'] = '南関東'
 
     area_sql_text = get_area_sql_text(area_name)

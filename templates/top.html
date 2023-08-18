@@ -144,7 +144,7 @@
 
     <div class="row">
         <div class="col-12 text-center">
-            <h1 class='m-2'>明日の関東お勧めマップ(※タップで地図を動かせます)</h1>
+            <h1 class='mt-4'>明日の関東お勧めマップ(※タップで地図を動かせます)</h1>
             <iframe class="embed-responsive-item" scrolling="no" height="450" width="100%" src={{ data.iframe|safe }}</iframe>
             <div class="mx-auto" style="width: 400px;">
                 <h2>関東明日の注目取材一覧</h2>
@@ -166,11 +166,11 @@
                             <tr>
                                 {% for col, row_ in zip(data.display_report_df_column_names, row) %}
                                     {% if col == '取材名' %}
-                                        <td><a href="/tomorrow_recommend/{{data.area_name}}/syuzai/{{ row_ }}" >{{ row_ }}</a></td>
+                                        <td><a href="/tomorrow_recommend/minamikantou/syuzai/{{ row_ }}" >{{ row_ }}</a></td>
                                     {% elif col == '店舗名' %}
-                                        <td><a href="/tomorrow_recommend/{{data.area_name}}/hall/{{ row_ }}" >{{ row_ }}</a></td>
+                                        <td><a href="/tomorrow_recommend/minamikantou/hall/{{ row_ }}" >{{ row_ }}</a></td>
                                     {% elif col == '媒体名' %}
-                                        <td><a href="/tomorrow_recommend/{{data.area_name}}/media/{{ row_ }}" >{{ row_ }}</a></td>
+                                        <td><a href="/tomorrow_recommend/minamikantou/media/{{ row_ }}" >{{ row_ }}</a></td>
                                     {% else %}
                                         <td>{{row_}}</td>
                                     {% endif %}
@@ -186,6 +186,31 @@
 
 </div>
 
+<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1/i18n/jquery.ui.datepicker-ja.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/themes/cupertino/jquery-ui.min.css">  <!-- テーマcupertinoを選択 -->\
+<script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+<script>
+$(document).ready(function(){
+    $("#syuzai_table").DataTable({
+        "language":{url:"https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json",},
+            // 件数切替機能 無効
+        lengthChange: false,
+        // 検索機能 無効
+        searching: true,
+        // ソート機能 無効
+        ordering: true,
+        // 情報表示 無効
+        info: true,
+        // ページング機能 無効
+        paging: false,
+        // 初期表示の並び替えなし
+        order: [],
+    });
+});
+</script>
 
 
 {% endblock %}
