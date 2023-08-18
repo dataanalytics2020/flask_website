@@ -34,6 +34,10 @@ load_dotenv()
 df:pd.DataFrame  = pd.read_csv(r'csv/2022-12-09_touhou.csv')
 heroku_port:int = int(os.environ.get("PORT", 5000))
 
+def convert_sql_date_to_jp_date(sql_date:datetime.date) -> str:
+    sql_str_date = str(sql_date)
+    return sql_str_date.split('-')[1].lstrip('0') + '月' + sql_str_date.split('-')[2].lstrip('0') + '日'
+
 
 def get_area_sql_text(target_area_name):
     print(target_area_name)
@@ -472,7 +476,112 @@ def top():
             jp_str_day = day.strftime('%m').lstrip('0') + '月' + day.strftime('%d').lstrip('0') + '日' + w_list[day.weekday()]
             jp_str_day_list.append(jp_str_day)
         data['jp_str_day_list'] = jp_str_day_list
-        return render_template('top.html',data=data)
+        area_sql_text = get_area_sql_text('minamikantou')
+        cursor = get_driver()
+        sql = f'''SELECT イベント日,都道府県,店舗名,取材名,取材ランク,媒体名,latitude,longitude
+                FROM schedule as schedule2
+                left join maptable as maptable2
+                on schedule2.店舗名 = maptable2.hallnavi_name
+                WHERE イベント日 > CURRENT_DATE
+                AND イベント日 <= CURRENT_DATE + 1
+                AND 媒体名 != 'ホールナビ'
+                AND (取材ランク = 'S' OR 取材ランク = 'A')
+                AND ({area_sql_text})
+                ORDER BY イベント日,都道府県,店舗名,媒体名,取材名 desc;'''
+        print(sql)
+        cursor.execute(sql)
+        cols = [col[0] for col in cursor.description]
+        print('cols',cols)
+        report_df =  pd.DataFrame(cursor.fetchall(),columns = cols )
+        report_df = report_df.loc[:,~report_df.columns.duplicated()]
+        report_df = report_df.drop_duplicates(keep='first')
+        report_df =report_df.dropna(subset=['latitude'])
+        map_report_df = report_df[['店舗名','取材名','媒体名']].drop_duplicates(keep='first')
+        map_report_df = map_report_df.sort_values(['店舗名','媒体名']).reset_index(drop=True)
+        #東京都に設定
+        prefecture_latitude = 35.68944
+        prefecture_longitude = 139.69167
+        
+        folium_map = folium.Map(location=[prefecture_latitude,prefecture_longitude], zoom_start=10, width="100%", height="100%")
+        # 地図表示
+        # マーカープロット（ポップアップ設定，色変更，アイコン変更）
+        print(report_df)
+        for tenpo_name in report_df['店舗名'].unique():
+            print(tenpo_name)
+            extract_syuzai_df_1 = report_df[report_df['店舗名'] == tenpo_name]
+            #display(extract_syuzai_df_1)
+            print(extract_syuzai_df_1)
+            syuzai_rank_list = list(extract_syuzai_df_1['取材ランク'].unique())
+            #print(syuzai_rank_list)
+            longitude = extract_syuzai_df_1.iloc[0]['longitude']
+            latitude = extract_syuzai_df_1.iloc[0]['latitude']
+            print('latitude,longitude',latitude,longitude)
+            # グレースケールの画像データを作成
+            im= Image.new("L", (280, 100),color=(0))
+            im.putalpha(0)
+            im2= Image.new("L", (260, 50),color=(50))
+            im2.putalpha(128)
+            im3 = Image.open('icon.png')
+            draw = ImageDraw.Draw(im)
+            font = ImageFont.truetype('font/LightNovelPOPv2.otf',19)
+            if len(extract_syuzai_df_1)==1:
+                syuzai_name_text = '◆' + tenpo_name + f'\n {extract_syuzai_df_1["取材名"].values[0]}'
+            else:
+                syuzai_name_text = '◆' + tenpo_name + f'\n {extract_syuzai_df_1["取材名"].values[0]}、他{len(extract_syuzai_df_1)-1}件'
+            #print(syuzai_name_text)
+            draw = ImageDraw.Draw(im)
+            font = ImageFont.truetype('font/LightNovelPOPv2.otf',19)
+
+            # 画像を表示
+            im.paste(im3, (-15,-14))
+            im.paste(im2, (25,48))
+            draw.multiline_text(
+                (150, 50),
+                f'{syuzai_name_text}',
+                font=font,
+                fill='white',
+                align='center',
+                spacing=0,
+                anchor='ma'
+            )
+
+            im.save('syuzai_image.png', quality=95)
+            img = 'syuzai_image.png'
+            popup_df = extract_syuzai_df_1[['店舗名','取材名','媒体名']].sort_values('店舗名').reset_index(drop=True).T
+            popup_df = popup_df.to_html(escape=False)
+            popup_data = folium.Popup(popup_df,  max_width=1500,show=False,size=(700, 300))
+
+            folium.Marker(location=[latitude ,longitude],
+                tiles='https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png',
+                attr='国土地理院',
+                popup=popup_data,
+                icon = CustomIcon(
+                            icon_image = img,
+                            icon_size = (280, 100),
+                            icon_anchor = (0, 0),
+                            #shadow_image = shadow_img, # 影効果（今回は使用せず コメントアウト
+                            #shadow_size = (30, 30),
+                            shadow_anchor = (-4, -40),
+                            popup_anchor = (3, 3))).add_to(folium_map)
+            #break
+        
+        # set the iframe width and height
+        plugins.Fullscreen(
+                            position="topright",
+                            title="拡大する",
+                            title_cancel="元に戻す",
+                            force_separate_button=True,
+                        ).add_to(folium_map)
+        folium_map.get_root().width = "500px"
+        folium_map.get_root().height = "600px"
+        
+        data['iframe'] = folium_map.get_root()._repr_html_()
+        display_report_df = report_df[['イベント日','都道府県','店舗名','媒体名','取材名']].sort_values(['イベント日','都道府県','店舗名','媒体名','取材名'],ascending=[True,True,True,True,False]).reset_index(drop=True)
+        display_report_df['イベント日'] = display_report_df['イベント日'].map(convert_sql_date_to_jp_date)
+        data['display_report_df_column_names'] = display_report_df.columns.values
+        data['display_report_df'] = display_report_df 
+        data['display_report_df_row_data'] = list(display_report_df.values.tolist())
+        return render_template('top.html',data=data,zip=zip)
 
 
 @app.route('/recommend/<prefecture>', methods=['GET', 'POST'])

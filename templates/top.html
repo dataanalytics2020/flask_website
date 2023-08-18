@@ -2,7 +2,7 @@
 {% block content %}
 <div class="container">
     <div class="row">
-        <div class="col mt-4">
+        <div class="col">
             <h2>エリアから行きたい日の取材予定を地図で探す</h2>
             <p>※現在は北・南関東のみ対応しています。</p>
             <div class="row">
@@ -28,7 +28,7 @@
         </div>
     </div>
 
-    <div class="row mt-4">
+    <div class="row">
         <div class="col">
             <h2>都道府県から行きたい日の取材予定を地図で探す</h2>
             <form action="{{ url_for('top') }}" method="post">
@@ -140,5 +140,53 @@
             </div>
         </div>
     </div>
+
+
+    <div class="row">
+        <div class="col-12 text-center">
+
+            <h1 class='m-2'>明日の関東お勧めマップ(※タップで地図を動かせます)</h1>
+            <iframe class="col-md-12", src={{ data.iframe|safe }}</iframe></div>
+            <div class="mx-auto" style="width: 400px;">
+                <h2>関東明日の注目取材一覧</h2>
+            </div>
+            <div class = 'heatmap .table-wrap'>
+                <div class="scroll_area" style="width:100%;max-width:2000px;overflow-x:scroll;">
+                    <table id="syuzai_table" class="table table-striped">
+                        <thead>
+                            <tr>
+                                {% for col in data.display_report_df_column_names %}
+                                <th>
+                                {{col}}
+                                </th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in data.display_report_df_row_data %}
+                            <tr>
+                                {% for col, row_ in zip(data.display_report_df_column_names, row) %}
+                                    {% if col == '取材名' %}
+                                        <td><a href="/tomorrow_recommend/{{data.area_name}}/syuzai/{{ row_ }}" >{{ row_ }}</a></td>
+                                    {% elif col == '店舗名' %}
+                                        <td><a href="/tomorrow_recommend/{{data.area_name}}/hall/{{ row_ }}" >{{ row_ }}</a></td>
+                                    {% elif col == '媒体名' %}
+                                        <td><a href="/tomorrow_recommend/{{data.area_name}}/media/{{ row_ }}" >{{ row_ }}</a></td>
+                                    {% else %}
+                                        <td>{{row_}}</td>
+                                    {% endif %}
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
+
+
+
 {% endblock %}
