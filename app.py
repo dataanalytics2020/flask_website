@@ -487,17 +487,18 @@ def top():
                 WHERE イベント日 > CURRENT_DATE
                 AND イベント日 <= CURRENT_DATE + 1
                 AND 媒体名 != 'ホールナビ'
-                AND (取材ランク = 'S' OR 取材ランク = 'A')
                 AND ({area_sql_text})
-                ORDER BY イベント日,都道府県,店舗名,媒体名,取材名 desc;'''
+                ORDER BY イベント日,都道府県,店舗名,媒体名,取材名 desc;'''#AND (取材ランク = 'S' OR 取材ランク = 'A')
         print(sql)
         cursor.execute(sql)
         cols = [col[0] for col in cursor.description]
         print('cols',cols)
         report_df =  pd.DataFrame(cursor.fetchall(),columns = cols )
         report_df = report_df.loc[:,~report_df.columns.duplicated()]
-        report_df = report_df.drop_duplicates(keep='first')
-        report_df =report_df.dropna(subset=['latitude'])
+        all_kanto_display_df = report_df = report_df.drop_duplicates(keep='first')
+        report_df = report_df.dropna(subset=['latitude'])
+        #(取材ランク = 'S' OR 取材ランク = 'A')のみ抽出
+        report_df = report_df[report_df['取材ランク'].isin(['S','A'])]
         map_report_df = report_df[['店舗名','取材名','媒体名']].drop_duplicates(keep='first')
         map_report_df = map_report_df.sort_values(['店舗名','媒体名']).reset_index(drop=True)
         #東京都に設定
@@ -578,10 +579,11 @@ def top():
         folium_map.get_root().height = "600px"
         
         data['iframe'] = folium_map.get_root()._repr_html_()
-        display_report_df = report_df[['イベント日','都道府県','店舗名','媒体名','取材名']].sort_values(['イベント日','都道府県','店舗名','媒体名','取材名'],ascending=[True,True,True,True,False]).reset_index(drop=True)
+        display_report_df = all_kanto_display_df[['イベント日','都道府県','店舗名','媒体名','取材名']].sort_values(['イベント日','都道府県','店舗名','媒体名','取材名'],ascending=[True,False,True,True,False]).reset_index(drop=True)
+        display_report_df = display_report_df.drop_duplicates(keep='first')
         display_report_df['イベント日'] = display_report_df['イベント日'].map(convert_sql_date_to_jp_date)
         data['display_report_df_column_names'] = display_report_df.columns.values
-        data['display_report_df'] = display_report_df 
+        data['display_report_df'] = display_report_df
         data['display_report_df_row_data'] = list(display_report_df.values.tolist())
         data['area_name'] = 'minamikantou'
         data['area_name_jp'] = area_name_and_str_jp_area_name_dict['minamikantou']
@@ -1064,6 +1066,8 @@ def tomorrow_recommend_area(area_name):
     data['groupby_media_name_count_df'] = groupby_media_name_count_df
     data['groupby_media_name_count_df_column_names'] = groupby_media_name_count_df.columns.values
     data['groupby_media_name_count_df_row_data'] = list(groupby_media_name_count_df.values.tolist())
+    
+    
     return render_template('tomorrow_recommend_area.html',data=data,zip=zip)
 #           /tomorrow_recommend/minamikanto/media/BASHtv-data
 
