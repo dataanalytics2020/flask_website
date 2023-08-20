@@ -816,4 +816,51 @@ td.ui-datepicker-week-end a.ui-state-highlight{
 
 
 
+.tab-area {
+  display: flex;/* flexで横並び */
+  border: 2px solid;
+  cursor: pointer;/* カーソルポインターに */
+}
+.tab {
+  width: calc(100%/3);/* calc関数を使用し、均等に3分割する */
+  padding: 5px;
+  text-align: center;/* 文字を中央に。 */
+}
+.tab:nth-child(n+2) {
+  border-left: 2px solid;
+}
+.tab.active {
+  background-color: #000;
+  color: #fff;
+}
 
+h4 {
+  position: relative;
+  background: #1e00b7;
+  padding: 2px 5px 2px 25px;
+  font-size: 16px;
+  color: #ffffff;
+  border-radius: 0 10px 10px 0;
+}
+
+h4:before {
+  font-family: "Font Awesome 5 Free";
+  content: "\f135";
+  display: inline-block;
+  line-height: 40px;
+  position: absolute;
+  padding: 0em;
+  color: white;
+  background: #1e00b7;
+  font-weight: 900;
+  width: 40px;
+  text-align: center;
+  height: 40px;
+  line-height: 40px;
+  left: -1.35em;
+  top: 50%;
+  -webkit-transform: translateY(-50%);
+  transform: translateY(-50%);
+  border: solid 3px white; 
+  border-radius: 50%;
+}
