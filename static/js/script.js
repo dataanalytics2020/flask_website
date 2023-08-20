@@ -28,7 +28,7 @@ $(function(){
             console.log('window.location.href')
             console.log(window.location.href)
             let domain_url = window.location.href.replace('/top','')
-            window.location.href =  domain_url  + '/recommend/' + id;
+            window.location.href =  domain_url  + '/' + id;
             prefReset();
         }
     });

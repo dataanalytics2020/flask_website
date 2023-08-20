@@ -589,6 +589,10 @@ def top():
         data['area_name_jp'] = area_name_and_str_jp_area_name_dict['minamikantou']
         return render_template('top.html',data=data,zip=zip)
 
+@app.route('/recommend', methods=['GET', 'POST'])
+def select_recommend_area():
+    return render_template('target_date_recommend_top.html')
+
 
 @app.route('/recommend/<prefecture>', methods=['GET', 'POST'])
 def select_tenpo_name(prefecture):
@@ -670,7 +674,7 @@ def clicked_tenpo_name(prefecture,tenpo_name):
         
         print(user_data['tenpo-name'],user_data['recommend-day'])
         target_day_list = []
-        number = 0
+        number = 1
         today = date.today()
         target_number:int = str(user_data['recommend-day'][-1])
         data['target_number'] = target_number
@@ -682,6 +686,10 @@ def clicked_tenpo_name(prefecture,tenpo_name):
                     target_day = today - timedelta(days=number)
                     print('取得日',target_day)
                     target_day_str = target_day.strftime('%Y-%m-%d')
+                    if target_day_str[-2:] == '31':
+                        print('取得日',target_day,'は31日なのでスキップします。')
+                        number += 1
+                        continue
                     target_day_list.append(target_day_str)
                     number += 1
                     break
