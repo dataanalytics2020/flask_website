@@ -145,7 +145,7 @@
     <div class="row">
         <div class="col-12 text-center">
             <h1 class='mt-4'>明日の関東お勧めマップ(※タップで地図を動かせます)</h1>
-            <h4  data-text="※明日みんなが注目の取材のみマップに表示中">※明日みんなが注目の取材のみマップに表示中</h4>
+            <h4 data-text="※明日みんなが注目の取材のみマップに表示中">※明日要注目の取材のみマップに表示中</h4>
             <iframe class="embed-responsive-item" scrolling="no" height="450" width="100%" src={{ data.iframe|safe }}</iframe>
             <div class="mx-auto mt-4" style="width: 400px;">
                 <h2>南関東明日の取材一覧</h2>
@@ -241,7 +241,10 @@ $(document).ready(function(){
         lengthMenu: [ 10, 20, 30, 40, 50, 100 ],
         // ページングの件数切替機能 無効
         pageLength: 30,
-        // ページングの件数切替機能 無効
+
+        //列の幅を調整する
+        autoWidth: true,
+        
         // 初期表示の並び替えなし
         order: [],
     });

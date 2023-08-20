@@ -837,7 +837,7 @@ td.ui-datepicker-week-end a.ui-state-highlight{
 h4 {
   position: relative;
   background: #1e00b7;
-  padding: 2px 5px 2px 25px;
+  padding: 2px 5px 2px 35px;
   font-size: 16px;
   color: #ffffff;
   border-radius: 0 10px 10px 0;
@@ -846,7 +846,7 @@ h4 {
 h4:before {
   font-family: "Font Awesome 5 Free";
   content: "\f135";
-  display: inline-block;
+  display: block;
   line-height: 40px;
   position: absolute;
   padding: 0em;
@@ -857,7 +857,7 @@ h4:before {
   text-align: center;
   height: 40px;
   line-height: 40px;
-  left: -1.35em;
+  left: 0em;
   top: 50%;
   -webkit-transform: translateY(-50%);
   transform: translateY(-50%);
