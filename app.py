@@ -377,7 +377,7 @@ def top():
         else:
             pass
 
-        folium_map = folium.Map(location=[prefecture_latitude,prefecture_longitude], zoom_start=12, width="100%", height="100%")
+        folium_map = folium.Map(location=[prefecture_latitude,prefecture_longitude], zoom_start=11, width="100%", height="100%")
         # 地図表示
         # マーカープロット（ポップアップ設定，色変更，アイコン変更）
         print(report_df)
