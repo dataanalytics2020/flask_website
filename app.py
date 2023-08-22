@@ -580,13 +580,9 @@ def heatmap_test():#prefecture,tenpo_name
         date_list = [date.strftime("%Y-%m-%d") for date in date_list]
         return render_template('target_date_recommend_schedule.html',date_list=date_list,tenpo_name=tenpo_name)
 
-@app.route('/top', methods=['GET', 'POST'])
-
-
 @app.route('/recommend', methods=['GET', 'POST'])
 def select_recommend_area():
     return render_template('target_date_recommend_top.html')
-
 
 @app.route('/recommend/<prefecture>', methods=['GET', 'POST'])
 def select_tenpo_name(prefecture):
@@ -641,7 +637,6 @@ SKIP,ザシティ/ベルシティ,ジアス,ジャパンニューアルファ,�
             target = extract_tokyo_tenpo_url_df.index[(extract_tokyo_tenpo_url_df['店舗名'] == tenpo_name)]
         web_group_name_list.append(tmp_list)
 
-    
     others_extract_tokyo_tenpo_url_df = extract_tokyo_tenpo_url_df 
     for group_name in sorted_group_name_count_dict:
         extract_groupname_df = extract_tokyo_tenpo_url_df[extract_tokyo_tenpo_url_df['店舗名'].str.contains(group_name)]
