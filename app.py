@@ -232,103 +232,7 @@ bootstrap = Bootstrap(app)
 path=os.getcwd()
 print(path)
 
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///blog.db'
-# app.config['SECRET_KEY'] = os.urandom(24)
-# db = SQLAlchemy(app)
-
 @app.route('/', methods=['GET', 'POST'])
-def root():
-    return redirect("/top")
-
-@app.route('/heatmap', methods=['GET', 'POST'])#<prefecture>/<tenpo_name>
-def heatmap_test():#prefecture,tenpo_name
-    from datetime import date, timedelta
-    if request.method == 'POST':
-        target_day_list = []
-        number = 0
-        today = date.today()
-        target_number:int = '7'
-        serch_number:int = 3
-        tenpo_name = 'マルハン亀有店'
-        for i in range(serch_number):
-            while True:
-                #print(str(date.today() - timedelta(days=number))[-1])
-                if target_number == str(today - timedelta(days=number))[-1]:
-                    target_day = today - timedelta(days=number)
-                    print('取得日',target_day)
-                    target_day_str = target_day.strftime('%Y-%m-%d')
-                    target_day_list.append(target_day_str)
-                    number += 1
-                    break
-                else: 
-                    pass
-                number += 1
-        target_day_list.reverse()
-        print(target_day_list)
-        concat_df_list = []
-        urls = []
-        for serch_date in target_day_list:
-            search_url = url = f"https://ana-slo.com/{serch_date}-マルハン亀有店-data/"
-            urls.append(search_url)
-
-        with ThreadPoolExecutor(serch_number) as executor:
-            results = list(executor.map(requests.get, urls))
-        print(results)
-
-        concat_df_list = []
-        for search_response,target_day in zip(results, target_day_list):
-            soup = BeautifulSoup(search_response.text, "lxml")
-            elem = soup.select('#all_data_block')
-            dfs = pd.read_html(str(elem))
-            for df in dfs:
-                if '機種名' in list(df.columns):
-                    tmp_df = df
-                    #tmp_df['店舗名'] = user_data['tenpo-name']
-                    tmp_df['日付'] = target_day
-                    #tmp_df['機種名'] = tmp_df['機種名'].map(removal_text)
-                    break
-            concat_df_list.append(df)
-
-        concat_df = pre_concat_df =pd.concat(concat_df_list,axis=0)
-        for column_name in ['合成確率','BB確率','RB確率','ART確率','BB','RB','ART']:
-            try:
-                concat_df = concat_df.drop([column_name],axis=1)
-            except:
-                pass
-
-        horizon_concat_list =[]
-        for groupby_date_df in concat_df_list:
-            for column_name in ['合成確率','BB確率','RB確率','ART確率','BB','RB','ART']:
-                try:
-                    groupby_date_df = groupby_date_df.drop([column_name],axis=1)
-                except:
-                    pass
-            groupby_date_df['台番号'] = groupby_date_df['台番号'].astype(int)
-            groupby_date_df.sort_values(['台番号'],inplace=True)
-            groupby_date_df['台番号'] = groupby_date_df['台番号'].astype(str)
-            groupby_date_df['機種名'] = groupby_date_df['台番号'] + '_' + groupby_date_df['機種名']
-            groupby_date_df = groupby_date_df.drop(['台番号'],axis=1)
-            column_date_name:str = groupby_date_df['日付'].loc[0].split('-')[1].lstrip('0') + '/' + groupby_date_df['日付'].loc[0].split('-')[2].lstrip('0')
-            groupby_date_df = groupby_date_df.drop(['日付'],axis=1)
-            groupby_date_df = groupby_date_df.rename(columns={'機種名':column_date_name+'_台番号_機種名','G数':column_date_name+'_G数','差枚':column_date_name + '_差枚'})
-            #display(groupby_date_df)
-            groupby_date_df.reset_index(drop=True,inplace=True)
-            horizon_concat_list.append(groupby_date_df)
-            
-
-        horizon_concat_df = pd.concat(horizon_concat_list,axis=1)
-        horizon_concat_df_html = re.sub(' target', '" id="target', horizon_concat_df.to_html(classes='target',index=False))
-        return render_template('test.html',horizon_concat_df = horizon_concat_df_html,\
-                                            zip=zip,\
-                                            heatmap_column_names=horizon_concat_df.columns.values, \
-                                            heatmap_row_data=list(horizon_concat_df.values.tolist()) )
-    else:
-        today = date.today()
-        date_list = [today + timedelta(days=day) for day in range(1,9)]
-        date_list = [date.strftime("%Y-%m-%d") for date in date_list]
-        return render_template('target_date_recommend_schedule.html',date_list=date_list,tenpo_name=tenpo_name)
-
-@app.route('/top', methods=['GET', 'POST'])
 def top():
     if request.method == 'POST':
         user_data = request.form
@@ -339,7 +243,6 @@ def top():
         target_day = str(today.year) + '-' + user_data['target_day'].split('月')[0] + '-' + user_data['target_day'].split('月')[1].split('日')[0]
         jpn_target_day = target_day.split('-')[1].lstrip('0') + '月' + target_day.split('-')[2].lstrip('0') + '日'
         print(prefecture,target_day)
-        
         #イベント日,店舗名,取材名,媒体名,アナスロ店舗名
         cursor = get_driver()
         sql = f"""SELECT イベント日,店舗名,取材名,媒体名,店舗名,latitude,longitude,取材ランク
@@ -451,7 +354,7 @@ def top():
         folium_map.get_root().height = "600px"
         
         iframe = folium_map.get_root()._repr_html_()
- 
+
         return render_template('schedule_map.html',data=data,jpn_target_day=jpn_target_day,\
                                             user_data=user_data,iframe=iframe,\
                                             zip=zip,\
@@ -459,7 +362,6 @@ def top():
                                             row_data=list(map_report_df.values.tolist()))
     else:
         data = {}
-        
         data['prefecture_list'] =['北海道','青森県','岩手県','宮城県','秋田県','山形県',\
                                 '福島県','茨城県','栃木県','群馬県','埼玉県','千葉県',\
                                 '東京都','神奈川県','新潟県','富山県','石川県','福井県',\
@@ -588,6 +490,98 @@ def top():
         data['area_name'] = 'minamikantou'
         data['area_name_jp'] = area_name_and_str_jp_area_name_dict['minamikantou']
         return render_template('top.html',data=data,zip=zip)
+
+
+@app.route('/heatmap', methods=['GET', 'POST'])#<prefecture>/<tenpo_name>
+def heatmap_test():#prefecture,tenpo_name
+    from datetime import date, timedelta
+    if request.method == 'POST':
+        target_day_list = []
+        number = 0
+        today = date.today()
+        target_number:int = '7'
+        serch_number:int = 3
+        tenpo_name = 'マルハン亀有店'
+        for i in range(serch_number):
+            while True:
+                #print(str(date.today() - timedelta(days=number))[-1])
+                if target_number == str(today - timedelta(days=number))[-1]:
+                    target_day = today - timedelta(days=number)
+                    print('取得日',target_day)
+                    target_day_str = target_day.strftime('%Y-%m-%d')
+                    target_day_list.append(target_day_str)
+                    number += 1
+                    break
+                else: 
+                    pass
+                number += 1
+        target_day_list.reverse()
+        print(target_day_list)
+        concat_df_list = []
+        urls = []
+        for serch_date in target_day_list:
+            search_url = url = f"https://ana-slo.com/{serch_date}-マルハン亀有店-data/"
+            urls.append(search_url)
+
+        with ThreadPoolExecutor(serch_number) as executor:
+            results = list(executor.map(requests.get, urls))
+        print(results)
+
+        concat_df_list = []
+        for search_response,target_day in zip(results, target_day_list):
+            soup = BeautifulSoup(search_response.text, "lxml")
+            elem = soup.select('#all_data_block')
+            dfs = pd.read_html(str(elem))
+            for df in dfs:
+                if '機種名' in list(df.columns):
+                    tmp_df = df
+                    #tmp_df['店舗名'] = user_data['tenpo-name']
+                    tmp_df['日付'] = target_day
+                    #tmp_df['機種名'] = tmp_df['機種名'].map(removal_text)
+                    break
+            concat_df_list.append(df)
+
+        concat_df = pre_concat_df =pd.concat(concat_df_list,axis=0)
+        for column_name in ['合成確率','BB確率','RB確率','ART確率','BB','RB','ART']:
+            try:
+                concat_df = concat_df.drop([column_name],axis=1)
+            except:
+                pass
+
+        horizon_concat_list =[]
+        for groupby_date_df in concat_df_list:
+            for column_name in ['合成確率','BB確率','RB確率','ART確率','BB','RB','ART']:
+                try:
+                    groupby_date_df = groupby_date_df.drop([column_name],axis=1)
+                except:
+                    pass
+            groupby_date_df['台番号'] = groupby_date_df['台番号'].astype(int)
+            groupby_date_df.sort_values(['台番号'],inplace=True)
+            groupby_date_df['台番号'] = groupby_date_df['台番号'].astype(str)
+            groupby_date_df['機種名'] = groupby_date_df['台番号'] + '_' + groupby_date_df['機種名']
+            groupby_date_df = groupby_date_df.drop(['台番号'],axis=1)
+            column_date_name:str = groupby_date_df['日付'].loc[0].split('-')[1].lstrip('0') + '/' + groupby_date_df['日付'].loc[0].split('-')[2].lstrip('0')
+            groupby_date_df = groupby_date_df.drop(['日付'],axis=1)
+            groupby_date_df = groupby_date_df.rename(columns={'機種名':column_date_name+'_台番号_機種名','G数':column_date_name+'_G数','差枚':column_date_name + '_差枚'})
+            #display(groupby_date_df)
+            groupby_date_df.reset_index(drop=True,inplace=True)
+            horizon_concat_list.append(groupby_date_df)
+            
+
+        horizon_concat_df = pd.concat(horizon_concat_list,axis=1)
+        horizon_concat_df_html = re.sub(' target', '" id="target', horizon_concat_df.to_html(classes='target',index=False))
+        return render_template('test.html',horizon_concat_df = horizon_concat_df_html,\
+                                            zip=zip,\
+                                            heatmap_column_names=horizon_concat_df.columns.values, \
+                                            heatmap_row_data=list(horizon_concat_df.values.tolist()) )
+    else:
+        today = date.today()
+        date_list = [today + timedelta(days=day) for day in range(1,9)]
+        date_list = [date.strftime("%Y-%m-%d") for date in date_list]
+        return render_template('target_date_recommend_schedule.html',date_list=date_list,tenpo_name=tenpo_name)
+
+@app.route('/top', methods=['GET', 'POST'])
+
 
 @app.route('/recommend', methods=['GET', 'POST'])
 def select_recommend_area():
