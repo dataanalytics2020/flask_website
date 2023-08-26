@@ -41,7 +41,7 @@ def login_scraping_site(area_name):
     options.add_argument('--headless')
     options.add_argument("--no-sandbox")
 
-    browser = webdriver.Chrome(ChromeDriverManager(requests.get('https://chromedriver.storage.googleapis.com/LATEST_RELEASE').text).install(),options=options)#ChromeDriverManager().install() 
+    browser = webdriver.Chrome(ChromeDriverManager().install(),options=options)#ChromeDriverManager().install() 
     browser.implicitly_wait(10)
     url_login = f"https://{os.getenv('SCRAPING_SYUZAI_DOMAIN')}/login_form_mail"
     #admageを開く
@@ -195,7 +195,7 @@ for area_name in ['kanto']:
     concat_pledge_df = pd.DataFrame(index=[], columns=[])
     increment_id = max(list(sql_syuzai_report_all_df['id']))
     print(increment_id)
-    text = f'{area_name} {count}件のpostgresへの公約レコードの追加が終了しました。'
+    
     for i,row in insert_pledge_df.iterrows():
         dicision_df = sql_syuzai_report_all_df[sql_syuzai_report_all_df['syuzai_name'] == row['syuzai_name']]
         #display(dicision_df)
@@ -210,6 +210,7 @@ for area_name in ['kanto']:
         else:
             #print('追加なし')
             pass
+    text = f'{area_name} {count}件のpostgresへの公約レコードの追加が終了しました。'
     post_line_text(text,os.getenv('LINE_TOKEN'))
 
 

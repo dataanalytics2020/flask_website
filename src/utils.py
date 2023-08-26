@@ -135,7 +135,7 @@ class UtilsTwitterClass():
         # options.add_argument("--disable-features=NetworkService")
         # options.add_argument("--window-size=1920x1080")
         # options.add_argument("--disable-features=VizDisplayCompositor")
-        browser = webdriver.Chrome(ChromeDriverManager(requests.get('https://chromedriver.storage.googleapis.com/LATEST_RELEASE').text).install(),options=options)
+        browser = webdriver.Chrome(ChromeDriverManager().install(),options=options)
         browser.get("https://twitter.com/home")
         browser.implicitly_wait(10)
 
@@ -616,7 +616,7 @@ class PledgeScraping():
         options = Options()
         options.add_argument('--headless')
         options.add_argument("--no-sandbox")
-        browser = webdriver.Chrome(ChromeDriverManager(requests.get('https://chromedriver.storage.googleapis.com/LATEST_RELEASE').text).install(),options=options)
+        browser = webdriver.Chrome(ChromeDriverManager().install(),options=options)
         browser.implicitly_wait(10)
         url_login = f"https://{os.getenv('SCRAPING_SYUZAI_DOMAIN')}/login_form_mail"
         #admageを開く
