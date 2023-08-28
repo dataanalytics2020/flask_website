@@ -28,3 +28,5 @@ csv/all_erea__halldata.csv
 csv/extract_halldata.csv
 test/heroku_psgr_dev.ipynb
 test/heroku_psgr_dev.ipynb
+csv/店舗名デコードテーブル.csv
+csv/店舗名デコードテーブル都道府県付き.csv
