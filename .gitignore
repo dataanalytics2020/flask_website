@@ -30,3 +30,9 @@ test/heroku_psgr_dev.ipynb
 test/heroku_psgr_dev.ipynb
 csv/店舗名デコードテーブル.csv
 csv/店舗名デコードテーブル都道府県付き.csv
+csv/アナスロとホールナビの店舗名比較_マスター.csv
+csv/アナスロとホールナビの店舗名比較.csv
+csv/ホールナビ_スクレイピングDMM店舗名_都道府県付.csv
+test/convert_dmm_tenpo_name_to_anaslo_tenpo_name.ipynb
+test/create_convert_tenpo_name_table.ipynb
+csv/店舗リスト_oyama.csv

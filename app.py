@@ -187,7 +187,7 @@ def create_media_map_iframe(report_df:pd.DataFrame):
             icon = CustomIcon(
                         icon_image = img,
                         icon_size = (280, 100),
-                        icon_anchor = (30, 0),
+                        icon_anchor = (0, 0),
                         #shadow_image = shadow_img, # 影効果（今回は使用せず コメントアウト
                         #shadow_size = (30, 30),
                         shadow_anchor = (-4, -40),
@@ -205,10 +205,10 @@ def create_media_map_iframe(report_df:pd.DataFrame):
     folium_map.get_root().height = "600px"
     return folium_map.get_root()._repr_html_()
 
-def create_hall_map_iframe(extract_hall_name_df):
+def create_hall_map_iframe(extract_hall_name_df,zoom_size=16):
     longitude = extract_hall_name_df.iloc[0]['longitude']
     latitude = extract_hall_name_df.iloc[0]['latitude']
-    folium_map = folium.Map(location=[latitude,longitude], zoom_start=16, width="100%", height="100%")
+    folium_map = folium.Map(location=[latitude,longitude], zoom_start=zoom_size, width="100%", height="100%")
     tenpo_name = list(extract_hall_name_df['店舗名'].unique())[0]
     # グレースケールの画像データを作成
     im= Image.new("L", (280, 100),color=(0))
@@ -1227,7 +1227,7 @@ def tomorrow_recommend_area_hall_hallname(area_name,hall_name):
     data['pworld_url'] = extract_hall_name_df.iloc[0].T['pworld_url']
     data['dmm_url'] = extract_hall_name_df.iloc[0].T['dmm_url']
     data['line_url'] = extract_hall_name_df.iloc[0].T['line_url']
-    data['iframe'] = create_hall_map_iframe(extract_hall_name_df)
+    data['iframe'] = create_hall_map_iframe(extract_hall_name_df,zoom_size=10)
     table_df = extract_hall_name_df[['イベント日','都道府県','媒体名','取材名']]
     table_df['イベント日'] = table_df['イベント日'].map(convert_sql_date_to_jp_date)
     data['extract_hall_name_df'] = table_df
