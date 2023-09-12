@@ -98,65 +98,67 @@ def login_scraping_site(area_name):
 
 
 furture_syuzai_list_df = pd.DataFrame(index=[], columns=['都道府県','イベント日','店舗名','取材名','媒体名','取材ランク'])
-browser = login_scraping_site('kanto')
-elements = browser.find_elements(By.CLASS_NAME,"mgn_serch_list_bottom")
-i = 0
-while True:
-    browser.find_element(By.CLASS_NAME,"head_change_main").click()
-    browser.implicitly_wait(10)
-    if 'プレミアム会員登録' == browser.find_element(By.CLASS_NAME,"menu_child").text:
-        browser = login_scraping_site('kanto')
-    else:
-        pass
-    try:
-        elements = browser.find_elements(By.CLASS_NAME,"mgn_serch_list_bottom")
-        baitai_name = elements[i].text.split(' ')[0]
-        baitai_name = baitai_name.replace('パチマガスロマガじゃ…','パチマガスロマガ').replace('パチンコ店長のホール…','パチンコ店長のホール攻略')
+#['hokkaido','tohoku','kanto','chubu','kansai','chugoku','sikoku','kyusyu']
+for area_name in ['kanto','kansai']:
+    browser = login_scraping_site(area_name)
+    elements = browser.find_elements(By.CLASS_NAME,"mgn_serch_list_bottom")
+    i = 0
+    while True:
+        browser.find_element(By.CLASS_NAME,"head_change_main").click()
+        browser.implicitly_wait(10)
+        if 'プレミアム会員登録' == browser.find_element(By.CLASS_NAME,"menu_child").text:
+            browser = login_scraping_site(area_name)
+        else:
+            pass
+        try:
+            elements = browser.find_elements(By.CLASS_NAME,"mgn_serch_list_bottom")
+            baitai_name = elements[i].text.split(' ')[0]
+            baitai_name = baitai_name.replace('パチマガスロマガじゃ…','パチマガスロマガ').replace('パチンコ店長のホール…','パチンコ店長のホール攻略')
 
-        if  ('県' in baitai_name) or ('府' in baitai_name) or ('東京都' in baitai_name) or ('北海道' in baitai_name):
-            print('県がついているためパスを処理しました',baitai_name)
+            if  ('県' in baitai_name) or ('府' in baitai_name) or ('東京都' in baitai_name) or ('北海道' in baitai_name):
+                print('県がついているためパスを処理しました',baitai_name)
+                i += 1
+                continue
+
+            print(baitai_name)
+            elements[i].click()
+            # if 'ホールナビ' in baitai_name:
+            #     print(baitai_name)
+            #     break
+            num = 0
+            while True:
+                for syuzai_tenpo_data in browser.find_elements(By.CLASS_NAME,"osbox"):
+                    tenpo_name = syuzai_tenpo_data.find_element(By.CLASS_NAME,"oslh2").text.replace('\n', '').replace(' ', '').replace('　', '')
+                    #print(tenpo_name.text)
+                    syuzai_date = syuzai_tenpo_data.find_element(By.CLASS_NAME,"oslmd").text
+                    rank_and_syuzai_name = syuzai_tenpo_data.find_element(By.CLASS_NAME,"list_event_name").text
+                    syuzai_rank = rank_and_syuzai_name.split('\n')[0]
+                    syuzai_name = rank_and_syuzai_name.split('\n')[1]
+                    prefectures = syuzai_tenpo_data.find_elements(By.CLASS_NAME,"oslha")[0].text
+                    #print(baitai_name,syuzai_date ,syuzai_rank,syuzai_name,prefectures)#prefectures
+                    record = pd.Series([prefectures,syuzai_date, tenpo_name,syuzai_name,baitai_name,syuzai_rank], index=furture_syuzai_list_df.columns)
+                    record_df =  pd.DataFrame(record)
+                    furture_syuzai_list_df = pd.concat([furture_syuzai_list_df,record_df.T])
+                    #print(record)
+                    #break
+                    browser.implicitly_wait(10)
+                if num >6:
+                    break
+                elif browser.find_element(By.CLASS_NAME,'navi_1_next').text == '次へ':
+                    browser.find_element(By.CLASS_NAME,'navi_1_next').click()
+                    num += 1
+                    print('num',num)
+                else:
+                    break
             i += 1
-            continue
-
-        print(baitai_name)
-        elements[i].click()
-        # if 'ホールナビ' in baitai_name:
-        #     print(baitai_name)
+            # time.sleep(1)
+            #break
+            #break
+        except Exception as e:
+            print('エラー理由',e)
+            break
+        # if i > 5:
         #     break
-        num = 0
-        while True:
-            for syuzai_tenpo_data in browser.find_elements(By.CLASS_NAME,"osbox"):
-                tenpo_name = syuzai_tenpo_data.find_element(By.CLASS_NAME,"oslh2").text.replace('\n', '').replace(' ', '').replace('　', '')
-                #print(tenpo_name.text)
-                syuzai_date = syuzai_tenpo_data.find_element(By.CLASS_NAME,"oslmd").text
-                rank_and_syuzai_name = syuzai_tenpo_data.find_element(By.CLASS_NAME,"list_event_name").text
-                syuzai_rank = rank_and_syuzai_name.split('\n')[0]
-                syuzai_name = rank_and_syuzai_name.split('\n')[1]
-                prefectures = syuzai_tenpo_data.find_elements(By.CLASS_NAME,"oslha")[0].text
-                #print(baitai_name,syuzai_date ,syuzai_rank,syuzai_name,prefectures)#prefectures
-                record = pd.Series([prefectures,syuzai_date, tenpo_name,syuzai_name,baitai_name,syuzai_rank], index=furture_syuzai_list_df.columns)
-                record_df =  pd.DataFrame(record)
-                furture_syuzai_list_df = pd.concat([furture_syuzai_list_df,record_df.T])
-                #print(record)
-                #break
-                browser.implicitly_wait(10)
-            if num >6:
-                break
-            elif browser.find_element(By.CLASS_NAME,'navi_1_next').text == '次へ':
-                browser.find_element(By.CLASS_NAME,'navi_1_next').click()
-                num += 1
-                print('num',num)
-            else:
-                break
-        i += 1
-        # time.sleep(1)
-        #break
-        #break
-    except Exception as e:
-        print('エラー理由',e)
-        break
-    # if i > 5:
-    #     break
 
 pattern = '東京都|北海道|(京都|大阪)府|.{2,3}県'
 # 都道府県を抽出する

@@ -13,7 +13,10 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup
-
+import urllib
+import urllib.parse
+import urllib.request
+import re
 from sshtunnel import SSHTunnelForwarder
 import pymysql as db
 import pandas as pd
@@ -62,26 +65,39 @@ def delete_data(cnx,day):
     cnx.commit()
 
 prefecture_list = ['東京都','静岡県','岐阜県','愛知県','三重県','新潟県','富山県','石川県','福井県','山梨県','長野県','神奈川県','千葉県','埼玉県','群馬県','栃木県','茨城県','福島県','山形県','秋田県','宮城県','岩手県','青森県','北海道']#,'東京都''静岡県','岐阜県','愛知県','三重県'
-
 line_token = os.getenv('LINE_TOKEN')
 #print(line_token)
 for prefecture in prefecture_list:
     try:
-        post_line_text(f'{prefecture}XサーバーへのMYSQL追加処理を開始します',line_token)
-        cols = ['機種名', '台番号', 'G数', '差枚', 'BB', 'RB', 'ART', 'BB確率', 'RB確率', 'ART確率','合成確率','店舗名']
-        ichiran_all_tennpo_df = pd.DataFrame(index=[], columns=cols)
+        browser = webdriver.Chrome(executable_path=r"C:\Users\tsc95\.wdm\drivers\chromedriver\win64\116.0.5845.187\chromedriver.exe")
+        #post_line_text(f'{prefecture}XサーバーへのMYSQL追加処理を開始します',line_token)
+        cols = ['店舗名','URL']
         yesterday = datetime.date.today() + datetime.timedelta(days=-1)
         url = f'https://{os.getenv("SCRAPING_DOMAIN")}/%E3%83%9B%E3%83%BC%E3%83%AB%E3%83%87%E3%83%BC%E3%82%BF/{prefecture}/'
-        res = requests.get(url)
-        soup = BeautifulSoup(res.text, 'html.parser')
-        table = soup.find_all('table')
-        tenpo_ichiran_df =pd.read_html(str(table))[-1]
-        print(tenpo_ichiran_df)
-        all_parlar_count_number = str(len(tenpo_ichiran_df))
-        post_line_text(f'{prefecture}は{all_parlar_count_number}の店舗が掲載されいます',line_token)
+        browser.get(url)
+        concat_df = pd.DataFrame(index=[], columns=[])
+        parlar_name_parlar_url_dict = {}
+        html = browser.page_source.encode('utf-8')
+        soup = BeautifulSoup(html, 'lxml')
+        for element in soup.find(class_="hall-list-table").find_all("a"):
+            #print(element.string,element['href'])
+            parlar_name = element.string
+            parlar_name_url = element['href']
+            parlar_name_parlar_url_dict[parlar_name] = parlar_name_url
+            record_df = pd.DataFrame([[parlar_name,parlar_name_url]], columns=cols)
+            record_df['url_店舗名'] = record_df['URL'].map(lambda x: urllib.parse.unquote((x.split('/')[-2])).replace('-データ一覧',''))
+            record_df['都道府県'] = prefecture
+            concat_df = pd.concat([concat_df,record_df],axis=0)
+            #display(record_df)
+        #break
+        time.sleep(1)
+
+        #post_line_text(f'{prefecture}は{str(len(concat_df))}の店舗が掲載されいます',line_token)
         count = 0
         error_count = 0
-        for i, tenpo_name in enumerate(tenpo_ichiran_df['ホール名'] ):#tenpo_ichiran_df['ホール名']
+        cols = ['機種名', '台番号', 'G数', '差枚', 'BB', 'RB', 'ART', 'BB確率', 'RB確率', 'ART確率','合成確率','店舗名']
+        ichiran_all_tennpo_df = pd.DataFrame(index=[], columns=cols)
+        for i, tenpo_name in enumerate(concat_df['url_店舗名']):#tenpo_ichiran_df['ホール名']
             try:
                 #time.sleep(1)
                 print(i,tenpo_name)
@@ -156,17 +172,20 @@ for prefecture in prefecture_list:
             cursor = cnx.cursor()
             insert_data_bulk(ichiran_all_tennpo_df,cnx)
             tenpo_name_number = len(ichiran_all_tennpo_df['店舗名'].unique())
-            post_line_text(f'{prefecture} {tenpo_name_number}/{all_parlar_count_number}件のSQL追加処理に成功しました',line_token)
+            post_line_text(f'{prefecture} {tenpo_name_number}/{str(len(concat_df))}件のSQL追加処理に成功しました',line_token)
             delete_data(cnx,35)
             # 終了
             cnx.close()
             
+        #break
+        browser.quit()
         #break
     except Exception as e:
         print(e)
         post_line_text(f'{prefecture}処理失敗{e}',line_token)
 
     finally:
+        #break
         print('終了')
         
 # except Exception as e :

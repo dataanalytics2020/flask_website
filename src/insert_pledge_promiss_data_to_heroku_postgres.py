@@ -74,9 +74,10 @@ def login_scraping_site(area_name):
     browser.implicitly_wait(10)
     return browser
 
-for area_name in ['kanto']:
+
+furture_syuzai_list_df = pd.DataFrame(index=[], columns=['都道府県','イベント日','店舗名','取材名','媒体名','取材ランク'])
+for area_name in ['kanto','kansai']:
     #try:
-    furture_syuzai_list_df = pd.DataFrame(index=[], columns=['都道府県','イベント日','店舗名','取材名','媒体名','取材ランク'])
     browser = login_scraping_site(area_name)
     elements = browser.find_elements(By.CLASS_NAME,"mgn_serch_list_bottom")
     i = 0
@@ -133,84 +134,85 @@ for area_name in ['kanto']:
         #break
 
     browser.quit()
-    pattern = '東京都|北海道|(京都|大阪)府|.{2,3}県'
-    # 都道府県を抽出する
-    furture_syuzai_list_df = furture_syuzai_list_df[furture_syuzai_list_df['都道府県'] != '']
-    # furture_syuzai_list_df['都道府県']=furture_syuzai_list_df['都道府県'].apply(lambda x:re.match(pattern,x).group())
-    prefectures_list = []
-    for adress in furture_syuzai_list_df['都道府県']:
-        adress = adress.split(']')[-1]
-        try:
-            #print(re.match(pattern,adress).group())
-            prefectures_list.append(re.match(pattern,adress).group())
-        except:
-            prefectures_list.append('情報なし')
-    furture_syuzai_list_df['都道府県'] = prefectures_list
-    furture_syuzai_list_df_1 = furture_syuzai_list_df
-    furture_syuzai_list_df_1 = pd.concat([furture_syuzai_list_df_1, furture_syuzai_list_df_1['イベント日'].str.split('(', expand=True)], axis=1).drop('イベント日', axis=1)
-    furture_syuzai_list_df_1.rename(columns={0: 'イベント日', 1: '曜日'}, inplace=True)
-    furture_syuzai_list_df_1['曜日'] = furture_syuzai_list_df_1['曜日'].map(lambda x:x.replace(')',''))
-    furture_syuzai_list_df_1['イベント日'] = pd.to_datetime(furture_syuzai_list_df_1['イベント日'])
-    furture_syuzai_list_df_1 = furture_syuzai_list_df_1 [['都道府県','イベント日','曜日',	'店舗名','取材名','媒体名','取材ランク']]
-    furture_syuzai_list_df_1
-    # 現在時刻
-    today = datetime.datetime.now()
-    print(today)
-    #[結果] 2021-08-23 07:12:20.806648
-    # 1日後
-    today_str:str = today.strftime('%Y-%m-%d')
-    eight_days_after:str = (today + datetime.timedelta(days=8)).strftime('%Y-%m-%d')
-    yesterday:str = (today + datetime.timedelta(days=-2)).strftime('%Y-%m-%d')
-        #### Create dataframe from resultant table ####
-    # except Exception as e:
-    #     post_line_text(f'取材予定エラー\n{e}',os.getenv('LINE_TOKEN'))
-    
-    users = os.getenv('HEROKU_PSGR_USER')    # DBにアクセスするユーザー名(適宜変更)
-    dbnames = os.getenv('HEROKU_PSGR_DATABASE')   # 接続するデータベース名(適宜変更)
-    passwords = os.getenv('HEROKU_PSGR_PASSWORD')  # DBにアクセスするユーザーのパスワード(適宜変更)
-    host = os.getenv('HEROKU_PSGR_HOST')     # DBが稼働しているホスト名(適宜変更)
-    port = 5432        # DBが稼働しているポート番号(適宜変更)
 
-    # PostgreSQLへ接続
-    conn = psycopg2.connect("user=" + users +" dbname=" + dbnames +" password=" + passwords, host=host, port=port)
+pattern = '東京都|北海道|(京都|大阪)府|.{2,3}県'
+# 都道府県を抽出する
+furture_syuzai_list_df = furture_syuzai_list_df[furture_syuzai_list_df['都道府県'] != '']
+# furture_syuzai_list_df['都道府県']=furture_syuzai_list_df['都道府県'].apply(lambda x:re.match(pattern,x).group())
+prefectures_list = []
+for adress in furture_syuzai_list_df['都道府県']:
+    adress = adress.split(']')[-1]
+    try:
+        #print(re.match(pattern,adress).group())
+        prefectures_list.append(re.match(pattern,adress).group())
+    except:
+        prefectures_list.append('情報なし')
+furture_syuzai_list_df['都道府県'] = prefectures_list
+furture_syuzai_list_df_1 = furture_syuzai_list_df
+furture_syuzai_list_df_1 = pd.concat([furture_syuzai_list_df_1, furture_syuzai_list_df_1['イベント日'].str.split('(', expand=True)], axis=1).drop('イベント日', axis=1)
+furture_syuzai_list_df_1.rename(columns={0: 'イベント日', 1: '曜日'}, inplace=True)
+furture_syuzai_list_df_1['曜日'] = furture_syuzai_list_df_1['曜日'].map(lambda x:x.replace(')',''))
+furture_syuzai_list_df_1['イベント日'] = pd.to_datetime(furture_syuzai_list_df_1['イベント日'])
+furture_syuzai_list_df_1 = furture_syuzai_list_df_1 [['都道府県','イベント日','曜日',	'店舗名','取材名','媒体名','取材ランク']]
+furture_syuzai_list_df_1
+# 現在時刻
+today = datetime.datetime.now()
+print(today)
+#[結果] 2021-08-23 07:12:20.806648
+# 1日後
+today_str:str = today.strftime('%Y-%m-%d')
+eight_days_after:str = (today + datetime.timedelta(days=8)).strftime('%Y-%m-%d')
+yesterday:str = (today + datetime.timedelta(days=-2)).strftime('%Y-%m-%d')
+    #### Create dataframe from resultant table ####
+# except Exception as e:
+#     post_line_text(f'取材予定エラー\n{e}',os.getenv('LINE_TOKEN'))
 
-    # PostgreSQLにデータ登録
-    cursor = conn.cursor()
-    sql = f"""
-            SELECT *
-            FROM pledge
-            """
-    print(sql)
-    cursor.execute(sql)
-    #cols = [col[0] for col in cursor.description]
-    sql_syuzai_report_all_df = pd.DataFrame(cursor.fetchall(),columns = ['id','syuzai_name','media_name','pledge_text','created_at'])
-    sql_syuzai_report_all_df
-    insert_pledge_df = furture_syuzai_list_df_1[['取材名','媒体名']]
-    insert_pledge_df = insert_pledge_df.drop_duplicates()
-    insert_pledge_df = insert_pledge_df[insert_pledge_df['媒体名'] != 'ホールナビ']
-    insert_pledge_df['pledge_text'] = None
-    insert_pledge_df = insert_pledge_df.reset_index(drop=True)
-    insert_pledge_df.rename(columns={'取材名':'syuzai_name','媒体名':'media_name'},inplace=True)
-    count = 0
-    concat_pledge_df = pd.DataFrame(index=[], columns=[])
-    increment_id = max(list(sql_syuzai_report_all_df['id']))
-    print(increment_id)
+users = os.getenv('HEROKU_PSGR_USER')    # DBにアクセスするユーザー名(適宜変更)
+dbnames = os.getenv('HEROKU_PSGR_DATABASE')   # 接続するデータベース名(適宜変更)
+passwords = os.getenv('HEROKU_PSGR_PASSWORD')  # DBにアクセスするユーザーのパスワード(適宜変更)
+host = os.getenv('HEROKU_PSGR_HOST')     # DBが稼働しているホスト名(適宜変更)
+port = 5432        # DBが稼働しているポート番号(適宜変更)
+
+# PostgreSQLへ接続
+conn = psycopg2.connect("user=" + users +" dbname=" + dbnames +" password=" + passwords, host=host, port=port)
+
+# PostgreSQLにデータ登録
+cursor = conn.cursor()
+sql = f"""
+        SELECT *
+        FROM pledge
+        """
+print(sql)
+cursor.execute(sql)
+#cols = [col[0] for col in cursor.description]
+sql_syuzai_report_all_df = pd.DataFrame(cursor.fetchall(),columns = ['id','syuzai_name','media_name','pledge_text','created_at'])
+sql_syuzai_report_all_df
+insert_pledge_df = furture_syuzai_list_df_1[['取材名','媒体名']]
+insert_pledge_df = insert_pledge_df.drop_duplicates()
+insert_pledge_df = insert_pledge_df[insert_pledge_df['媒体名'] != 'ホールナビ']
+insert_pledge_df['pledge_text'] = None
+insert_pledge_df = insert_pledge_df.reset_index(drop=True)
+insert_pledge_df.rename(columns={'取材名':'syuzai_name','媒体名':'media_name'},inplace=True)
+count = 0
+concat_pledge_df = pd.DataFrame(index=[], columns=[])
+increment_id = max(list(sql_syuzai_report_all_df['id']))
+print(increment_id)
+
+for i,row in insert_pledge_df.iterrows():
+    dicision_df = sql_syuzai_report_all_df[sql_syuzai_report_all_df['syuzai_name'] == row['syuzai_name']]
+    #display(dicision_df)
+    increment_id += 1
     
-    for i,row in insert_pledge_df.iterrows():
-        dicision_df = sql_syuzai_report_all_df[sql_syuzai_report_all_df['syuzai_name'] == row['syuzai_name']]
-        #display(dicision_df)
-        increment_id += 1
-        
-        if len(dicision_df) == 0:
-            count += 1
-            print('追加',row['syuzai_name'],row['media_name'],None)
-            text += f'\n{row["syuzai_name"]}-{row["media_name"]} '
-            cursor.execute("INSERT INTO pledge VALUES (%s, %s,%s, %s, %s)", (increment_id ,row['syuzai_name'],row['media_name'],row['pledge_text'],datetime.datetime.now()))
-            conn.commit()
-        else:
-            #print('追加なし')
-            pass
-    text = f'{area_name} {count}件のpostgresへの公約レコードの追加が終了しました。'
-    post_line_text(text,os.getenv('LINE_TOKEN'))
+    if len(dicision_df) == 0:
+        count += 1
+        print('追加',row['syuzai_name'],row['media_name'],None)
+        text += f'\n{row["syuzai_name"]}-{row["media_name"]} '
+        cursor.execute("INSERT INTO pledge VALUES (%s, %s,%s, %s, %s)", (increment_id ,row['syuzai_name'],row['media_name'],row['pledge_text'],datetime.datetime.now()))
+        conn.commit()
+    else:
+        #print('追加なし')
+        pass
+text = f'{area_name} {count}件のpostgresへの公約レコードの追加が終了しました。'
+post_line_text(text,os.getenv('LINE_TOKEN'))
 
 
