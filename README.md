@@ -43,6 +43,9 @@ python -m venv venv
 ## 仮想環境実行
 .venv/Scripts/Activate.ps1
 
+## サーバー起動
+python app.py --reload
+
 
 ## ファイル作成
 wsl mkdir -p flaskr/{static,templates} 
@@ -55,8 +58,7 @@ wsl touch flaskr/templates/{layout,show_entries}.html
 pip install -r requirements.txt
 
 
-## サーバー起動
-python app.py --reload
+
 
 ## postgressql起動コマンド
 heroku pg:psql postgresql-cubic-54628 --app flask-mapwebsite
@@ -70,7 +72,8 @@ https://lmn-blog.com/jquery_accordion01/
 参考動画 Udemy
 https://www.udemy.com/share/107ggo3@Txcm81u9m0_R8WkgeEfxzhIgmQLev8Y-bo3XeWtZf-xpGNmtwNK2BWfe94n4SryHTg==/
 
-
+### ナビゲーションバーサンプルサイト
+https://www.webopixel.net/lab/sample/17/fixed-sidebar/01/#
 
 ### GitHub Issueを用いた開発手順
 https://zenn.dev/ogakuzuko/articles/2250f7c7331106
