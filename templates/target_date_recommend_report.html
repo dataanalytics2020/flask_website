@@ -12,8 +12,8 @@
       <div class="col-12">
         <h1>{{data['target_number']}}のつく日の直近{{serch_number}}回分 分析結果</h1>
         <div>
-          <h2>行きたい日付： {{ user_data['recommend-day'] }}</h2>
-            <br><h2>比較した日付</h2>
+          <div class="heading-008 my-2 ">行きたい日付： {{ user_data['recommend-day'] }}</div>
+            <br><div class="heading-008 my-2 ">比較した日付</div>
           <p>比較するデータは{{ user_data['tenpo-name'] }}の</p>
             {% for date in target_day_list_jp %}
               <ul class = 'day_list '>{{ date }}</ul>
@@ -153,8 +153,8 @@ element.style.height = '600px';
 
 
 <h1><p>{{ user_data['tenpo-name'] }}  {{data['target_number']}}のつく日<br>直近過去{{serch_number}}回合計分で最も出ていたお勧め機種TOP10</p></h1>
-<h2>※合計{{serch_number}}回分(バラは除く)</h2>
-<h2>✅お勧め機種はここで確認しよう</h2>
+<div class="heading-008 my-2 ">※合計{{serch_number}}回分(バラは除く)</div>
+<div class="heading-008 my-2 ">✅お勧め機種はここで確認しよう</div>
 <div class='design16 .table-wrap'>
   <div class="scroll_area" style="width:100%;max-width:1000px;overflow-x:scroll;">
     <table style="width:100%;">
@@ -307,10 +307,10 @@ element.style.height = '600px';
   </script>
  
 <h1>お勧め機種総差枚バブルチャート</h1>
-<h2>✅どの機種に大きな出玉配分があるか可視化</h2>
+<div class="heading-008 my-2 ">✅どの機種に大きな出玉配分があるか可視化</div>
 <canvas id="bubblechart"></canvas>
 <h1>ヒートマップ並び傾向分析</h1>
-<h2>✅6台並びやどの場所に入るか傾向があるか確認！</h2>
+<div class="heading-008 my-2 ">✅6台並びやどの場所に入るか傾向があるか確認！</div>
 <div class ='container'>
     <div class="row">
         <div class="col-12">
@@ -717,7 +717,7 @@ $(document).ready(function() {
 </script>
 
 <h1>日別機種別差枚順過去{{serch_number}}回合計データTOP30</h1>
-<h2>全台系はここから見ると👍</h2>
+<div class="heading-008 my-2 ">全台系はここから見ると👍</div>
 <div class="scroll_area" style="width:100%;max-width:1000px;overflow-x:scroll;">
   <table class='design17' style="width:100%;">
       <thead>
@@ -742,7 +742,7 @@ $(document).ready(function() {
   </div>
 </div>
 <h1>日別機種別差枚順データTOP30</h1>
-<h2>日毎のデータはここでチェック</h2>
+<div class="heading-008 my-2 ">日毎のデータはここでチェック</div>
 {% for day_df , date in zip(display_day_df_list,target_day_list_jp) %}
   <ul class = 'day_list '>{{ date }}</ul>
   <div class='design16 .table-wrap'>

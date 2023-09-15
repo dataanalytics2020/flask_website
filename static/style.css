@@ -377,40 +377,6 @@ h1 {
     background:#ff00a2;
   }   */
 
-
-
- h2 {
-  position: relative;
-  display: inline-block;
-  height: 44px;
-  margin-left: 30px;
-  padding: 0.8rem 1rem 0.5rem 1rem;
-  color: #fff;
-  background: #fa4141;
-  font-size: calc(1.025rem + .1vw);
-}
-
-h2:before {
-  position: absolute;
-  top: 0;
-  left: -30px;
-  content: '';
-  border-width: 22px 30px 22px 0;
-  border-style: solid;
-  border-color: transparent #fa4141 transparent transparent;
-}
-
-h2:after {
-  position: absolute;
-  top: calc(50% - 7px);
-  left: -10px;
-  width: 14px;
-  height: 14px;
-  content: '';
-  border-radius: 50%;
-  background: #fff;
-}
-
 h3 {
   padding: 1rem 2rem;
   color: #fff;
@@ -914,3 +880,23 @@ h4:before {
 .snsButtons_pworld { background: #ca0000; }
 .snsButtons_line   { background: #009100; }
 .snsButtons_dmm   { background: #000000; }
+
+
+.heading-008 {
+  display: inline-block;
+  position: relative;
+  padding: .5em .7em;
+  border-radius: 50px 0 0 50px;
+  background-color: #256eff;
+  color: #fff;
+}
+
+.heading-008::before {
+  content: '';
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  margin-right: 13px;
+  border-radius: 50%;
+  background: #fff;
+}
