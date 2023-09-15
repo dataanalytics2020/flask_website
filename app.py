@@ -34,6 +34,17 @@ load_dotenv()
 df:pd.DataFrame  = pd.read_csv(r'csv/2022-12-09_touhou.csv')
 heroku_port:int = int(os.environ.get("PORT", 5000))
 
+prefecture_list:list[str] = '''北海道
+,青森県,岩手県,宮城県,秋田県,山形県,福島県
+,茨城県,栃木県,群馬県
+,埼玉県,千葉県,東京都,神奈川県
+,新潟県,富山県,石川県,福井県,山梨県,長野県
+,岐阜県,静岡県,愛知県,三重県,滋賀県
+,京都府,大阪府,兵庫県,奈良県,和歌山県
+,鳥取県,島根県,岡山県,広島県
+,徳島県,香川県,愛媛県,高知県
+,山口県,福岡県,佐賀県,長崎県,熊本県,大分県,宮崎県,鹿児島県,沖縄県'''.split(',')
+
 def convert_sql_date_to_jp_date(sql_date:datetime.date) -> str:
     sql_str_date = str(sql_date)
     return sql_str_date.split('-')[1].lstrip('0') + '月' + sql_str_date.split('-')[2].lstrip('0') + '日'
@@ -481,23 +492,9 @@ def top():
         map_report_df = report_df[['店舗名','取材名','媒体名']].drop_duplicates(keep='first')
         map_report_df = map_report_df.sort_values(['店舗名','媒体名']).reset_index(drop=True)
 
-        if prefecture == '神奈川県':
-            prefecture_latitude = 35.44778
-            prefecture_longitude = 139.64250
-        elif prefecture == '東京都':
-            prefecture_latitude = 35.68944
-            prefecture_longitude = 139.69167
-        elif prefecture == '千葉県':
-            prefecture_latitude = 35.60472
-            prefecture_longitude = 140.12333
-        elif prefecture == '埼玉県':
-            prefecture_latitude = 35.85694
-            prefecture_longitude = 139.64889
-        elif prefecture == '茨城県':
-            prefecture_latitude = 36.34139
-            prefecture_longitude = 140.44667
-        else:
-            pass
+        prefecture_df = pd.read_csv(r'csv/pref_lat_lon.csv')
+        prefecture_latitude = prefecture_df[prefecture_df['pref_name'] == prefecture]['latitude'].values[0]
+        prefecture_longitude = prefecture_df[prefecture_df['pref_name'] == prefecture]['longitude'].values[0]
 
         folium_map = folium.Map(location=[prefecture_latitude,prefecture_longitude], zoom_start=11, width="100%", height="100%")
         # 地図表示
@@ -590,7 +587,7 @@ def top():
                                 '山口県','徳島県','香川県','愛媛県','高知県',\
                                 '福岡県','佐賀県','長崎県','熊本県','大分県',\
                                 '宮崎県','鹿児島県','沖縄県']
-        data['kanto_prefecture_list'] = ['東京都','神奈川県','千葉県','埼玉県']
+        #data['kanto_prefecture_list'] = ['東京都','神奈川県','千葉県','埼玉県']
         w_list = ['(月)', '(火)', '(水)', '(木)', '(金)', '(土)', '(日)']
         today = date.today()
         jp_str_day_list = []
