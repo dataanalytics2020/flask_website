@@ -1,5 +1,6 @@
 #utf-8
 from flask import Flask, render_template, request, redirect 
+from flask_sitemap import Sitemap
 from flask_mail import Mail
 from email.mime.text import MIMEText
 import smtplib
@@ -33,6 +34,7 @@ load_dotenv()
 
 df:pd.DataFrame  = pd.read_csv(r'csv/2022-12-09_touhou.csv')
 heroku_port:int = int(os.environ.get("PORT", 5000))
+
 
 prefecture_list:list[str] = '''北海道
 ,青森県,岩手県,宮城県,秋田県,山形県,福島県
@@ -456,6 +458,7 @@ def create_df_cell_image(_df,image_name):
 area_name_and_str_jp_area_name_dict = {'hokkaidoutouhoku':'北海道・東北', 'kitakantou':'北関東','minamikantou':'南関東','hokurikukoushinetsu':'北陸・甲信越','toukai':'東海','kansai':'関西','chugokushikoku':'中国・四国','kyushu':'九州・山口'}
 
 app = Flask(__name__, static_folder="static")
+ext = Sitemap(app=app)
 bootstrap = Bootstrap(app)
 
 #pathがどこにあるか確認
