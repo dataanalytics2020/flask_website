@@ -1,6 +1,6 @@
 #utf-8
 from flask import Flask, render_template, request, redirect 
-from flask_sitemap import Sitemap
+#from flask_sitemap import Sitemap
 from flask_mail import Mail
 from email.mime.text import MIMEText
 import smtplib
@@ -58,10 +58,11 @@ def create_syuzai_map_iframe(report_df:pd.DataFrame):
     map_report_df = report_df[['店舗名','取材名','媒体名']].drop_duplicates(keep='first')
     map_report_df = map_report_df.sort_values(['店舗名','媒体名']).reset_index(drop=True)
     #東京都に設定
-    prefecture_latitude = 35.68944
-    prefecture_longitude = 139.69167
-    
-    folium_map = folium.Map(location=[prefecture_latitude,prefecture_longitude], zoom_start=10, width="100%", height="100%")
+    prefecture_latitude = report_df.iloc[0]['longitude']
+    prefecture_longitude = report_df.iloc[0]['longitude']
+    print('新prefecture_latitude',prefecture_latitude,prefecture_longitude)
+
+    folium_map = folium.Map(location=[prefecture_latitude,prefecture_longitude], zoom_start=7, width="100%", height="100%")
     # 地図表示
     # マーカープロット（ポップアップ設定，色変更，アイコン変更）
     print(report_df)
@@ -74,7 +75,7 @@ def create_syuzai_map_iframe(report_df:pd.DataFrame):
         #print(syuzai_rank_list)
         longitude = extract_syuzai_df_1.iloc[0]['longitude']
         latitude = extract_syuzai_df_1.iloc[0]['latitude']
-        print('latitude,longitude',latitude,longitude)
+        #print('latitude,longitude',latitude,longitude)
         # グレースケールの画像データを作成
         im= Image.new("L", (280, 100),color=(0))
         im.putalpha(0)
@@ -138,13 +139,14 @@ def create_media_map_iframe(report_df:pd.DataFrame):
     report_df = report_df.drop_duplicates(keep='first')
     report_df = report_df.dropna(subset=['latitude'])
     #(取材ランク = 'S' OR 取材ランク = 'A')のみ抽出
+    print('report_df',report_df)
     map_report_df = report_df[['店舗名','取材名','媒体名']].drop_duplicates(keep='first')
     map_report_df = map_report_df.sort_values(['店舗名','媒体名']).reset_index(drop=True)
     #東京都に設定
-    prefecture_latitude = 35.68944
-    prefecture_longitude = 139.69167
+    prefecture_latitude = report_df.iloc[0]['latitude']
+    prefecture_longitude = report_df.iloc[0]['longitude']
     
-    folium_map = folium.Map(location=[prefecture_latitude,prefecture_longitude], zoom_start=10, width="100%", height="100%")
+    folium_map = folium.Map(location=[prefecture_latitude,prefecture_longitude], zoom_start=9, width="100%", height="100%")
     # 地図表示
     # マーカープロット（ポップアップ設定，色変更，アイコン変更）
     print(report_df)
@@ -458,7 +460,7 @@ def create_df_cell_image(_df,image_name):
 area_name_and_str_jp_area_name_dict = {'hokkaidoutouhoku':'北海道・東北', 'kitakantou':'北関東','minamikantou':'南関東','hokurikukoushinetsu':'北陸・甲信越','toukai':'東海','kansai':'関西','chugokushikoku':'中国・四国','kyushu':'九州・山口'}
 
 app = Flask(__name__, static_folder="static")
-ext = Sitemap(app=app)
+#ext = Sitemap(app=app)
 bootstrap = Bootstrap(app)
 
 #pathがどこにあるか確認
@@ -1197,6 +1199,7 @@ def tomorrow_recommend_area_syuzai_syuzainame(area_name,syuzai_name):
     extract_syuzai_name_df = pd.DataFrame(cursor.fetchall(),columns=cols)
     table_df = extract_syuzai_name_df[['イベント日','都道府県','店舗名','媒体名']]
     table_df['イベント日'] = table_df['イベント日'].map(convert_sql_date_to_jp_date)
+    table_df.drop_duplicates(keep='first',inplace=True)
     data['iframe'] = create_syuzai_map_iframe(extract_syuzai_name_df)
     data['extract_syuzai_name_df'] = table_df
     data['extract_syuzai_name_df_column_names'] = table_df.columns.values
@@ -1230,6 +1233,7 @@ def tomorrow_recommend_area_hall_hallname(area_name,hall_name):
     data['iframe'] = create_hall_map_iframe(extract_hall_name_df,zoom_size=10)
     table_df = extract_hall_name_df[['イベント日','都道府県','媒体名','取材名']]
     table_df['イベント日'] = table_df['イベント日'].map(convert_sql_date_to_jp_date)
+    table_df.drop_duplicates(keep='first',inplace=True)
     data['extract_hall_name_df'] = table_df
     data['extract_hall_name_df_column_names'] = table_df.columns.values
     data['extract_hall_name_df_row_data'] = list(table_df.values.tolist())
@@ -1262,6 +1266,7 @@ def tomorrow_recommend_area_media_medianame(area_name,media_name):
     extract_media_name_df = pd.DataFrame(cursor.fetchall(),columns=cols)
     table_df = extract_media_name_df[['イベント日','都道府県','店舗名','取材名']]
     table_df['イベント日'] = table_df['イベント日'].map(convert_sql_date_to_jp_date)
+    table_df.drop_duplicates(keep='first',inplace=True)
     data['iframe'] = create_media_map_iframe(extract_media_name_df)
     data['extract_media_name_df'] = table_df
     data['extract_media_name_df_column_names'] = table_df.columns.values
@@ -1291,12 +1296,13 @@ def tomorrow_recommend_area(area_name):
                 ORDER BY COUNT(媒体名) desc;''')
     cols = [col.name for col in cursor.description]
     groupby_media_name_count_df = pd.DataFrame(cursor.fetchall(),columns=cols)
+    #重複行を削除する
+    groupby_media_name_count_df.drop_duplicates(keep='first',inplace=True)
+    print('groupby_media_name_count_df:',groupby_media_name_count_df)
     groupby_media_name_count_df.rename(columns={'count': '取材数'},inplace=True)
     data['groupby_media_name_count_df'] = groupby_media_name_count_df
     data['groupby_media_name_count_df_column_names'] = groupby_media_name_count_df.columns.values
     data['groupby_media_name_count_df_row_data'] = list(groupby_media_name_count_df.values.tolist())
-    
-    
     return render_template('tomorrow_recommend_area.html',data=data,zip=zip)
 #           /tomorrow_recommend/minamikanto/media/BASHtv-data
 
