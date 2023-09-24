@@ -63,7 +63,7 @@ def login_scraping_site(area_name):
     #options.add_argument('--headless')
     options.add_argument("--no-sandbox")
 
-    browser = webdriver.Chrome(ChromeDriverManager().install(),options=options)#ChromeDriverManager().install() 
+    browser = webdriver.Chrome(executable_path="C:\\Users\\tsc95\\.wdm\\drivers\\chromedriver\\win64\\116.0.5845.140\\chromedriver-win32\\chromedriver.exe",options=options)#ChromeDriverManager().install() 
     browser.implicitly_wait(10)
     url_login = f"https://{os.getenv('SCRAPING_SYUZAI_DOMAIN')}/login_form_mail"
     #admageを開く
@@ -98,8 +98,8 @@ def login_scraping_site(area_name):
 
 
 furture_syuzai_list_df = pd.DataFrame(index=[], columns=['都道府県','イベント日','店舗名','取材名','媒体名','取材ランク'])
-#['hokkaido','tohoku','kanto','chubu','kansai','chugoku','sikoku','kyusyu']
-for area_name in ['kanto','kansai']:
+#['hokkaido','tohoku','kanto','chubu','kansai','chugoku','sikoku','kyushu']
+for area_name in ['hokkaido','tohoku','kanto','chubu','kansai','chugoku','sikoku','kyushu']:
     browser = login_scraping_site(area_name)
     elements = browser.find_elements(By.CLASS_NAME,"mgn_serch_list_bottom")
     i = 0
@@ -179,10 +179,9 @@ furture_syuzai_list_df_1.rename(columns={0: 'イベント日', 1: '曜日'}, inp
 furture_syuzai_list_df_1['曜日'] = furture_syuzai_list_df_1['曜日'].map(lambda x:x.replace(')',''))
 furture_syuzai_list_df_1['イベント日'] = pd.to_datetime(furture_syuzai_list_df_1['イベント日'])
 furture_syuzai_list_df_1 = furture_syuzai_list_df_1 [['都道府県','イベント日','曜日',	'店舗名','取材名','媒体名','取材ランク']]
-furture_syuzai_list_df_1
+furture_syuzai_list_df_1.drop_duplicates(keep='first', inplace=True)
 
 browser.quit()
-
 
 server = sshtunnel.SSHTunnelForwarder((os.getenv('SSH_USERNAME'), 10022), 
     ssh_username="pachislot777", 
@@ -264,7 +263,7 @@ def insert_data_bulk(df,cnx):
 
 concat_df = furture_syuzai_list_df_1
 concat_df['イベント日'] = concat_df['イベント日'].astype(str)   
-concat_df = concat_df[~concat_df.duplicated(keep=False)]
+concat_df.drop_duplicates(keep='first', inplace=True)
 concat_df['取得時間'] = today_str
 concat_df['取得時間'] = concat_df['取得時間'].astype(str)   
 
@@ -272,7 +271,6 @@ concat_df['id'] = 0
 cols = concat_df.columns.tolist()
 cols = cols[-1:] + cols[:-1]
 concat_df = concat_df[cols] 
-concat_df
 
 users = os.getenv('HEROKU_PSGR_USER')    # DBにアクセスするユーザー名(適宜変更)
 dbnames = os.getenv('HEROKU_PSGR_DATABASE')   # 接続するデータベース名(適宜変更)

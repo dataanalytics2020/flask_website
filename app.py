@@ -136,23 +136,25 @@ def create_syuzai_map_iframe(report_df:pd.DataFrame):
     return folium_map.get_root()._repr_html_()
 
 def create_media_map_iframe(report_df:pd.DataFrame):
-    report_df = report_df.drop_duplicates(keep='first')
     report_df = report_df.dropna(subset=['latitude'])
+    report_df.drop_duplicates(keep='first',inplace=True)
     #(取材ランク = 'S' OR 取材ランク = 'A')のみ抽出
-    print('report_df',report_df)
-    map_report_df = report_df[['店舗名','取材名','媒体名']].drop_duplicates(keep='first')
+    #print('report_df',report_df)
+    map_report_df = report_df[['店舗名','取材名','媒体名']]
     map_report_df = map_report_df.sort_values(['店舗名','媒体名']).reset_index(drop=True)
-    #東京都に設定
+    map_report_df.drop_duplicates(keep='first',inplace=True)
+    print('map_report_df',map_report_df)
     prefecture_latitude = report_df.iloc[0]['latitude']
     prefecture_longitude = report_df.iloc[0]['longitude']
-    
+
     folium_map = folium.Map(location=[prefecture_latitude,prefecture_longitude], zoom_start=9, width="100%", height="100%")
     # 地図表示
     # マーカープロット（ポップアップ設定，色変更，アイコン変更）
-    print(report_df)
+    #print(report_df)
     for tenpo_name in report_df['店舗名'].unique():
         print(tenpo_name)
         extract_syuzai_df_1 = report_df[report_df['店舗名'] == tenpo_name]
+        extract_syuzai_df_1.drop_duplicates(keep='first',inplace=True)
         #display(extract_syuzai_df_1)
         print(extract_syuzai_df_1)
         syuzai_rank_list = list(extract_syuzai_df_1['取材ランク'].unique())
@@ -192,6 +194,7 @@ def create_media_map_iframe(report_df:pd.DataFrame):
         im.save('syuzai_image.png', quality=95)
         img = 'syuzai_image.png'
         popup_df = extract_syuzai_df_1[['イベント日','店舗名','取材名','媒体名']].sort_values('店舗名').reset_index(drop=True).T
+        popup_df.drop_duplicates(keep='first',inplace=True)
         popup_df = popup_df.to_html(escape=False)
         popup_data = folium.Popup(popup_df,  max_width=1500,show=False,size=(700, 300))
 
@@ -1197,6 +1200,7 @@ def tomorrow_recommend_area_syuzai_syuzainame(area_name,syuzai_name):
                     ORDER BY イベント日,都道府県 desc;''')
     cols = [col.name for col in cursor.description]
     extract_syuzai_name_df = pd.DataFrame(cursor.fetchall(),columns=cols)
+    extract_syuzai_name_df.drop_duplicates(keep='first',inplace=True)
     table_df = extract_syuzai_name_df[['イベント日','都道府県','店舗名','媒体名']]
     table_df['イベント日'] = table_df['イベント日'].map(convert_sql_date_to_jp_date)
     table_df.drop_duplicates(keep='first',inplace=True)
@@ -1226,10 +1230,11 @@ def tomorrow_recommend_area_hall_hallname(area_name,hall_name):
                 ORDER BY イベント日,都道府県 desc;''')
     cols = [col.name for col in cursor.description]
     extract_hall_name_df = pd.DataFrame(cursor.fetchall(),columns=cols)
-    data['twitter_url'] = extract_hall_name_df.iloc[0].T['twitter_url']
-    data['pworld_url'] = extract_hall_name_df.iloc[0].T['pworld_url']
-    data['dmm_url'] = extract_hall_name_df.iloc[0].T['dmm_url']
-    data['line_url'] = extract_hall_name_df.iloc[0].T['line_url']
+    for column_name in ['twitter_url','pworld_url','dmm_url','line_url']:
+        try:
+            data[column_name] = extract_hall_name_df.iloc[0].T[column_name]
+        except:
+            data[column_name] = ''
     data['iframe'] = create_hall_map_iframe(extract_hall_name_df,zoom_size=10)
     table_df = extract_hall_name_df[['イベント日','都道府県','媒体名','取材名']]
     table_df['イベント日'] = table_df['イベント日'].map(convert_sql_date_to_jp_date)
@@ -1253,6 +1258,7 @@ def tomorrow_recommend_area_media_medianame(area_name,media_name):
     cursor = get_driver()
     area_sql_text = get_area_sql_text(area_name)
     #首都圏のイベントの媒体別の予約数を集計
+    print('media_name',media_name)
     cursor.execute(f'''SELECT *
                 FROM schedule as schedule2
                 left join halldata as halldata2
@@ -1264,9 +1270,11 @@ def tomorrow_recommend_area_media_medianame(area_name,media_name):
                 ORDER BY イベント日,都道府県 desc;''')
     cols = [col.name for col in cursor.description]
     extract_media_name_df = pd.DataFrame(cursor.fetchall(),columns=cols)
+    extract_media_name_df.drop_duplicates(keep='first',inplace=True)
     table_df = extract_media_name_df[['イベント日','都道府県','店舗名','取材名']]
     table_df['イベント日'] = table_df['イベント日'].map(convert_sql_date_to_jp_date)
     table_df.drop_duplicates(keep='first',inplace=True)
+    print(table_df)
     data['iframe'] = create_media_map_iframe(extract_media_name_df)
     data['extract_media_name_df'] = table_df
     data['extract_media_name_df_column_names'] = table_df.columns.values
