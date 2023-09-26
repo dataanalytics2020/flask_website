@@ -3,7 +3,9 @@
 https://www.slo-map.com/
 
 ## 製作過程のスクショ一覧
-
+### 2023/09/26時点のエリア別選択ページ
+#### エンドポイント　/tomorrow-recommend/kyushu/
+![スクリーンショット 2023-09-27 020331](https://github.com/dataanalytics2020/flask_website/assets/117744645/095938dc-14a5-4098-b4a4-82b884151d7a)
 ### 2023/08/18時点の明日のお勧め店舗画面
 #### エンドポイント　/top
 ![20230818_top](https://github.com/dataanalytics2020/flask_website/assets/117744645/779d3147-ab77-4b3a-be7f-f0ad6dc22eec)
