@@ -1,60 +1,30 @@
 {% extends "base.html" %}
-
 {% block head %}
-<title>明日のお勧め{{data.area_name}}</title>
+<title>明日のお勧め</title>
 {% endblock %}
+
 
 {% block content %}
 <div class="container">
-    <div class="row text-center">
-        <div class="col-12 ">
+    <div class="row">
+        <div class="col-12 text-center">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                   <li class="breadcrumb-item"><a href="/">HOME</a></li>
-                  <li class="breadcrumb-item active" aria-current="page"><a href="/tomorrow-recommend/{{data.area_name}}">{{data.area_name_jp}}</a></li>
+                  <li class="breadcrumb-item"><a href="/tomorrow-recommend/{{data.area_name}}">{{data.area_name_jp}}</a></li>
+                  <li class="breadcrumb-item active" aria-current="page"><a href="/tomorrow-recommend/{{data.area_name}}/prefecture/{{data.prefecture_name}}">{{data.prefecture_name}}</a></li>
                 </ol>
             </nav>
-        </div>
-        <h1>{{data.area_name_jp}}のパチンコ・スロット取材予定</h1>
-        <div class="row">
-            <div class="col-12 text-center">
-                <div class="mx-auto" style="width: 200px;">
-                    <div class="heading-008 my-2 ">都道府県から探す</div>
-                </div>
-                <div class="col_3">
-                    {%for prefecture_name in data.prefecture_name_list%}
-                        <div><a href="{{ url_for('tomorrow_recommend_area_prefecture_prefecturename',area_name=data.area_name,prefecture_name=prefecture_name) }}" id="prefecture-btn-link">{{prefecture_name}}</a></div>
-                    {%endfor%}
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-12">
-                <div class="mx-auto" style="width: 200px;">
-                    <div class="heading-008 my-2 ">{{data.date}}日付から探す</div>
-                </div>
-                
-                <div class="input-group-append">
-                    <form action="{{ url_for('tomorrow_recommend_area',area_name=data.area_name) }}" method="POST">
-                        <input type="text" id="date_pick" name="date" value="{{data.date}}" class="form-control" placeholder="日付を選択" aria-label="日付を選択" aria-describedby="basic-addon2">
-                        <button class="btn btn-outline-secondary" type="submit" formmethod="POST">検索</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-12 text-center">
             <div class="mx-auto" style="width: 200px;">
-                <div class="heading-008 my-2 ">媒体名から探す</div>
+                <div class="heading-008 my-2 ">{{data.prefecture_name}}</div>
             </div>
-
+            <iframe class="embed-responsive-item" scrolling="no" height="450" width="100%" src={{ data.iframe|safe }}</iframe>
             <div class = 'heatmap .table-wrap'>
                 <div class="scroll_area" style="width:100%;max-width:2000px;overflow-x:scroll;">
                     <table id="media_table" class="table table-striped">
                         <thead>
                             <tr>
-                                {% for col in data.groupby_media_name_count_df_column_names %}
+                                {% for col in data.extract_prefecture_name_df_column_names %}
                                 <th>
                                 {{col}}
                                 </th>
@@ -62,10 +32,14 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for row in data.groupby_media_name_count_df_row_data %}
+                            {% for row in data.extract_prefecture_name_df_row_data %}
                             <tr>
-                                {% for col, row_ in zip(data.groupby_media_name_count_df_column_names, row) %}
-                                    {% if col == '媒体名' %}
+                                {% for col, row_ in zip(data.extract_prefecture_name_df_column_names, row) %}
+                                    {% if col == '取材名' %}
+                                        <td><a href="/tomorrow_recommend/{{data.area_name}}/syuzai/{{ row_ }}" >{{ row_ }}</a></td>
+                                    {% elif col == '店舗名' %}
+                                        <td><a href="/tomorrow_recommend/{{data.area_name}}/hall/{{ row_ }}" >{{ row_ }}</a></td>
+                                    {% elif col == '媒体名' %}
                                         <td><a href="/tomorrow_recommend/{{data.area_name}}/media/{{ row_ }}" >{{ row_ }}</a></td>
                                     {% else %}
                                         <td>{{row_}}</td>
@@ -109,7 +83,7 @@ $(document).ready(function(){
 <script>
 	$(function() {
 		$.datepicker.setDefaults($.datepicker.regional["ja"]);
-		$("#date_pick").datepicker({
+		$("#input1").datepicker({
             minDate: new Date(),
             maxDate: '+6d',
             dateFormat: 'yy-mm-dd',
@@ -117,7 +91,7 @@ $(document).ready(function(){
 	});
 
     $(function() {
-        $('#date_pick').datepicker({
+        $('#datepicker').datepicker({
             minDate: new Date(),
             maxDate: '+6d',
             dateFormat: 'yy-mm-dd',

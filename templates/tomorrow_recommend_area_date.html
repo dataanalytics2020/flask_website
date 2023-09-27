@@ -2,16 +2,106 @@
 {% block head %}
 <title>明日のお勧め</title>
 {% endblock %}
-
 {% block content %}
 <div class="container">
     <div class="row">
-        <div class="col-12">
-            <h1>{{data.date_jp}}の{{data.area_name_jp}}お勧めスロット・パチンコ取材予定一覧</h1>
-        </div>
-        <div class="col-12">
-            {{ data.date}}
+        <div class="col-12 text-center">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                  <li class="breadcrumb-item"><a href="/">HOME</a></li>
+                  <li class="breadcrumb-item"><a href="/tomorrow-recommend/{{data.area_name}}">{{data.area_name_jp}}</a></li>
+                  <li class="breadcrumb-item active" aria-current="page"><a href="/tomorrow-recommend/{{data.area_name}}/syuzai/{{data.target_date}}">{{data.target_date}}</a></li>
+                </ol>
+            </nav>
+            <div class="mx-auto" style="width: 200px;">
+                <div class="heading-008 my-2 ">{{data.target_date}}</div>
+            </div>
+            <iframe class="embed-responsive-item" scrolling="no" height="450" width="100%" src={{ data.iframe|safe }}</iframe>
+            <div class = 'heatmap .table-wrap'>
+                <div class="scroll_area" style="width:100%;max-width:2000px;overflow-x:scroll;">
+                    <table id="syuzai_table" class="table table-striped">
+                        <thead>
+                            <tr>
+                                {% for col in data.extract_target_date_df_column_names %}
+                                <th>
+                                {{col}}
+                                </th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in data.extract_target_date_df_row_data %}
+                            <tr>
+                                {% for col, row_ in zip(data.extract_target_date_df_column_names, row) %}
+                                    {% if col == '取材名' %}
+                                        <td><a href="/tomorrow_recommend/{{data.area_name}}/syuzai/{{ row_ }}" >{{ row_ }}</a></td>
+                                    {% elif col == '店舗名' %}
+                                        <td><a href="/tomorrow_recommend/{{data.area_name}}/hall/{{ row_ }}" >{{ row_ }}</a></td>
+                                    {% elif col == '媒体名' %}
+                                        <td><a href="/tomorrow_recommend/{{data.area_name}}/media/{{ row_ }}" >{{ row_ }}</a></td>
+                                    {% else %}
+                                        <td>{{row_}}</td>
+                                    {% endif %}
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
+<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1/i18n/jquery.ui.datepicker-ja.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/themes/cupertino/jquery-ui.min.css">  <!-- テーマcupertinoを選択 -->\
+<script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+<script>
+
+$(document).ready(function(){
+    $("#syuzai_table").DataTable({
+        "language":{url:"https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json",},
+            // 件数切替機能 無効
+        lengthChange: false,
+        // 検索機能 無効
+        searching: true,
+        // ソート機能 無効
+        ordering: true,
+        // 情報表示 無効
+        info: true,
+        // ページング機能 無効
+        paging: false,
+        // 初期表示の並び替えなし
+        order: [],
+    });
+    
+});
+</script>
+<script>
+	$(function() {
+		$.datepicker.setDefaults($.datepicker.regional["ja"]);
+		$("#input1").datepicker({
+            minDate: new Date(),
+            maxDate: '+6d',
+            dateFormat: 'yy-mm-dd',
+        });
+	});
+
+    $(function() {
+        $('#datepicker').datepicker({
+            minDate: new Date(),
+            maxDate: '+6d',
+            dateFormat: 'yy-mm-dd',
+        }).css({
+            'margin': 'auto',
+            'padding': 'auto',
+            });
+    });
+
+
+
+</script>
 {% endblock %}

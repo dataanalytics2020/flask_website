@@ -6,22 +6,22 @@
             <div class="heading-008 my-2 ">エリアから取材予定を地図で探す</div>
             <div class="row">
                 <ul class="top-btn" style="list-style: none; padding: 0;  margin:0;">
-                    <li><a class="link-btn colorname1" href="/tomorrow-recommend/hokkaidoutouhoku">北海道・東北</a></li>
-                    <li><a class="link-btn colorname1" href="/tomorrow-recommend/kitakantou">北関東</a></li>
-                    <li><a class="link-btn colorname1" href="/tomorrow-recommend/minamikantou">南関東</a></li>
+                    <li><a class="link-btn colorname1" href="{{ url_for('tomorrow_recommend_area', area_name='hokkaidoutouhoku')}}">北海道・東北</a></li>
+                    <li><a class="link-btn colorname1" href="{{ url_for('tomorrow_recommend_area', area_name='kitakantou')}}">北関東</a></li>
+                    <li><a class="link-btn colorname1" href="{{ url_for('tomorrow_recommend_area', area_name='minamikantou')}}">南関東</a></li>
                 </ul>
             </div>
             <div class="row">
                 <ul class="top-btn" style="list-style: none; padding: 0;  margin:0;">
-                    <li><a class="link-btn colorname1" href="/tomorrow-recommend/hokurikukoushinetsu">北陸・甲信越</a></li>
-                    <li><a class="link-btn colorname1" href="/tomorrow-recommend/toukai">東海</a></li>
-                    <li><a class="link-btn colorname1" href="/tomorrow-recommend/kansai">関西</a></li>
+                    <li><a class="link-btn colorname1" href="{{ url_for('tomorrow_recommend_area', area_name='hokurikukoushinetsu')}}">北陸・甲信越</a></li>
+                    <li><a class="link-btn colorname1" href="{{ url_for('tomorrow_recommend_area', area_name='toukai')}}">東海</a></li>
+                    <li><a class="link-btn colorname1" href="{{ url_for('tomorrow_recommend_area', area_name='kansai')}}">関西</a></li>
                 </ul>
             </div>
             <div class="row">
                 <ul class="top-btn" style="list-style: none; padding: 0;  margin:0;">
-                    <li><a class="link-btn colorname1" href="/tomorrow-recommend/chugokushikoku">中国・四国</a></li>
-                    <li><a class="link-btn colorname1" href="/tomorrow-recommend/kyushu">九州・山口</a></li>
+                    <li><a class="link-btn colorname1" href="{{ url_for('tomorrow_recommend_area', area_name='chugokushikoku')}}">中国・四国</a></li>
+                    <li><a class="link-btn colorname1" href="{{ url_for('tomorrow_recommend_area', area_name='kyushu')}}">九州・山口</a></li>
                 </ul>
             </div>
         </div>

@@ -57,7 +57,7 @@ def login_scraping_site(area_name):
     #options.add_argument('--headless')
     options.add_argument("--no-sandbox")
 
-    browser = webdriver.Chrome(ChromeDriverManager().install(),options=options)#ChromeDriverManager().install() 
+    browser = webdriver.Chrome(executable_path="C:\\Users\\tsc95\\.wdm\\drivers\\chromedriver\\win64\\116.0.5845.140\\chromedriver-win32\\chromedriver.exe",options=options)#ChromeDriverManager().install() 
     browser.implicitly_wait(10)
     url_login = f"https://{os.getenv('SCRAPING_SYUZAI_DOMAIN')}/login_form_mail"
     #admageを開く
