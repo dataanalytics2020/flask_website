@@ -47,7 +47,18 @@ prefecture_list:list[str] = '''北海道
 ,京都府,大阪府,兵庫県,奈良県,和歌山県
 ,鳥取県,島根県,岡山県,広島県
 ,徳島県,香川県,愛媛県,高知県
-,山口県,福岡県,佐賀県,長崎県,熊本県,大分県,宮崎県,鹿児島県,沖縄県'''.split(',')
+,山口県,福岡県,佐賀県,長崎県,熊本県,大分県,宮崎県,鹿児島県,沖縄県'''.replace('\n','').split(',')
+
+prefecture_id_and_name_dict:dict = {}
+for prefecture_id,prefecture_name in enumerate(prefecture_list):
+    prefecture_id += 1
+    prefecture_id_and_name_dict[prefecture_name]= prefecture_id
+    
+def get_key_from_value(d, val):
+    keys = [k for k, v in d.items() if v == val]
+    if keys:
+        return keys[0]
+    return None
 
 def convert_sql_date_to_jp_date(sql_date:datetime.date) -> str:
     sql_str_date = str(sql_date)
@@ -297,7 +308,6 @@ def get_area_prefecture_list(target_area_name):
             break
     return target_area_name_list
 
-
 def get_area_sql_text(target_area_name='minamikantou'):
     print(target_area_name)
     hokkaidoutouhoku_list = ['北海道', '青森県', '岩手県', '宮城県', '秋田県', '山形県', '福島県']
@@ -460,19 +470,19 @@ def create_df_cell_image(_df,image_name):
                 percet = atari_kaisuu / bunbo
                 #print(percet)
                 draw.rectangle([(0, 0), (percet * 100, 40)], fill=(255, 193, 133))
-                
+
             if df_columns_list[column_number] ==  '勝率'  :
                 atari_kaisuu = float(record[column_number].split(')')[1].replace('%','').replace(' ',''))
                 #print(atari_kaisuu)
                 draw.rectangle([(0, 0), ((atari_kaisuu/100)*200, 40)], fill=(251, 244, 0))
-            
+
             else:
                 pass
-                
+
             draw.multiline_text((cell_width/2,10), f'{record[column_number]}', fill=(0,0,0), font=font,anchor="ma")
             draw.rectangle((0, 0, w-1, h-1), outline = (0,0,0))
             height_concat_lists.append(im)
-            
+
         #break
         concat_image_path  = rf"image/temp_image/complted_cell_{column_number}.png"
         get_concat_v_multi_resize(height_concat_lists).save(concat_image_path)
@@ -483,7 +493,6 @@ def create_df_cell_image(_df,image_name):
     return create_df_cell_image_path
 
 area_name_and_str_jp_area_name_dict = {'hokkaidoutouhoku':'北海道・東北', 'kitakantou':'北関東','minamikantou':'南関東','hokurikukoushinetsu':'北陸・甲信越','toukai':'東海','kansai':'関西','chugokushikoku':'中国・四国','kyushu':'九州・山口'}
-
 app = Flask(__name__, static_folder="static")
 app.config['SECRET_KEY'] = 'o+UFANpa1rA35'
 #ext = Sitemap(app=app)
@@ -499,8 +508,13 @@ def top():
         user_data = request.form
         today = datetime.date.today()
         print('user_data',user_data)
+        prefecture_id = int(user_data['pref_id'])
+        print('prefecture_id',prefecture_id,type(prefecture_id))
+        prefecture = get_key_from_value(prefecture_id_and_name_dict, prefecture_id)
+        print(prefecture)
+        
         data = {}
-        prefecture = user_data['prefecture']
+        data['prefecture'] = prefecture
         target_day = str(today.year) + '-' + user_data['target_day'].split('月')[0] + '-' + user_data['target_day'].split('月')[1].split('日')[0]
         jpn_target_day = target_day.split('-')[1].lstrip('0') + '月' + target_day.split('-')[2].lstrip('0') + '日'
         print(prefecture,target_day)
@@ -609,15 +623,7 @@ def top():
                                             row_data=list(map_report_df.values.tolist()))
     else:
         data = {}
-        data['prefecture_list'] =['北海道','青森県','岩手県','宮城県','秋田県','山形県',\
-                                '福島県','茨城県','栃木県','群馬県','埼玉県','千葉県',\
-                                '東京都','神奈川県','新潟県','富山県','石川県','福井県',\
-                                '山梨県','長野県','岐阜県','静岡県','愛知県','三重県',\
-                                '滋賀県','京都府','大阪府','兵庫県','奈良県',\
-                                '和歌山県','鳥取県','島根県','岡山県','広島県',\
-                                '山口県','徳島県','香川県','愛媛県','高知県',\
-                                '福岡県','佐賀県','長崎県','熊本県','大分県',\
-                                '宮崎県','鹿児島県','沖縄県']
+        data['prefecture_list'] = prefecture_list
         #data['kanto_prefecture_list'] = ['東京都','神奈川県','千葉県','埼玉県']
         w_list = ['(月)', '(火)', '(水)', '(木)', '(金)', '(土)', '(日)']
         today = date.today()
@@ -627,6 +633,13 @@ def top():
             jp_str_day = day.strftime('%m').lstrip('0') + '月' + day.strftime('%d').lstrip('0') + '日' + w_list[day.weekday()]
             jp_str_day_list.append(jp_str_day)
         data['jp_str_day_list'] = jp_str_day_list
+        tomorrow:date = today + timedelta(days=1)
+        print(tomorrow)
+        tommorow_jp_str_day = tomorrow.strftime('%m').lstrip('0') + '月' + tomorrow.strftime('%d').lstrip('0') + '日' + w_list[tomorrow.weekday()]
+        print(tommorow_jp_str_day)
+        data['tommorow_jp_str_day'] =  tommorow_jp_str_day
+        data['prefecture_id_and_name_dict'] = prefecture_id_and_name_dict
+
         area_sql_text = get_area_sql_text('minamikantou')
         cursor = get_driver()
         sql = f'''SELECT イベント日,都道府県,店舗名,取材名,取材ランク,媒体名,latitude,longitude
@@ -1169,7 +1182,6 @@ def form():
         accoun_mail = os.getenv('GMAIL_ACCOUNT')
         password = os.getenv('GMAIL_PASSWORD')
         second_password = os.getenv('GMAIL_SECOND_PASSWORD')
-        
         name =  request.form.get('name')
         from_email = request.form.get('email')
         category = request.form.get('category')
@@ -1232,8 +1244,6 @@ def tomorrow_recommend_area_syuzai_syuzainame(area_name,syuzai_name):
     data['extract_syuzai_name_df_column_names'] = table_df.columns.values
     data['extract_syuzai_name_df_row_data'] = list(table_df.values.tolist())
     return render_template('tomorrow_recommend_area_syuzai_syuzainame.html',data=data,zip=zip)
-
-
 
 @app.route("/tomorrow_recommend/<area_name>/hall/<hall_name>")
 def tomorrow_recommend_area_hall_hallname(area_name,hall_name):
@@ -1433,6 +1443,15 @@ def tomorrow_recommend_area_date(area_name,date):
         data['area_name_jp'] = '関東'
     return render_template('tomorrow_recommend_area_date.html',data=data)
 
+@app.route("/post_test", methods=['GET','POST'])
+def post_test():
+    data = {}
+    prefecture_id_and_name_dict = {}
+    for i, prefecture_name in enumerate(prefecture_list):
+        i = i + 1
+        prefecture_id_and_name_dict[i] = prefecture_name
+    data['prefecture_id_and_name_dict'] = prefecture_id_and_name_dict
+    return render_template('post_test.html',data=data)
 
 @app.route("/privacy_policy")
 def privacy_policy():

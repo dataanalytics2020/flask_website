@@ -24,11 +24,7 @@ $(function(){
     $('.pref_list [data-id]').click(function(){
         if($(this).data('id')){
             var id = $(this).data('id');
-            //都道府県IDに応じて別ページに飛ばす
-            console.log('window.location.href')
-            console.log(window.location.href)
-            let domain_url = window.location.href.replace('/top','')
-            window.location.href =  domain_url  + '/' + id;
+            $('[name="pref_id"]').val(id);
             prefReset();
         }
     });

@@ -3,6 +3,9 @@
 https://www.slo-map.com/
 
 ## 製作過程のスクショ一覧
+### 2023/09/30時点のTOPページ
+#### 都道府県マップから選択できるように機能追加
+![slomap_Capture http___127 0 0 1_5000_ 20230930](https://github.com/dataanalytics2020/flask_website/assets/117744645/6bf1d3ee-e606-4165-94c3-9c1d89b19d51)
 ### 2023/09/26時点のエリア別選択ページ
 #### エンドポイント　/tomorrow-recommend/kyushu/
 ![スクリーンショット 2023-09-27 020331](https://github.com/dataanalytics2020/flask_website/assets/117744645/095938dc-14a5-4098-b4a4-82b884151d7a)
