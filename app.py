@@ -75,7 +75,7 @@ def create_syuzai_map_iframe(report_df:pd.DataFrame):
     prefecture_longitude = report_df.iloc[0]['longitude']
     print('新prefecture_latitude',prefecture_latitude,prefecture_longitude)
 
-    folium_map = folium.Map(location=[prefecture_latitude,prefecture_longitude], zoom_start=9, width="100%", height="100%")
+    folium_map = folium.Map(location=[prefecture_latitude,prefecture_longitude], zoom_start=10, width="100%", height="100%")
     # 地図表示
     # マーカープロット（ポップアップ設定，色変更，アイコン変更）
     print(report_df)
@@ -156,7 +156,7 @@ def create_media_map_iframe(report_df:pd.DataFrame):
     map_report_df = report_df[['店舗名','取材名','媒体名']]
     map_report_df = map_report_df.sort_values(['店舗名','媒体名']).reset_index(drop=True)
     map_report_df.drop_duplicates(keep='first',inplace=True)
-    print('map_report_df',map_report_df)
+    #print('map_report_df',map_report_df)
     prefecture_latitude = report_df.iloc[0]['latitude']
     prefecture_longitude = report_df.iloc[0]['longitude']
 
@@ -165,16 +165,16 @@ def create_media_map_iframe(report_df:pd.DataFrame):
     # マーカープロット（ポップアップ設定，色変更，アイコン変更）
     #print(report_df)
     for tenpo_name in report_df['店舗名'].unique():
-        print(tenpo_name)
+        #print(tenpo_name)
         extract_syuzai_df_1 = report_df[report_df['店舗名'] == tenpo_name]
         extract_syuzai_df_1.drop_duplicates(keep='first',inplace=True)
         #display(extract_syuzai_df_1)
-        print(extract_syuzai_df_1)
+        #print(extract_syuzai_df_1)
         syuzai_rank_list = list(extract_syuzai_df_1['取材ランク'].unique())
         #print(syuzai_rank_list)
         longitude = extract_syuzai_df_1.iloc[0]['longitude']
         latitude = extract_syuzai_df_1.iloc[0]['latitude']
-        print('latitude,longitude',latitude,longitude)
+        #print('latitude,longitude',latitude,longitude)
         # グレースケールの画像データを作成
         im= Image.new("L", (280, 100),color=(0))
         im.putalpha(0)
@@ -307,6 +307,52 @@ def get_area_prefecture_list(target_area_name):
             print(target_area_name_list)
             break
     return target_area_name_list
+
+def get_prefecture_area_list(prefecture_name):
+    print(prefecture_name)
+    hokkaidoutouhoku_list = ['北海道', '青森県', '岩手県', '宮城県', '秋田県', '山形県', '福島県']
+    kitakantou_list = ['茨城県', '栃木県', '群馬県']
+    minamikantou_list = ['埼玉県', '千葉県', '東京都', '神奈川県']
+    hokurikukoushinetsu_list = ['新潟県', '富山県', '石川県', '福井県', '長野県', '山梨県']
+    toukai_list = ['愛知県', '岐阜県', '静岡県', '三重県']
+    kansai_list = ['大阪府', '京都府', '兵庫県', '奈良県', '滋賀県', '和歌山県']
+    chugokushikoku_list = ['鳥取県', '島根県', '岡山県', '広島県','徳島県', '香川県', '愛媛県', '高知県']
+    kyushu_list = [ '山口県','福岡県', '佐賀県', '長崎県', '大分県', '熊本県', '宮崎県', '鹿児島県','沖縄県']
+    prefecture_str_lists = ['hokkaidoutouhoku_list', 'kitakantou_list','minamikantou_list','hokurikukoushinetsu_list','toukai_list','kansai_list','chugokushikoku_list','kyushu_list'] 
+    for prefecture_list_name in prefecture_str_lists:
+        #print(prefecture_list_name)
+        target_area_name_list = eval(prefecture_list_name)
+        if prefecture_name in target_area_name_list:
+            print('ok',prefecture_list_name)
+            area_name = prefecture_list_name.replace('_list','')
+            if area_name == 'hokkaidoutouhoku':
+                area_name_jp = '北海道・東北'
+                area_name_url = 'hokkaidoutouhoku'
+            elif area_name == 'kitakantou':
+                area_name_jp = '北関東'
+                area_name_url = 'kitakantou'
+            elif area_name == 'minamikantou':
+                area_name_jp = '南関東'
+                area_name_url = 'minamikantou'
+            elif area_name == 'hokurikukoushinetsu':
+                area_name_jp = '北陸・甲信越'
+                area_name_url = 'hokurikukoushinetsu'
+            elif area_name == 'toukai':
+                area_name_jp = '東海'
+                area_name_url = 'toukai'
+            elif area_name == 'kansai':
+                area_name_jp = '関西'
+                area_name_url = 'kansai'
+            elif area_name == 'chugokushikoku':
+                area_name_jp = '中国・四国'
+                area_name_url = 'chugokushikoku'
+            elif area_name == 'kyushu':
+                area_name_jp = '九州・沖縄'
+                area_name_url = 'kyushu'
+            else:
+                area_name_jp = '情報なし'
+            break
+    return area_name_jp,area_name_url
 
 def get_area_sql_text(target_area_name='minamikantou'):
     print(target_area_name)
@@ -512,115 +558,40 @@ def top():
         print('prefecture_id',prefecture_id,type(prefecture_id))
         prefecture = get_key_from_value(prefecture_id_and_name_dict, prefecture_id)
         print(prefecture)
-        
+        area_name_jp,area_name = get_prefecture_area_list(prefecture)
+        print(area_name_jp,area_name)
         data = {}
-        data['prefecture'] = prefecture
+        data['prefecture_name'] = prefecture
+        data['area_name_jp'] = area_name_jp
+        data['area_name'] = area_name
+        print('dataは',data)
         target_day = str(today.year) + '-' + user_data['target_day'].split('月')[0] + '-' + user_data['target_day'].split('月')[1].split('日')[0]
         jpn_target_day = target_day.split('-')[1].lstrip('0') + '月' + target_day.split('-')[2].lstrip('0') + '日'
-        print(prefecture,target_day)
+        #print(prefecture,target_day)
         #イベント日,店舗名,取材名,媒体名,アナスロ店舗名
         cursor = get_driver()
-        sql = f"""SELECT イベント日,店舗名,取材名,媒体名,店舗名,latitude,longitude,取材ランク
-                FROM schedule as schedule2
-                left join maptable as maptable2
-                on schedule2.店舗名 = maptable2.hallnavi_name
-                where schedule2.都道府県 = '{prefecture}' and schedule2.イベント日 IN ('{target_day}') and schedule2.媒体名 != 'ホールナビ' 
-                """
-        print(sql)
-        cursor.execute(sql)
-        cols = [col[0] for col in cursor.description]
-        print('cols',cols)
-        report_df =  pd.DataFrame(cursor.fetchall(),columns = cols )
-        report_df = report_df.loc[:,~report_df.columns.duplicated()]
-        report_df = report_df.drop_duplicates(keep='first')
-        report_df =report_df.dropna(subset=['latitude'])
-        map_report_df = report_df[['店舗名','取材名','媒体名']].drop_duplicates(keep='first')
-        map_report_df = map_report_df.sort_values(['店舗名','媒体名']).reset_index(drop=True)
-
-        prefecture_df = pd.read_csv(r'csv/pref_lat_lon.csv')
-        prefecture_latitude = prefecture_df[prefecture_df['pref_name'] == prefecture]['latitude'].values[0]
-        prefecture_longitude = prefecture_df[prefecture_df['pref_name'] == prefecture]['longitude'].values[0]
-
-        folium_map = folium.Map(location=[prefecture_latitude,prefecture_longitude], zoom_start=11, width="100%", height="100%")
-        # 地図表示
-        # マーカープロット（ポップアップ設定，色変更，アイコン変更）
-        print(report_df)
-        for tenpo_name in report_df['店舗名'].unique():
-            print(tenpo_name)
-            extract_syuzai_df_1 = report_df[report_df['店舗名'] == tenpo_name]
-            #display(extract_syuzai_df_1)
-            print(extract_syuzai_df_1)
-            syuzai_rank_list = list(extract_syuzai_df_1['取材ランク'].unique())
-            #print(syuzai_rank_list)
-            longitude = extract_syuzai_df_1.iloc[0]['longitude']
-            latitude = extract_syuzai_df_1.iloc[0]['latitude']
-            print('latitude,longitude',latitude,longitude)
-            # グレースケールの画像データを作成
-            im= Image.new("L", (280, 100),color=(0))
-            im.putalpha(0)
-            im2= Image.new("L", (260, 50),color=(50))
-            im2.putalpha(128)
-            im3 = Image.open('icon.png')
-            draw = ImageDraw.Draw(im)
-            font = ImageFont.truetype('font/LightNovelPOPv2.otf',19)
-            if len(extract_syuzai_df_1)==1:
-                syuzai_name_text = '◆' + tenpo_name + f'\n {extract_syuzai_df_1["取材名"].values[0]}'
-            else:
-                syuzai_name_text = '◆' + tenpo_name + f'\n {extract_syuzai_df_1["取材名"].values[0]}、他{len(extract_syuzai_df_1)-1}件'
-            #print(syuzai_name_text)
-            draw = ImageDraw.Draw(im)
-            font = ImageFont.truetype('font/LightNovelPOPv2.otf',19)
-
-            # 画像を表示
-            im.paste(im3, (-15,-14))
-            im.paste(im2, (25,48))
-            draw.multiline_text(
-                (150, 50),
-                f'{syuzai_name_text}',
-                font=font,
-                fill='white',
-                align='center',
-                spacing=0,
-                anchor='ma'
-            )
-
-            im.save('syuzai_image.png', quality=95)
-            img = 'syuzai_image.png'
-            popup_df = extract_syuzai_df_1[['店舗名','取材名','媒体名']].sort_values('店舗名').reset_index(drop=True).T
-            popup_df = popup_df.to_html(escape=False)
-            popup_data = folium.Popup(popup_df,  max_width=1500,show=False,size=(700, 300))
-
-            folium.Marker(location=[latitude ,longitude],
-                tiles='https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png',
-                attr='国土地理院',
-                popup=popup_data,
-                icon = CustomIcon(
-                            icon_image = img,
-                            icon_size = (280, 100),
-                            icon_anchor = (0, 0),
-                            #shadow_image = shadow_img, # 影効果（今回は使用せず コメントアウト
-                            #shadow_size = (30, 30),
-                            shadow_anchor = (-4, -40),
-                            popup_anchor = (3, 3))).add_to(folium_map)
-            #break
-        
-        # set the iframe width and height
-        plugins.Fullscreen(
-                            position="topright",
-                            title="拡大する",
-                            title_cancel="元に戻す",
-                            force_separate_button=True,
-                        ).add_to(folium_map)
-        folium_map.get_root().width = "500px"
-        folium_map.get_root().height = "600px"
-        
-        iframe = folium_map.get_root()._repr_html_()
-
-        return render_template('schedule_map.html',data=data,jpn_target_day=jpn_target_day,\
-                                            user_data=user_data,iframe=iframe,\
-                                            zip=zip,\
-                                            column_names=map_report_df.columns.values, \
-                                            row_data=list(map_report_df.values.tolist()))
+        print('prefectureは',prefecture)
+        cursor.execute(f'''SELECT *
+                    FROM schedule as schedule2
+                    left join halldata as halldata2
+                    on schedule2.店舗名 = halldata2.hall_name
+                    WHERE イベント日 = '{target_day}'
+                    AND 媒体名 != 'ホールナビ'
+                    AND 媒体名 != '旧イベ'
+                    AND 都道府県 = '{prefecture}'
+                    ORDER BY イベント日,都道府県 desc;''')
+        cols = [col.name for col in cursor.description]
+        extract_prefecture_name_df = pd.DataFrame(cursor.fetchall(),columns=cols)
+        extract_prefecture_name_df.drop_duplicates(keep='first',inplace=True)
+        table_df = extract_prefecture_name_df[['イベント日','店舗名','媒体名','取材名']]
+        table_df['イベント日'] = table_df['イベント日'].map(convert_sql_date_to_jp_date)
+        table_df.drop_duplicates(keep='first',inplace=True)
+        #print(table_df)
+        data['iframe'] = create_media_map_iframe(extract_prefecture_name_df)
+        data['extract_prefecture_name_df'] = table_df
+        data['extract_prefecture_name_df_column_names'] = table_df.columns.values
+        data['extract_prefecture_name_df_row_data'] = list(table_df.values.tolist())
+        return render_template('tomorrow_recommend_area_prefecture_prefecturename.html',data=data,zip=zip)
     else:
         data = {}
         data['prefecture_list'] = prefecture_list
@@ -649,6 +620,7 @@ def top():
                 WHERE イベント日 > CURRENT_DATE
                 AND イベント日 <= CURRENT_DATE + 1
                 AND 媒体名 != 'ホールナビ'
+                AND 媒体名 != '旧イベ'
                 AND ({area_sql_text})
                 ORDER BY イベント日,都道府県,店舗名,媒体名,取材名 desc;'''#AND (取材ランク = 'S' OR 取材ランク = 'A')
         print(sql)
@@ -1230,6 +1202,7 @@ def tomorrow_recommend_area_syuzai_syuzainame(area_name,syuzai_name):
                 WHERE イベント日 >= current_date
                     AND イベント日 < current_date + 7
                     AND 媒体名 != 'ホールナビ'
+                    AND 媒体名 != '旧イベ'
                     AND 取材名 = '{syuzai_name}'
                     AND ({area_sql_text})
                     ORDER BY イベント日,都道府県 desc;''')
@@ -1261,6 +1234,7 @@ def tomorrow_recommend_area_hall_hallname(area_name,hall_name):
                 AND イベント日 < current_date + 7
                 AND 店舗名 = '{hall_name}'
                 AND 媒体名 != 'ホールナビ'
+                AND 媒体名 != '旧イベ'
                 AND ({area_sql_text})
                 ORDER BY イベント日,都道府県 desc;''')
     cols = [col.name for col in cursor.description]
@@ -1339,6 +1313,7 @@ def tomorrow_recommend_area_prefecture_prefecturename(area_name,prefecture_name)
                 WHERE イベント日 >= current_date
                 AND イベント日 < current_date + 7
                 AND 媒体名 != 'ホールナビ'
+                AND 媒体名 != '旧イベ'
                 AND 都道府県 = '{prefecture_name}'
                 ORDER BY イベント日,都道府県 desc;''')
     cols = [col.name for col in cursor.description]
@@ -1384,6 +1359,7 @@ def tomorrow_recommend_area(area_name):
                     WHERE イベント日 >= current_date
                         AND イベント日 < current_date + 7
                         AND 媒体名 != 'ホールナビ'
+                        AND 媒体名 != '旧イベ'
                         AND イベント日 = '{target_date}'
                         AND ({area_sql_text})
                         ORDER BY イベント日,都道府県 desc;''')
@@ -1403,10 +1379,10 @@ def tomorrow_recommend_area(area_name):
         WHERE イベント日 >= current_date
         AND イベント日 <= current_date + 6
         AND 媒体名 != 'ホールナビ'
+        AND 媒体名 != '旧イベ'
         AND ({area_sql_text})
         GROUP BY 媒体名
         ORDER BY COUNT(媒体名) desc;'''
-            
             #data['form']=form
         data = {}
         today = date.today()
