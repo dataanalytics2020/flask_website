@@ -190,7 +190,7 @@ sql_syuzai_report_all_df = pd.DataFrame(cursor.fetchall(),columns = ['id','syuza
 sql_syuzai_report_all_df
 insert_pledge_df = furture_syuzai_list_df_1[['取材名','媒体名']]
 insert_pledge_df = insert_pledge_df.drop_duplicates()
-insert_pledge_df = insert_pledge_df[insert_pledge_df['媒体名'] != 'ホールナビ']
+#insert_pledge_df = insert_pledge_df[insert_pledge_df['媒体名'] != 'ホールナビ']
 insert_pledge_df['pledge_text'] = None
 insert_pledge_df = insert_pledge_df.reset_index(drop=True)
 insert_pledge_df.rename(columns={'取材名':'syuzai_name','媒体名':'media_name'},inplace=True)
