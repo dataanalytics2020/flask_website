@@ -1366,9 +1366,11 @@ def tomorrow_recommend_area(area_name):
         data = request.form
         print('dataは',data)
         print('form.inputdate.data',form.inputdate.data)
-        target_date = data['date']
+        target_date_jp:str = data['date']
+        target_date = data['date'].split(' (')[0].replace('年','-').replace('月','-').replace('日','')
         print('target_date',target_date)
         data = {}
+        data['target_date_jp'] = target_date_jp
         data['area_name'] = area_name
         data['target_date'] = target_date
         data['area_name_jp'] = area_name_and_str_jp_area_name_dict[area_name]
