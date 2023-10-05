@@ -71,8 +71,13 @@ def create_syuzai_map_iframe(report_df:pd.DataFrame):
     map_report_df = report_df[['店舗名','取材名','媒体名']].drop_duplicates(keep='first')
     map_report_df = map_report_df.sort_values(['店舗名','媒体名']).reset_index(drop=True)
     #東京都に設定
-    prefecture_latitude = report_df.iloc[0]['latitude']
-    prefecture_longitude = report_df.iloc[0]['longitude']
+    try:
+        prefecture_latitude = report_df.iloc[0]['latitude']
+        prefecture_longitude = report_df.iloc[0]['longitude']
+    except:
+        prefecture_latitude = 35.681236
+        prefecture_longitude = 139.767125
+        
     print('新prefecture_latitude',prefecture_latitude,prefecture_longitude)
 
     folium_map = folium.Map(location=[prefecture_latitude,prefecture_longitude], zoom_start=10, width="100%", height="100%")
@@ -145,7 +150,7 @@ def create_syuzai_map_iframe(report_df:pd.DataFrame):
                         force_separate_button=True,
                     ).add_to(folium_map)
     folium_map.get_root().width = "500px"
-    folium_map.get_root().height = "600px"
+    folium_map.get_root().height = "500px"
     return folium_map.get_root()._repr_html_()
 
 def create_media_map_iframe(report_df:pd.DataFrame):
@@ -157,9 +162,13 @@ def create_media_map_iframe(report_df:pd.DataFrame):
     map_report_df = map_report_df.sort_values(['店舗名','媒体名']).reset_index(drop=True)
     map_report_df.drop_duplicates(keep='first',inplace=True)
     print('map_report_df',map_report_df)
-    prefecture_latitude = report_df.iloc[0]['latitude']
-    prefecture_longitude = report_df.iloc[0]['longitude']
 
+    try:
+        prefecture_latitude = report_df.iloc[0]['latitude']
+        prefecture_longitude = report_df.iloc[0]['longitude']
+    except:
+        prefecture_latitude = 35.681236
+        prefecture_longitude = 139.767125
     folium_map = folium.Map(location=[prefecture_latitude,prefecture_longitude], zoom_start=9, width="100%", height="100%")
     # 地図表示
     # マーカープロット（ポップアップ設定，色変更，アイコン変更）
@@ -233,7 +242,7 @@ def create_media_map_iframe(report_df:pd.DataFrame):
                         force_separate_button=True,
                     ).add_to(folium_map)
     folium_map.get_root().width = "500px"
-    folium_map.get_root().height = "600px"
+    folium_map.get_root().height = "500px"
     return folium_map.get_root()._repr_html_()
 
 def create_hall_map_iframe(extract_hall_name_df,zoom_size=16):
@@ -285,7 +294,7 @@ def create_hall_map_iframe(extract_hall_name_df,zoom_size=16):
                         force_separate_button=True,
                     ).add_to(folium_map)
     folium_map.get_root().width = "500px"
-    folium_map.get_root().height = "600px"
+    folium_map.get_root().height = "500px"
     return folium_map.get_root()._repr_html_()
 
 def get_area_prefecture_list(target_area_name):
@@ -710,7 +719,7 @@ def top():
                             force_separate_button=True,
                         ).add_to(folium_map)
         folium_map.get_root().width = "500px"
-        folium_map.get_root().height = "600px"
+        folium_map.get_root().height = "500px"
         
         data['iframe'] = folium_map.get_root()._repr_html_()
         display_report_df = all_kanto_display_df[['イベント日','都道府県','店舗名','媒体名','取材名']].sort_values(['イベント日','都道府県','店舗名','媒体名','取材名'],ascending=[True,False,True,True,False]).reset_index(drop=True)
@@ -1405,6 +1414,29 @@ def tomorrow_recommend_area(area_name):
         data['groupby_media_name_count_df'] = groupby_media_name_count_df
         data['groupby_media_name_count_df_column_names'] = groupby_media_name_count_df.columns.values
         data['groupby_media_name_count_df_row_data'] = list(groupby_media_name_count_df.values.tolist())
+        print('data',data)
+        cursor = get_driver()
+        cursor.execute(f'''SELECT COUNT(店舗名),都道府県, 店舗名
+                FROM schedule as schedule2
+                left join halldata as halldata2
+                on schedule2.店舗名 = halldata2.hall_name
+                WHERE イベント日 >= current_date
+                AND イベント日 <= current_date + 7
+                AND 媒体名 != 'ホールナビ'
+                AND 媒体名 != '旧イベ'
+                AND ({area_sql_text})
+                GROUP BY 店舗名,都道府県
+                ORDER BY COUNT(店舗名) desc;''')
+        cols = [col.name for col in cursor.description]
+        groupby_hall_name_count_df = pd.DataFrame(cursor.fetchall(),columns=cols)
+        #重複行を削除する
+        print(groupby_hall_name_count_df)
+        groupby_hall_name_count_df.drop_duplicates(keep='first',inplace=True)
+        print('groupby_hall_name_count_df:',groupby_hall_name_count_df)
+        groupby_hall_name_count_df.rename(columns={'count': '取材数'},inplace=True)
+        data['groupby_hall_name_count_df'] = groupby_hall_name_count_df
+        data['groupby_hall_name_count_df_column_names'] = groupby_hall_name_count_df.columns.values
+        data['groupby_hall_name_count_df_row_data'] = list(groupby_hall_name_count_df.values.tolist())
         return render_template('tomorrow_recommend_area.html',data=data,zip=zip)
 #           /tomorrow_recommend/minamikanto/media/BASHtv-data
 
@@ -1440,4 +1472,4 @@ def sitemap():
     return app.send_static_file("sitemap.xml")
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0",debug=False, port=int(os.environ.get('PORT', 5000)))
+    app.run(host="0.0.0.0",debug=True, port=int(os.environ.get('PORT', 5000)))
