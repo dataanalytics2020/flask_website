@@ -152,11 +152,11 @@ def create_media_map_iframe(report_df:pd.DataFrame):
     report_df = report_df.dropna(subset=['latitude'])
     report_df.drop_duplicates(keep='first',inplace=True)
     #(取材ランク = 'S' OR 取材ランク = 'A')のみ抽出
-    #print('report_df',report_df)
+    print('report_df',report_df)
     map_report_df = report_df[['店舗名','取材名','媒体名']]
     map_report_df = map_report_df.sort_values(['店舗名','媒体名']).reset_index(drop=True)
     map_report_df.drop_duplicates(keep='first',inplace=True)
-    #print('map_report_df',map_report_df)
+    print('map_report_df',map_report_df)
     prefecture_latitude = report_df.iloc[0]['latitude']
     prefecture_longitude = report_df.iloc[0]['longitude']
 
@@ -617,8 +617,8 @@ def top():
                 FROM schedule as schedule2
                 left join maptable as maptable2
                 on schedule2.店舗名 = maptable2.hallnavi_name
-                WHERE イベント日 > CURRENT_DATE
-                AND イベント日 <= CURRENT_DATE + 1
+                WHERE イベント日 > current_date
+                AND イベント日 <= current_date + 7
                 AND 媒体名 != 'ホールナビ'
                 AND 媒体名 != '旧イベ'
                 AND ({area_sql_text})
@@ -1322,7 +1322,7 @@ def tomorrow_recommend_area_prefecture_prefecturename(area_name,prefecture_name)
     table_df = extract_prefecture_name_df[['イベント日','店舗名','媒体名','取材名']]
     table_df['イベント日'] = table_df['イベント日'].map(convert_sql_date_to_jp_date)
     table_df.drop_duplicates(keep='first',inplace=True)
-    print(table_df)
+    print('extract_prefecture_name_df',extract_prefecture_name_df)
     data['iframe'] = create_media_map_iframe(extract_prefecture_name_df)
     data['extract_prefecture_name_df'] = table_df
     data['extract_prefecture_name_df_column_names'] = table_df.columns.values
