@@ -60,9 +60,14 @@ def get_key_from_value(d, val):
         return keys[0]
     return None
 
-def convert_sql_date_to_jp_date(sql_date:datetime.date) -> str:
-    sql_str_date = str(sql_date)
-    return sql_str_date.split('-')[1].lstrip('0') + '月' + sql_str_date.split('-')[2].lstrip('0') + '日'
+# def convert_sql_date_to_jp_date(sql_date:datetime.date) -> str:
+#     sql_str_date = str(sql_date)
+#     return sql_str_date.split('-')[1].lstrip('0') + '月' + sql_str_date.split('-')[2].lstrip('0') + '日'
+
+def convert_sql_date_to_jp_date_and_weekday(sql_date:datetime.date) -> str:
+    w_list = ['(月)', '(火)', '(水)', '(木)', '(金)', '(土)', '(日)']
+    target_date = sql_date.strftime('%m').lstrip('0') + '月' + sql_date.strftime('%d').lstrip('0') + '日' + w_list[sql_date.weekday()]
+    return target_date
 
 def create_syuzai_map_iframe(report_df:pd.DataFrame):
     report_df = report_df.drop_duplicates(keep='first')
@@ -126,7 +131,7 @@ def create_syuzai_map_iframe(report_df:pd.DataFrame):
         im.save('syuzai_image.png', quality=95)
         img = 'syuzai_image.png'
         popup_df = extract_syuzai_df_1[['イベント日','店舗名','取材名','媒体名']].sort_values('店舗名')
-        popup_df['イベント日'] = popup_df['イベント日'].apply(convert_sql_date_to_jp_date) 
+        popup_df['イベント日'] = popup_df['イベント日'].apply(convert_sql_date_to_jp_date_and_weekday) 
         popup_df = popup_df.to_html(escape=False,index=False)
         popup_data = folium.Popup(popup_df,  max_width=1500,show=False,size=(700, 300))
         folium.Marker(location=[latitude ,longitude],
@@ -218,7 +223,7 @@ def create_media_map_iframe(report_df:pd.DataFrame):
         img = 'syuzai_image.png'
         popup_df = extract_syuzai_df_1[['イベント日','店舗名','取材名','媒体名']].sort_values('店舗名')#.reset_index(drop=True).T
         popup_df.drop_duplicates(keep='first',inplace=True)
-        popup_df['イベント日'] = popup_df['イベント日'].apply(convert_sql_date_to_jp_date) 
+        popup_df['イベント日'] = popup_df['イベント日'].apply(convert_sql_date_to_jp_date_and_weekday) 
         popup_df = popup_df.to_html(escape=False,index=False)
         popup_data = folium.Popup(popup_df,  max_width=1500,show=False,size=(700, 300))
 
@@ -595,7 +600,8 @@ def top():
         extract_prefecture_name_df = pd.DataFrame(cursor.fetchall(),columns=cols)
         extract_prefecture_name_df.drop_duplicates(keep='first',inplace=True)
         table_df = extract_prefecture_name_df[['イベント日','店舗名','媒体名','取材名']]
-        table_df['イベント日'] = table_df['イベント日'].map(convert_sql_date_to_jp_date)
+        table_df['イベント日'] = table_df['イベント日'].map(convert_sql_date_to_jp_date_and_weekday)
+        table_df = table_df.sort_values(['イベント日','店舗名','媒体名','取材名'],ascending=[True,True,True,True],inplace=False).reset_index(drop=True)
         table_df.drop_duplicates(keep='first',inplace=True)
         #print(table_df)
         data['iframe'] = create_media_map_iframe(extract_prefecture_name_df)
@@ -696,7 +702,7 @@ def top():
             im.save('syuzai_image.png', quality=95)
             img = 'syuzai_image.png'
             popup_df = extract_syuzai_df_1[['イベント日','店舗名','媒体名','取材名']].sort_values('店舗名')#.reset_index(drop=True)#.T
-            popup_df['イベント日'] = popup_df['イベント日'].map(convert_sql_date_to_jp_date)
+            popup_df['イベント日'] = popup_df['イベント日'].map(convert_sql_date_to_jp_date_and_weekday)
             popup_df = popup_df.to_html(escape=False,index=False,classes="mystyle")
             popup_data = folium.Popup(popup_df,  max_width=1500,show=False,size=(700, 300))
 
@@ -725,9 +731,11 @@ def top():
         folium_map.get_root().height = "500px"
         
         data['iframe'] = folium_map.get_root()._repr_html_()
-        display_report_df = all_kanto_display_df[['イベント日','都道府県','店舗名','媒体名','取材名']].sort_values(['イベント日','都道府県','店舗名','媒体名','取材名'],ascending=[True,False,True,True,False]).reset_index(drop=True)
+        display_report_df = all_kanto_display_df[['イベント日','都道府県','店舗名','媒体名','取材名']].sort_values(['イベント日','都道府県','店舗名','媒体名','取材名'],ascending=[True,False,True,True,False],inplace=False).reset_index(drop=True)
+        print(display_report_df)
         display_report_df = display_report_df.drop_duplicates(keep='first')
-        display_report_df['イベント日'] = display_report_df['イベント日'].map(convert_sql_date_to_jp_date)
+        display_report_df['イベント日'] = display_report_df['イベント日'].map(convert_sql_date_to_jp_date_and_weekday)
+        #display_report_df.sort_values(['イベント日','都道府県','店舗名','媒体名','取材名'],ascending=[True,False,True,True,False],inplace=True)
         data['display_report_df_column_names'] = display_report_df.columns.values
         data['display_report_df'] = display_report_df
         data['display_report_df_row_data'] = list(display_report_df.values.tolist())
@@ -1222,7 +1230,7 @@ def tomorrow_recommend_area_syuzai_syuzainame(area_name,syuzai_name):
     extract_syuzai_name_df = pd.DataFrame(cursor.fetchall(),columns=cols)
     extract_syuzai_name_df.drop_duplicates(keep='first',inplace=True)
     table_df = extract_syuzai_name_df[['イベント日','都道府県','店舗名','媒体名']]
-    table_df['イベント日'] = table_df['イベント日'].map(convert_sql_date_to_jp_date)
+    table_df['イベント日'] = table_df['イベント日'].map(convert_sql_date_to_jp_date_and_weekday)
     table_df.drop_duplicates(keep='first',inplace=True)
     data['iframe'] = create_syuzai_map_iframe(extract_syuzai_name_df)
     data['extract_syuzai_name_df'] = table_df
@@ -1258,7 +1266,7 @@ def tomorrow_recommend_area_hall_hallname(area_name,hall_name):
             data[column_name] = ''
     data['iframe'] = create_hall_map_iframe(extract_hall_name_df,zoom_size=10)
     table_df = extract_hall_name_df[['イベント日','都道府県','媒体名','取材名']]
-    table_df['イベント日'] = table_df['イベント日'].map(convert_sql_date_to_jp_date)
+    table_df['イベント日'] = table_df['イベント日'].map(convert_sql_date_to_jp_date_and_weekday)
     table_df.drop_duplicates(keep='first',inplace=True)
     data['extract_hall_name_df'] = table_df
     data['extract_hall_name_df_column_names'] = table_df.columns.values
@@ -1293,7 +1301,8 @@ def tomorrow_recommend_area_media_medianame(area_name,media_name):
     extract_media_name_df = pd.DataFrame(cursor.fetchall(),columns=cols)
     extract_media_name_df.drop_duplicates(keep='first',inplace=True)
     table_df = extract_media_name_df[['イベント日','都道府県','店舗名','取材名']]
-    table_df['イベント日'] = table_df['イベント日'].map(convert_sql_date_to_jp_date)
+    table_df = table_df.sort_values(['イベント日','都道府県','店舗名','媒体名','取材名'],ascending=[True,False,True,True,False],inplace=False).reset_index(drop=True)
+    table_df['イベント日'] = table_df['イベント日'].map(convert_sql_date_to_jp_date_and_weekday)
     table_df.drop_duplicates(keep='first',inplace=True)
     print(table_df)
     data['iframe'] = create_media_map_iframe(extract_media_name_df)
@@ -1332,7 +1341,8 @@ def tomorrow_recommend_area_prefecture_prefecturename(area_name,prefecture_name)
     extract_prefecture_name_df = pd.DataFrame(cursor.fetchall(),columns=cols)
     extract_prefecture_name_df.drop_duplicates(keep='first',inplace=True)
     table_df = extract_prefecture_name_df[['イベント日','店舗名','媒体名','取材名']]
-    table_df['イベント日'] = table_df['イベント日'].map(convert_sql_date_to_jp_date)
+    table_df.sort_values(['イベント日','店舗名','媒体名','取材名'],ascending=[True,True,True,True],inplace=True)
+    table_df['イベント日'] = table_df['イベント日'].map(convert_sql_date_to_jp_date_and_weekday)
     table_df.drop_duplicates(keep='first',inplace=True)
     print('extract_prefecture_name_df',extract_prefecture_name_df)
     data['iframe'] = create_media_map_iframe(extract_prefecture_name_df)
@@ -1379,6 +1389,7 @@ def tomorrow_recommend_area(area_name):
         extract_target_date_df = pd.DataFrame(cursor.fetchall(),columns=cols)
         extract_target_date_df.drop_duplicates(keep='first',inplace=True)
         table_df = extract_target_date_df[['都道府県','店舗名','媒体名','取材名']]
+        table_df.sort_values(['都道府県','店舗名','媒体名','取材名'],ascending=[True,True,True,True],inplace=True)
         table_df.drop_duplicates(keep='first',inplace=True)
         data['iframe'] = create_syuzai_map_iframe(extract_target_date_df)
         data['extract_target_date_df'] = table_df
