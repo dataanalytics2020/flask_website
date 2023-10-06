@@ -1303,7 +1303,7 @@ def tomorrow_recommend_area_media_medianame(area_name,media_name):
     extract_media_name_df = pd.DataFrame(cursor.fetchall(),columns=cols)
     extract_media_name_df.drop_duplicates(keep='first',inplace=True)
     table_df = extract_media_name_df[['イベント日','都道府県','店舗名','取材名']]
-    table_df = table_df.sort_values(['イベント日','都道府県','店舗名','媒体名','取材名'],ascending=[True,False,True,True,False],inplace=False).reset_index(drop=True)
+    table_df = table_df.sort_values(['イベント日','都道府県','店舗名','取材名'],ascending=[True,True,True,True],inplace=False).reset_index(drop=True)
     table_df['イベント日'] = table_df['イベント日'].map(convert_sql_date_to_jp_date_and_weekday)
     table_df.drop_duplicates(keep='first',inplace=True)
     print(table_df)
