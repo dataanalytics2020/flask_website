@@ -125,8 +125,9 @@ def create_syuzai_map_iframe(report_df:pd.DataFrame):
 
         im.save('syuzai_image.png', quality=95)
         img = 'syuzai_image.png'
-        popup_df = extract_syuzai_df_1[['イベント日','店舗名','取材名','媒体名']].sort_values('店舗名').reset_index(drop=True).T
-        popup_df = popup_df.to_html(escape=False)
+        popup_df = extract_syuzai_df_1[['イベント日','店舗名','取材名','媒体名']].sort_values('店舗名')
+        popup_df['イベント日'] = popup_df['イベント日'].apply(convert_sql_date_to_jp_date) 
+        popup_df = popup_df.to_html(escape=False,index=False)
         popup_data = folium.Popup(popup_df,  max_width=1500,show=False,size=(700, 300))
         folium.Marker(location=[latitude ,longitude],
             tiles='https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png',
@@ -217,7 +218,8 @@ def create_media_map_iframe(report_df:pd.DataFrame):
         img = 'syuzai_image.png'
         popup_df = extract_syuzai_df_1[['イベント日','店舗名','取材名','媒体名']].sort_values('店舗名').reset_index(drop=True).T
         popup_df.drop_duplicates(keep='first',inplace=True)
-        popup_df = popup_df.to_html(escape=False)
+        popup_df['イベント日'] = popup_df['イベント日'].apply(convert_sql_date_to_jp_date) 
+        popup_df = popup_df.to_html(escape=False,index=False)
         popup_data = folium.Popup(popup_df,  max_width=1500,show=False,size=(700, 300))
 
         folium.Marker(location=[latitude ,longitude],
@@ -693,8 +695,9 @@ def top():
 
             im.save('syuzai_image.png', quality=95)
             img = 'syuzai_image.png'
-            popup_df = extract_syuzai_df_1[['店舗名','取材名','媒体名']].sort_values('店舗名').reset_index(drop=True).T
-            popup_df = popup_df.to_html(escape=False)
+            popup_df = extract_syuzai_df_1[['イベント日','店舗名','媒体名','取材名']].sort_values('店舗名')#.reset_index(drop=True)#.T
+            popup_df['イベント日'] = popup_df['イベント日'].map(convert_sql_date_to_jp_date)
+            popup_df = popup_df.to_html(escape=False,index=False,classes="mystyle")
             popup_data = folium.Popup(popup_df,  max_width=1500,show=False,size=(700, 300))
 
             folium.Marker(location=[latitude ,longitude],
