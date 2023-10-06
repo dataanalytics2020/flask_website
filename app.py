@@ -663,6 +663,7 @@ def top():
         for tenpo_name in report_df['店舗名'].unique():
             print(tenpo_name)
             extract_syuzai_df_1 = report_df[report_df['店舗名'] == tenpo_name]
+            extract_syuzai_df_1.drop_duplicates(keep='first',inplace=True)
             #display(extract_syuzai_df_1)
             print(extract_syuzai_df_1)
             syuzai_rank_list = list(extract_syuzai_df_1['取材ランク'].unique())
@@ -703,7 +704,7 @@ def top():
             img = 'syuzai_image.png'
             popup_df = extract_syuzai_df_1[['イベント日','店舗名','媒体名','取材名']].sort_values('店舗名')#.reset_index(drop=True)#.T
             popup_df['イベント日'] = popup_df['イベント日'].map(convert_sql_date_to_jp_date_and_weekday)
-            popup_df = popup_df.to_html(escape=False,index=False,classes="mystyle")
+            popup_df = popup_df.to_html(escape=False,index=False,table_id="mystyle")
             popup_data = folium.Popup(popup_df,  max_width=1500,show=False,size=(700, 300))
 
             folium.Marker(location=[latitude ,longitude],
