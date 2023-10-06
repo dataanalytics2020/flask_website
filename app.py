@@ -80,7 +80,7 @@ def create_syuzai_map_iframe(report_df:pd.DataFrame):
         
     print('新prefecture_latitude',prefecture_latitude,prefecture_longitude)
 
-    folium_map = folium.Map(location=[prefecture_latitude,prefecture_longitude], zoom_start=10, width="100%", height="100%")
+    folium_map = folium.Map(location=[prefecture_latitude,prefecture_longitude], zoom_start=14, width="100%", height="100%")
     # 地図表示
     # マーカープロット（ポップアップ設定，色変更，アイコン変更）
     print(report_df)
@@ -170,7 +170,7 @@ def create_media_map_iframe(report_df:pd.DataFrame):
     except:
         prefecture_latitude = 35.681236
         prefecture_longitude = 139.767125
-    folium_map = folium.Map(location=[prefecture_latitude,prefecture_longitude], zoom_start=9, width="100%", height="100%")
+    folium_map = folium.Map(location=[prefecture_latitude,prefecture_longitude], zoom_start=11, width="100%", height="100%")
     # 地図表示
     # マーカープロット（ポップアップ設定，色変更，アイコン変更）
     #print(report_df)
@@ -216,7 +216,7 @@ def create_media_map_iframe(report_df:pd.DataFrame):
 
         im.save('syuzai_image.png', quality=95)
         img = 'syuzai_image.png'
-        popup_df = extract_syuzai_df_1[['イベント日','店舗名','取材名','媒体名']].sort_values('店舗名').reset_index(drop=True).T
+        popup_df = extract_syuzai_df_1[['イベント日','店舗名','取材名','媒体名']].sort_values('店舗名')#.reset_index(drop=True).T
         popup_df.drop_duplicates(keep='first',inplace=True)
         popup_df['イベント日'] = popup_df['イベント日'].apply(convert_sql_date_to_jp_date) 
         popup_df = popup_df.to_html(escape=False,index=False)
@@ -650,7 +650,7 @@ def top():
         prefecture_latitude = 35.68944
         prefecture_longitude = 139.69167
         
-        folium_map = folium.Map(location=[prefecture_latitude,prefecture_longitude], zoom_start=10, width="100%", height="100%")
+        folium_map = folium.Map(location=[prefecture_latitude,prefecture_longitude], zoom_start=11, width="100%", height="100%")
         # 地図表示
         # マーカープロット（ポップアップ設定，色変更，アイコン変更）
         print(report_df)
