@@ -7,11 +7,12 @@ import requests
 import mysql.connector
 import os
 
-from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
+
+from chromedriver_py import binary_path # this will get you the path variable
 from bs4 import BeautifulSoup
 import urllib
 import urllib.parse
@@ -69,7 +70,16 @@ line_token = os.getenv('LINE_TOKEN')
 #print(line_token)
 for prefecture in prefecture_list:
     try:
-        browser = webdriver.Chrome(executable_path=r"C:\Users\tsc95\.wdm\drivers\chromedriver\win64\116.0.5845.187\chromedriver.exe")
+        from selenium.webdriver.chrome.service import Service
+        from selenium import webdriver
+        from chromedriver_py import binary_path # this will get you the path variable
+        svc = Service(executable_path=binary_path)
+        options = Options()
+        options.add_argument('--headless')
+        options.add_argument('--disable-gpu')
+        options.add_argument('--no-sandbox')
+        options.add_argument('--disable-dev-shm-usage')
+        browser = webdriver.Chrome(service=svc, options=options)
         #post_line_text(f'{prefecture}XサーバーへのMYSQL追加処理を開始します',line_token)
         cols = ['店舗名','URL']
         yesterday = datetime.date.today() + datetime.timedelta(days=-1)

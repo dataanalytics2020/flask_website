@@ -127,15 +127,16 @@ class UtilsTwitterClass():
         self.target_date_string_sql:str = target_date.strftime('%Y-%m-%d')
 
     def twitter_login(self):
+        from selenium.webdriver.chrome.service import Service
+        from selenium import webdriver
+        from chromedriver_py import binary_path # this will get you the path variable
+        svc = Service(executable_path=binary_path)
         options = Options()
-        # options.add_argument("--headless")
-        # options.add_argument("--no-sandbox")
-        # options.add_argument("--disable-dev-shm-usage")
-        # options.add_argument("--disable-gpu")
-        # options.add_argument("--disable-features=NetworkService")
-        # options.add_argument("--window-size=1920x1080")
-        # options.add_argument("--disable-features=VizDisplayCompositor")
-        browser = webdriver.Chrome(ChromeDriverManager().install(),options=options)
+        options.add_argument('--headless')
+        options.add_argument('--disable-gpu')
+        options.add_argument('--no-sandbox')
+        options.add_argument('--disable-dev-shm-usage')
+        browser = webdriver.Chrome(service=svc, options=options)
         browser.get("https://twitter.com/home")
         browser.implicitly_wait(10)
 
@@ -613,10 +614,16 @@ class PledgeScraping():
 
     def login_scraping_site(self,area_name):
         global browser
+        from selenium.webdriver.chrome.service import Service
+        from selenium import webdriver
+        from chromedriver_py import binary_path # this will get you the path variable
+        svc = Service(executable_path=binary_path)
         options = Options()
         options.add_argument('--headless')
-        options.add_argument("--no-sandbox")
-        browser = webdriver.Chrome(ChromeDriverManager().install(),options=options)
+        options.add_argument('--disable-gpu')
+        options.add_argument('--no-sandbox')
+        options.add_argument('--disable-dev-shm-usage')
+        browser = webdriver.Chrome(service=svc, options=options)
         browser.implicitly_wait(10)
         url_login = f"https://{os.getenv('SCRAPING_SYUZAI_DOMAIN')}/login_form_mail"
         #admageを開く

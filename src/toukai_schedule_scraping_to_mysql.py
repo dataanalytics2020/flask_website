@@ -5,6 +5,8 @@ import re
 from selenium.webdriver.common.by import By
 #from datetime import datetime, date, timedelta
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
+from chromedriver_py import binary_path # this will get you the path variable
 import requests
 import json
 
@@ -53,11 +55,14 @@ def post_line_text_and_image(message,image_path,token):
 
 
 def login_scraping_site(area_name):
-    options = Options()
-    #options.add_argument('--headless')
-    options.add_argument("--no-sandbox")
 
-    browser = webdriver.Chrome(executable_path="C:\\Users\\tsc95\\.wdm\\drivers\\chromedriver\\win64\\116.0.5845.140\\chromedriver-win32\\chromedriver.exe",options=options)#ChromeDriverManager().install() 
+    svc = Service(executable_path=binary_path)
+    options = Options()
+    options.add_argument('--headless')
+    options.add_argument('--disable-gpu')
+    options.add_argument('--no-sandbox')
+    options.add_argument('--disable-dev-shm-usage')
+    browser = webdriver.Chrome(service=svc, options=options)
     browser.implicitly_wait(10)
     url_login = f"https://{os.getenv('SCRAPING_SYUZAI_DOMAIN')}/login_form_mail"
     #admageを開く
