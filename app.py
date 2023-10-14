@@ -623,6 +623,7 @@ def top():
             jp_str_day_list.append(jp_str_day)
         data['jp_str_day_list'] = jp_str_day_list
         tomorrow:date = today + timedelta(days=1)
+        
         print(tomorrow)
         tommorow_jp_str_day = tomorrow.strftime('%m').lstrip('0') + '月' + tomorrow.strftime('%d').lstrip('0') + '日' + w_list[tomorrow.weekday()]
         print(tommorow_jp_str_day)
@@ -651,8 +652,11 @@ def top():
         report_df = report_df.dropna(subset=['latitude'])
         #(取材ランク = 'S' OR 取材ランク = 'A')のみ抽出
         report_df = report_df[report_df['取材ランク'].isin(['S','A'])]
-        map_report_df = report_df[['店舗名','取材名','媒体名']].drop_duplicates(keep='first')
+        map_report_df = report_df[report_df['イベント日'] == tomorrow]
+        map_report_df = map_report_df[['店舗名','取材名','媒体名']].drop_duplicates(keep='first')
         map_report_df = map_report_df.sort_values(['店舗名','媒体名']).reset_index(drop=True)
+        #明日のみ抽出
+        
         #東京都に設定
         prefecture_latitude = 35.68944
         prefecture_longitude = 139.69167
@@ -660,14 +664,15 @@ def top():
         folium_map = folium.Map(location=[prefecture_latitude,prefecture_longitude], zoom_start=11, width="100%", height="100%")
         # 地図表示
         # マーカープロット（ポップアップ設定，色変更，アイコン変更）
-        print(report_df)
-        for tenpo_name in report_df['店舗名'].unique():
+        print(map_report_df)
+        for tenpo_name in map_report_df['店舗名'].unique():
             print(tenpo_name)
             extract_syuzai_df_1 = report_df[report_df['店舗名'] == tenpo_name]
+            extract_syuzai_df_1 = extract_syuzai_df_1[extract_syuzai_df_1['イベント日'] == tomorrow]
             extract_syuzai_df_1.drop_duplicates(keep='first',inplace=True)
             #display(extract_syuzai_df_1)
             print(extract_syuzai_df_1)
-            syuzai_rank_list = list(extract_syuzai_df_1['取材ランク'].unique())
+            #syuzai_rank_list = list(extract_syuzai_df_1['取材ランク'].unique())
             #print(syuzai_rank_list)
             longitude = extract_syuzai_df_1.iloc[0]['longitude']
             latitude = extract_syuzai_df_1.iloc[0]['latitude']
@@ -1490,4 +1495,4 @@ def sitemap():
     return app.send_static_file("sitemap.xml")
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0",debug=False, port=int(os.environ.get('PORT', 5000)))
+    app.run(host="0.0.0.0",debug=True, port=int(os.environ.get('PORT', 5000)))
