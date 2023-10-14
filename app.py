@@ -560,6 +560,7 @@ app.config['SECRET_KEY'] = 'o+UFANpa1rA35'
 #ext = Sitemap(app=app)
 bootstrap = Bootstrap(app)
 
+
 #pathがどこにあるか確認
 path=os.getcwd()
 print(path)
@@ -744,6 +745,7 @@ def top():
         data['area_name'] = 'minamikantou'
         data['area_name_jp'] = area_name_and_str_jp_area_name_dict['minamikantou']
         return render_template('top.html',data=data,zip=zip)
+
 
 
 @app.route('/heatmap', methods=['GET', 'POST'])#<prefecture>/<tenpo_name>
