@@ -3,6 +3,14 @@
 https://www.slo-map.com/
 
 ## 製作過程のスクショ一覧
+
+### 2023/10/26時点の明日のお勧めページ
+#### googleアドセンス対策用の明日のお勧め店舗&機種ページ
+![スクリーンショット 2023-10-26 022409](https://github.com/dataanalytics2020/flask_website/assets/117744645/a5069c76-1aad-41f1-896e-801d1199c3d6)
+![スクリーンショット 2023-10-26 022350](https://github.com/dataanalytics2020/flask_website/assets/117744645/6ab2f3f7-2997-4ec8-8edc-96c507e89c92)
+![スクリーンショット 2023-10-26 022330](https://github.com/dataanalytics2020/flask_website/assets/117744645/5ed43f5a-184d-465c-9db0-2c5af1e14662)
+
+
 ### 2023/09/30時点のTOPページ
 #### 都道府県マップから選択できるように機能追加
 ![slomap_Capture http___127 0 0 1_5000_ 20230930](https://github.com/dataanalytics2020/flask_website/assets/117744645/6bf1d3ee-e606-4165-94c3-9c1d89b19d51)
