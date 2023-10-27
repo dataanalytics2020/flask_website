@@ -205,6 +205,8 @@ h1 {
   background: -webkit-repeating-linear-gradient(-45deg, #f0f8ff, #f0f8ff 3px,#e9f4ff 3px, #e9f4ff 7px);
   background: repeating-linear-gradient(-45deg, #f0f8ff, #f0f8ff 3px,#e9f4ff 3px, #e9f4ff 7px);
   font-size: calc(1.025rem + .1vw);
+  margin-bottom: 0px;
+  font-weight: bold;
 }
 
 .design16 {
@@ -997,3 +999,172 @@ text-align: center; /* 内容は中央配置 */
   -webkit-border-top-right-radius: 5px;
   -moz-border-radius-topright: 5px;
   border-top-right-radius: 5px;}  
+
+
+  .toc-002 {
+    margin-bottom: 5px;
+    border: 2px solid #2589d0;
+    border-radius: 3px;
+}
+
+.toc-002 div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    padding: 2px 0;
+    background-color: #2589d0;
+    color: #fff;
+    font-weight: 600;
+    font-size: 1.1em;
+}
+
+.toc-002 div::before {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    margin-right: 5px;
+    background-image: url('data:image/svg+xml;charset=utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22%23fff%22%3E%3Cpath%20d%3D%22M3.8%2017.2h-3c-.5%200-.8.4-.8.8v3c0%20.4.3.8.8.8h3c.4%200%20.8-.3.8-.8v-3c-.1-.4-.4-.8-.8-.8zm0-15h-3c-.5%200-.8.4-.8.8v3c0%20.4.3.8.8.8h3c.4%200%20.8-.3.8-.8V3c-.1-.4-.4-.8-.8-.8zm0%207.6h-3c-.5%200-.8.3-.8.7v3c0%20.4.3.8.8.8h3c.4%200%20.8-.3.8-.8v-3c-.1-.4-.4-.7-.8-.7zM23.2%2018h-15c-.4%200-.8.3-.8.8v1.5c0%20.4.3.8.8.8h15c.4%200%20.8-.3.8-.8v-1.5c0-.5-.3-.8-.8-.8zm0-15h-15c-.4%200-.7.3-.7.8v1.5c0%20.4.3.7.7.7h15c.5%200%20.8-.3.8-.8V3.8c0-.5-.3-.8-.8-.8zm0%207.5h-15c-.4%200-.8.3-.8.8v1.5c0%20.4.3.8.8.8h15c.4%200%20.8-.3.8-.8v-1.5c0-.5-.3-.8-.8-.8z%22%2F%3E%3C%2Fsvg%3E');
+    content: '';
+}
+
+.toc-002 ol {
+    list-style-type: decimal;
+    margin: 0;
+    overflow: hidden;
+}
+
+.toc-002 > ul, ol a {
+    padding: 0em !important ;
+}
+
+.toc-002 ol ol {
+    margin-top: 1px;
+    padding-left: 1.1em;
+}
+
+.toc-002 li {
+    font-weight: 600;
+    line-height: 25px!important;
+}
+
+.toc-002 ol ol li {
+    font-weight: 500;
+    font-size: .9em;
+}
+
+.toc-002 a {
+    color: #333;
+}
+
+.heading-011 {
+
+    position: relative;
+    color: white;
+    background: #004fb6;
+    line-height: 1.4;
+    padding: 0.5em 0.5em 0.5em 1.8em;
+  }
+
+.heading-011:before {
+    font-family: "Font Awesome 5 Free";
+    content: "\f14a";
+    font-weight: 900;
+    position: absolute;
+    left : 0.5em; /*左端からのアイコンまでの距離*/
+  }
+
+.kisyu_001 {
+    position: relative;
+    color: rgb(255, 255, 255);
+    background: #1a69e3;
+    line-height: 1.4;
+    padding: 0.25em 0.5em;
+    margin: 0em;
+    border-radius: 0 5px 5px 5px;
+  }
+  
+.kisyu_001:after {
+    /*タブ*/
+    position: absolute;
+    font-family: "Font Awesome 5 Free",'Quicksand','Avenir','Arial',sans-serif;
+    font-weight: 900;
+    content: '\f00c Check';
+    background: #2196F3;
+    color: #fff;
+    left: 0px;
+    bottom: 100%;
+    border-radius: 5px 5px 0 0;
+    padding: 3px 7px 1px;
+    font-size: 0.7em;
+    line-height: 1;
+    letter-spacing: 0.05em
+  }
+
+  .qa-001 {
+    max-width: 100%;
+    margin-bottom: 7px;
+    border: 1px solid #d6dde3;
+    border-radius: 5px;
+    margin-inline: auto
+}
+
+.qa-001 summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    padding: 1em 2em 1em 3em;
+    color: #333333;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.qa-001 summary::before,
+.qa-001 p::before {
+    position: absolute;
+    left: 1em;
+    font-weight: 600;
+    font-size: 1.3em;
+}
+
+.qa-001 summary::before {
+    color: #75bbff;
+    content: "Q";
+}
+
+.qa-001 summary::after {
+    transform: translateY(-25%) rotate(45deg);
+    width: 7px;
+    height: 7px;
+    margin-left: 10px;
+    border-bottom: 3px solid #333333b3;
+    border-right: 3px solid #333333b3;
+    content: '';
+    transition: transform .5s;
+}
+
+.qa-001[open] summary::after {
+    transform: rotate(225deg);
+}
+
+.qa-001 p {
+    position: relative;
+    transform: translateY(-10px);
+    opacity: 0;
+    margin: 0;
+    padding: .3em 3em 1.5em;
+    color: #333;
+    transition: transform .5s, opacity .5s;
+}
+
+.qa-001[open] p {
+    transform: none;
+    opacity: 1;
+}
+
+.qa-001 p::before {
+    color: #ff8d8d;
+    line-height: 1.2;
+    content: "A";
+}

@@ -18,8 +18,6 @@ import os
 from PIL  import ImageDraw , ImageFont , Image
 import unicodedata
 import string
-from folium import plugins
-import branca
 import folium
 from folium.features import CustomIcon
 import mysql
@@ -63,6 +61,12 @@ def get_key_from_value(d, val):
 # def convert_sql_date_to_jp_date(sql_date:datetime.date) -> str:
 #     sql_str_date = str(sql_date)
 #     return sql_str_date.split('-')[1].lstrip('0') + '月' + sql_str_date.split('-')[2].lstrip('0') + '日'
+def convert_str_date_to_jp_date_and_weekday(target_date:str) -> str:
+    target_date = datetime.datetime.strptime(target_date, '%Y-%m-%d')
+    w_list = ['(月)', '(火)', '(水)', '(木)', '(金)', '(土)', '(日)']
+    target_date = target_date .strftime('%m').lstrip('0') + '月' + target_date .strftime('%d').lstrip('0') + '日' + w_list[target_date .weekday()]
+    return target_date
+
 
 def convert_sql_date_to_jp_date_and_weekday(sql_date:datetime.date) -> str:
     w_list = ['(月)', '(火)', '(水)', '(木)', '(金)', '(土)', '(日)']
@@ -1476,7 +1480,7 @@ def tomorrow_recommend_area_date(area_name,date):
         data['area_name_jp'] = '関東'
     return render_template('tomorrow_recommend_area_date.html',data=data)
 
-@app.route("/post_test", methods=['GET','POST'])
+@app.route("/test2", methods=['GET','POST'])
 def post_test():
     data = {}
     prefecture_id_and_name_dict = {}
@@ -1484,7 +1488,7 @@ def post_test():
         i = i + 1
         prefecture_id_and_name_dict[i] = prefecture_name
     data['prefecture_id_and_name_dict'] = prefecture_id_and_name_dict
-    return render_template('post_test.html',data=data)
+    return render_template('test2.html',data=data)
 
 @app.route("/privacy_policy")
 def privacy_policy():
@@ -1495,4 +1499,4 @@ def sitemap():
     return app.send_static_file("sitemap.xml")
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0",debug=False, port=int(os.environ.get('PORT', 5000)))
+    app.run(host="0.0.0.0",debug=True, port=int(os.environ.get('PORT', 5000)))
