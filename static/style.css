@@ -1036,6 +1036,7 @@ text-align: center; /* 内容は中央配置 */
 
 .toc-002 > ul, ol a {
     padding: 0em !important ;
+    
 }
 
 .toc-002 ol ol {
@@ -1051,6 +1052,7 @@ text-align: center; /* 内容は中央配置 */
 .toc-002 ol ol li {
     font-weight: 500;
     font-size: .9em;
+    margin-bottom: 0px !important;
 }
 
 .toc-002 a {
