@@ -1170,3 +1170,29 @@ text-align: center; /* 内容は中央配置 */
     line-height: 1.2;
     content: "A";
 }
+
+.page-top {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    font-size: 77%;
+    position: fixed;
+    z-index: 9999;
+
+}
+.page-top a {
+    background: #666;
+    text-decoration: none;
+    color: #fff;
+    width: 100px;
+    padding: 30px 0;
+    text-align: center;
+    display: block;
+    border-radius: 5px;
+
+}
+.page-top a:hover {
+    text-decoration: none;
+    background: #999;
+
+}
