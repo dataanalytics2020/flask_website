@@ -108,3 +108,5 @@ Flask-Mail==0.9.1
 oauth2client==4.1.3
 Flask-WTF==1.1.1
 gspread_dataframe==3.3.1
+Janome==0.5.0
+wordcloud==1.9.2
