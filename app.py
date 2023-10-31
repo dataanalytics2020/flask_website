@@ -35,7 +35,7 @@ load_dotenv()
 df:pd.DataFrame  = pd.read_csv(r'csv/2022-12-09_touhou.csv')
 heroku_port:int = int(os.environ.get("PORT", 5000))
 
-
+w_list = ['(月)', '(火)', '(水)', '(木)', '(金)', '(土)', '(日)']
 prefecture_list:list[str] = '''北海道
 ,青森県,岩手県,宮城県,秋田県,山形県,福島県
 ,茨城県,栃木県,群馬県
@@ -63,7 +63,6 @@ def get_key_from_value(d, val):
 #     return sql_str_date.split('-')[1].lstrip('0') + '月' + sql_str_date.split('-')[2].lstrip('0') + '日'
 def convert_str_date_to_jp_date_and_weekday(target_date:str) -> str:
     target_date = datetime.datetime.strptime(target_date, '%Y-%m-%d')
-    w_list = ['(月)', '(火)', '(水)', '(木)', '(金)', '(土)', '(日)']
     target_date = target_date .strftime('%m').lstrip('0') + '月' + target_date .strftime('%d').lstrip('0') + '日' + w_list[target_date .weekday()]
     return target_date
 
@@ -618,7 +617,7 @@ def top():
         data = {}
         data['prefecture_list'] = prefecture_list
         #data['kanto_prefecture_list'] = ['東京都','神奈川県','千葉県','埼玉県']
-        w_list = ['(月)', '(火)', '(水)', '(木)', '(金)', '(土)', '(日)']
+
         today = date.today()
         jp_str_day_list = []
         for i in range(0,7):
@@ -754,8 +753,6 @@ def top():
         data['area_name'] = 'minamikantou'
         data['area_name_jp'] = area_name_and_str_jp_area_name_dict['minamikantou']
         return render_template('top.html',data=data,zip=zip)
-
-
 
 @app.route('/heatmap', methods=['GET', 'POST'])#<prefecture>/<tenpo_name>
 def heatmap_test():#prefecture,tenpo_name
@@ -982,9 +979,8 @@ def clicked_tenpo_name(prefecture,tenpo_name):
                 concat_df = concat_df.drop([column_name],axis=1)
             except:
                 pass
- 
+
         ######3列同時比較用のデータフレーム作成
-        
         horizon_concat_list =[]
         for groupby_date_df in concat_df_list:
             for column_name in ['合成確率','BB確率','RB確率','ART確率','BB','RB','ART']:
@@ -1006,7 +1002,6 @@ def clicked_tenpo_name(prefecture,tenpo_name):
 
         horizon_concat_df = pd.concat(horizon_concat_list,axis=1)
         horizon_concat_df_html = re.sub(' target', '" id="target', horizon_concat_df.to_html(classes='target',index=False))
-
 
         groupby_date_kisyubetu_df = pre_concat_df.groupby(['日付','機種名']).sum()
         groupby_date_kisyubetu_df['総台数'] = pre_concat_df.groupby(['日付','機種名']).size()
@@ -1490,6 +1485,90 @@ def post_test():
     data['prefecture_id_and_name_dict'] = prefecture_id_and_name_dict
     return render_template('test2.html',data=data)
 
+
+@app.route("/test3", methods=['GET','POST'])
+def test3():
+    if request.method == 'GET':
+        data = {}
+        date_list = []
+        day_str_list = []
+        prefecture_id_and_name_dict = {}
+        for i, prefecture_name in enumerate(prefecture_list):
+            i = i + 1
+            prefecture_id_and_name_dict[i] = prefecture_name
+        data['prefecture_id_and_name_dict'] = prefecture_id_and_name_dict
+        today = datetime.date.today()
+        prefecture_name = '東京都'
+        prefecture_name_en = 'tokyo'
+        #target_day =  today + datetime.timedelta(days=target_day_number)
+        target_day_str = today.strftime('%Y-%m-%d')
+        #曜日のリスト
+        print(target_day_str[-1])
+        #Nの付く日
+        display_date_list_dict = {}
+        tag_dict = {}
+        for i in range(0,9):
+            #print(i)
+            target_day = today + datetime.timedelta(days=i)
+            belong_day_str = target_day.strftime('%Y-%m-%d')
+            target_day_str_jp = target_day.strftime('%m/').lstrip('0')  +target_day.strftime('%d').lstrip('0') +  w_list[target_day.weekday()]
+            target_day_str_number:str = belong_day_str[-1] + 'の付く日'
+            display_date_list_dict[target_day_str_jp] = target_day_str_number
+            slug = f'event_{belong_day_str[-1]}_day'
+            display_list_str = target_day_str_jp + ' ' + target_day_str_number
+            tag_dict[display_list_str] = slug
+        print(tag_dict)
+        data['tag_dict'] = tag_dict
+        return render_template('test3.html',data=data,enumerate=enumerate)
+    else:
+        pass
+        #return render_template('test4.html',data=data,enumerate=enumerate)
+    
+@app.route("/test4", methods=['GET','POST'])
+def test4():
+    if request.method == 'POST':
+        event_day_tag_dict = {
+        'event_0_day': '17',
+        'event_1_day': '18',
+        'event_2_day': '19',
+        'event_3_day': '20',
+        'event_4_day': '21',
+        'event_5_day': '22',
+        'event_6_day': '23',
+        'event_7_day': '24',
+        'event_8_day': '25',
+        'event_9_day': '26'}
+        
+        #北海道が選択された場合 wordpressのタグのidは72
+        
+        data = {}
+        data['target_day'] = request.form.get('target_day')
+        data['pref_id'] = request.form.get('pref_id')
+        data['wordpress_eventday_tag_id'] = wordpress_eventday_tag_id = int(request.form.get('target_day').split('_')[1]) + 17#event_0_dayの0の部分
+        data['wordpress_prefecture_tag_id'] = wordpress_prefecture_tag_id = int(request.form.get('pref_id')) + 71
+        print('dataは',data)
+        print('ここを通過')
+        # ブログのURLを指定
+        blog_url = 'https://pachislo7.com/'
+        #wordpress rest apiでタグを指定してviewのみ
+        url = f'{blog_url}/wp-json/wp/v2/posts?tags={wordpress_eventday_tag_id}&tags={wordpress_prefecture_tag_id}&context=embed'
+
+        # リクエスト送信してレスポンスのJSONを解析
+        response = requests.get(url).json()
+        data['response'] = response
+        # レスポンスをぐるぐる
+        # for res in response:
+        #     # 公開日、更新日、タイトルを表示
+        #     print(f'{res["date"]}, {res["modified"]},{res["title"]["rendered"]}')
+        # data['target_day_str'] = request.form.get('target_day')
+        # data['prefecture'] = request.form.get('prefecture')
+        tag_df = pd.DataFrame(response)
+        #data['tag_df'] = tag_df.to_html(justify='justify-all',classes='tb01')
+        return render_template('test4.html',data=data,enumerate=enumerate)
+    else:
+        redirect(url_for('test3'))
+
+
 @app.route("/privacy_policy")
 def privacy_policy():
     return render_template('privacy_policy.html')
@@ -1499,4 +1578,4 @@ def sitemap():
     return app.send_static_file("sitemap.xml")
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0",debug=True, port=int(os.environ.get('PORT', 5000)))
+    app.run(host="0.0.0.0",debug=False, port=int(os.environ.get('PORT', 5000)))
