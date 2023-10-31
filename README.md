@@ -4,6 +4,9 @@ https://www.slo-map.com/
 
 ## 製作過程のスクショ一覧
 
+### 2023/10/30時点の記事用サンプルサムネ
+![Word_Cloud_test](https://github.com/dataanalytics2020/flask_website/assets/117744645/1b9b992f-46ca-4022-948d-ae269090f298)
+
 ### 2023/10/26時点の明日のお勧めページ
 #### googleアドセンス対策用の明日のお勧め店舗&機種ページ
 ![スクリーンショット 2023-10-26 022409](https://github.com/dataanalytics2020/flask_website/assets/117744645/a5069c76-1aad-41f1-896e-801d1199c3d6)
