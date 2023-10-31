@@ -11,6 +11,16 @@ body {
   }
   
 
+.row {
+  padding-right:0px !important;
+  padding-left:0px !important;
+}
+
+.container {
+  padding-right:6px !important;
+  padding-left:6px !important;
+}
+
 
 .table-wrap {
     overflow-x: scroll;
@@ -1196,3 +1206,120 @@ text-align: center; /* 内容は中央配置 */
     background: #999;
 
 }
+
+
+.radio-003 {
+  border: none;
+  padding: inherit;
+}
+
+.radio-003 label {
+  display: flex;
+  align-items: center;
+  gap: 0 .5em;
+  position: relative;
+  max-width: 400px;
+  margin-top: 5px!important;
+  margin-bottom: 5px!important;
+  margin: auto;
+  padding: .5em .7em;
+  border: 1px solid #2589d0;
+  border-radius: 3px;
+  background-color: #2589d026;
+  cursor: pointer;
+}
+
+.radio-003 label:has(:checked) {
+  background-color: #2589d0;
+  color: #fff;
+}
+
+.radio-003 label::before,
+.radio-003 label:has(:checked)::after {
+  border-radius: 50%;
+  content: '';
+}
+
+.radio-003 label::before {
+  width: 14px;
+  height: 14px;
+  background-color: #fff;
+}
+
+
+.radio-003 label:has(:checked)::after {
+  position: absolute;
+  top: 50%;
+  left: calc(7px + .7em);
+  transform: translate(-50%, -50%);
+  width: 7px;
+  height: 7px;
+  background-color: #2589d0;
+}
+
+.radio-003 input {
+  display: none;
+}
+
+/* form-nav */
+
+.progressbar {
+  display: flex;
+  flex-wrap: wrap;
+}
+.progressbar .item {
+    position: relative;
+    width: 33%;
+    text-align: center;
+    position: relative;
+    align-items: center;
+    justify-content: center;
+    padding: 13px 0;
+    line-height: 1.5;
+    background: #F5F5F5;
+    color: #999999;
+}
+.progressbar .item:not(:last-child)::before,
+.progressbar .item:not(:last-child)::after {
+    position: absolute;
+    z-index: 2;
+    top: 0;
+    bottom: 0;
+    left: 100%;
+    content: '';
+    border: 37px solid transparent;
+    border-left: 20px solid #F5F5F5;
+    margin: auto;
+}
+.progressbar .item:not(:last-child)::before {
+    margin-left: 1px;
+    border-left-color: #FFF;
+}
+
+@media screen and (max-width: 767px) {
+.progressbar .item {
+    font-size: 11px;
+    line-height: 1.4;
+    padding: 10px 0;
+}
+.progressbar .item:not(:last-child)::before,
+.progressbar .item:not(:last-child)::after {
+    border-width: 25px;
+    border-left-width: 12px;
+}
+}
+
+/* active */
+
+.progressbar .item.active {
+    z-index: 1;
+    background: #0070BD;
+    color: #FFF;
+}
+.progressbar .item.active:not(:last-child)::after {
+    border-left-color: #0070bd;
+}
+.progressbar .item.active:not(:last-child)::before {
+    border-left: none;
+}
+

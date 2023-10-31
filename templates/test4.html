@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<div class='container'>
+    <div class='row'>
+        <div class='col-12'>
+            wordpress_eventday_tag_id: {{ data.wordpress_eventday_tag_id }}
+            <br>
+            wordpress_prefecture_tag_id: {{ data.wordpress_prefecture_tag_id }}
+            {{ data.response | safe }}
+            {{ data.tag_df | safe }}
+        </div>
+    </div>
+</div>
+{% endblock %}
