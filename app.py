@@ -637,8 +637,8 @@ def top():
         cursor = get_driver()
         sql = f'''SELECT イベント日,都道府県,店舗名,取材名,取材ランク,媒体名,latitude,longitude
                 FROM schedule as schedule2
-                left join maptable as maptable2
-                on schedule2.店舗名 = maptable2.hallnavi_name
+                left join halldata as halldata2
+                on schedule2.店舗名 = halldata2.hall_name
                 WHERE イベント日 > current_date
                 AND イベント日 <= current_date + 7
                 AND 媒体名 != 'ホールナビ'
