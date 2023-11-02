@@ -713,7 +713,7 @@ def top():
             img = 'syuzai_image.png'
             popup_df = extract_syuzai_df_1[['イベント日','店舗名','媒体名','取材名']].sort_values('店舗名')#.reset_index(drop=True)#.T
             popup_df['イベント日'] = popup_df['イベント日'].map(convert_sql_date_to_jp_date_and_weekday)
-            popup_df_html =f'<a href="/tomorrow_recommend/minamikantou/hall/{tenpo_name}"  target="_blank">{tenpo_name}※別タブで店舗詳細ページに飛びます </a>'
+            popup_df_html =f'<a href="/tomorrow_recommend/minamikantou/hall/{tenpo_name}"  target="_parent">{tenpo_name}※店舗詳細ページに飛びます </a>'
             popup_df_html += popup_df.to_html(escape=False,index=False,table_id="mystyle",justify='center',classes='table table-striped table-hover table-sm')
             popup_data = folium.Popup(popup_df_html,  max_width=1500,show=False,size=(700, 300))
 
