@@ -1546,23 +1546,26 @@ def test4():
         data['pref_id'] = request.form.get('pref_id')
         data['wordpress_eventday_tag_id'] = wordpress_eventday_tag_id = int(request.form.get('target_day').split('_')[1]) + 17#event_0_dayの0の部分
         data['wordpress_prefecture_tag_id'] = wordpress_prefecture_tag_id = int(request.form.get('pref_id')) + 71
-        print('dataは',data)
-        print('ここを通過')
-        # ブログのURLを指定
-        blog_url = 'https://pachislo7.com/'
-        #wordpress rest apiでタグを指定してviewのみ
-        url = f'{blog_url}/wp-json/wp/v2/posts?tags={wordpress_eventday_tag_id}&tags={wordpress_prefecture_tag_id}&context=embed'
 
-        # リクエスト送信してレスポンスのJSONを解析
-        response = requests.get(url).json()
-        data['response'] = response
-        # レスポンスをぐるぐる
-        # for res in response:
-        #     # 公開日、更新日、タイトルを表示
-        #     print(f'{res["date"]}, {res["modified"]},{res["title"]["rendered"]}')
-        # data['target_day_str'] = request.form.get('target_day')
-        # data['prefecture'] = request.form.get('prefecture')
-        tag_df = pd.DataFrame(response)
+        # アクセス情報の設定
+        SITE_URL = 'https://pachislo7.com/' 
+        API_URL = f"{SITE_URL}/wp-json/wp/v2/"
+        AUTH_USER = 'tsc953u'
+        AUTH_PASS = 'IyQe A1m6 YL4e f66u YjBn zzEo'
+
+        #下書き状態の記事を取得
+        #画像は取得するがurl以外は取得しない
+        label = 'posts?slug=tokyo-2023-11-05&status=draft&fields=id,slug,title,content,excerpt,featured_media'
+        parameter = ''
+        url = f"{API_URL}{label}{parameter}"
+        # すべてのアイテムを取得
+        print(url)
+        res = requests.get(url, auth=(AUTH_USER, AUTH_PASS)).json()
+        print(res)
+        parameter_id = res[0]['id']
+        print('parameter_id',parameter_id)
+        write_html = res[0]['content']['rendered']
+        data['write_html'] = write_html
         #data['tag_df'] = tag_df.to_html(justify='justify-all',classes='tb01')
         return render_template('test4.html',data=data,enumerate=enumerate)
     else:
