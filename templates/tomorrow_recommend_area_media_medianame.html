@@ -62,25 +62,6 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/themes/cupertino/jquery-ui.min.css">  <!-- テーマcupertinoを選択 -->\
 <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
 <script>
-$(document).ready(function(){
-    $("#media_table").DataTable({
-        "language":{url:"https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json",},
-            // 件数切替機能 無効
-        lengthChange: false,
-        // 検索機能 無効
-        searching: true,
-        // ソート機能 無効
-        ordering: true,
-        // 情報表示 無効
-        info: true,
-        // ページング機能 無効
-        paging: false,
-        // 初期表示の並び替えなし
-        order: [],
-    });
-});
-</script>
-<script>
 	$(function() {
 		$.datepicker.setDefaults($.datepicker.regional["ja"]);
 		$("#input1").datepicker({

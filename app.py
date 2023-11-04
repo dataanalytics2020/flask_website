@@ -740,12 +740,13 @@ def top():
                         ).add_to(folium_map)
         folium_map.get_root().width = "500px"
         folium_map.get_root().height = "500px"
-        
+
         data['iframe'] = folium_map.get_root()._repr_html_()
         display_report_df = all_kanto_display_df[['イベント日','都道府県','店舗名','媒体名','取材名']].sort_values(['イベント日','都道府県','店舗名','媒体名','取材名'],ascending=[True,False,True,True,False],inplace=False).reset_index(drop=True)
         print(display_report_df)
         display_report_df = display_report_df.drop_duplicates(keep='first')
         display_report_df['イベント日'] = display_report_df['イベント日'].map(convert_sql_date_to_jp_date_and_weekday)
+        display_report_df.rename(columns={'イベント日':'日','都道府県':'県'},inplace=True)
         #display_report_df.sort_values(['イベント日','都道府県','店舗名','媒体名','取材名'],ascending=[True,False,True,True,False],inplace=True)
         data['display_report_df_column_names'] = display_report_df.columns.values
         data['display_report_df'] = display_report_df
