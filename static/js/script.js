@@ -55,3 +55,103 @@ $(function() {
         return false;
     });
 });
+
+
+$(document).ready(function(){
+    $("#syuzai_table").DataTable({
+        "language":{url:"https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json",},
+            // 件数切替機能 無効
+        lengthChange: false,
+        // 検索機能 無効
+        searching: true,
+        // ソート機能 無効
+        ordering: true,
+        // 情報表示 無効
+        info: true,
+        // ページング機能 無効
+        paging: true,
+        // ページングの件数切替機能 無効
+        pagingType: "full_numbers",
+        // ページングの件数切替機能 無効
+        lengthMenu: [ 10, 20, 30, 40, 50, 100 ],
+        // ページングの件数切替機能 無効
+        pageLength: 10,
+
+        //列の幅を調整する
+        autoWidth: true,
+        
+        // 初期表示の並び替えなし
+        order: [],
+    });
+});
+
+$(document).ready(function(){
+    $("#media_table").DataTable({
+        "language":{url:"https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json",},
+        // 件数切替機能 無効
+        lengthChange: false,
+        // 検索機能 無効
+        searching: true,
+        // ソート機能 無効
+        ordering: true,
+        // 情報表示 無効
+        info: true,
+        // ページング機能 無効
+        paging: true,
+        // ページングの件数切替機能 無効
+        pagingType: "full_numbers",
+        // ページングの件数切替機能 無効
+        lengthMenu: [ 10, 20, 30, 40, 50, 100 ],
+        // ページングの件数切替機能 無効
+        pageLength: 10,
+
+        //列の幅を調整する
+        autoWidth: true,
+        
+        // 初期表示の並び替えなし
+        order: []
+    });
+    $("#hall_table").DataTable({
+        "language":{url:"https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json",},
+            // 件数切替機能 無効
+        lengthChange: false,
+        // 検索機能 無効
+        searching: true,
+        // ソート機能 無効
+        ordering: true,
+        // 情報表示 無効
+        info: true,
+        // ページング機能 無効
+        paging: true,
+        // ページングの件数切替機能 無効
+        pagingType: "full_numbers",
+        // ページングの件数切替機能 無効
+        lengthMenu: [ 10, 20, 30, 40, 50, 100 ],
+        // ページングの件数切替機能 無効
+        pageLength: 10,
+
+        //列の幅を調整する
+        autoWidth: true,
+        
+        // 初期表示の並び替えなし
+        order: []
+    });
+});
+
+$(function() {
+    $("#date_pick").datepicker({
+        locale: 'ja',
+        dateFormat: 'yy年MMdd日 (DD)',
+        yearSuffix: '年',
+        showMonthAfterYear: true,
+        monthNames: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
+        dayNames: ['日', '月', '火', '水', '木', '金', '土'],
+        dayNamesMin: ['日', '月', '火', '水', '木', '金', '土'],
+        ignoreReadonly: true,
+        minDate: new Date(),
+        maxDate: '+6d'
+    }).css({
+        'margin': 'auto',
+        'padding': 'auto',
+        });
+});
