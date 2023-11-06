@@ -1323,3 +1323,9 @@ text-align: center; /* 内容は中央配置 */
     border-left: none;
 }
 
+@media screen and (max-width: 340px) {
+.dataTables_wrapper .dataTables_length, .dataTables_wrapper .dataTables_filter {
+    float: none;
+    text-align: center;
+}
+}

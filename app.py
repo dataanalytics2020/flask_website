@@ -72,6 +72,87 @@ def convert_sql_date_to_jp_date_and_weekday(sql_date:datetime.date) -> str:
     target_date = sql_date.strftime('%m').lstrip('0') + '月' + sql_date.strftime('%d').lstrip('0') + '日' + w_list[sql_date.weekday()]
     return target_date
 
+def create_post_map_iframe(location_name_df,groupby_date_kisyubetu_df):
+
+    try:
+        prefecture_latitude = location_name_df.iloc[0]['latitude']
+        prefecture_longitude = location_name_df.iloc[0]['longitude']
+    except:
+        prefecture_latitude = 35.681236
+        prefecture_longitude = 139.767125
+        
+    print('新prefecture_latitude',prefecture_latitude,prefecture_longitude)
+
+    folium_map = folium.Map(location=[prefecture_latitude,prefecture_longitude], zoom_start=14, width="100%", height="100%")
+    # 地図表示
+    # マーカープロット（ポップアップ設定，色変更，アイコン変更）
+    print(location_name_df)
+    for i,row in location_name_df.iterrows():
+        tenpo_name = row['店舗名']
+        print(tenpo_name)
+        extract_syuzai_df_1 = groupby_date_kisyubetu_df[groupby_date_kisyubetu_df['店舗名'].str.contains(tenpo_name)]
+        #display(extract_syuzai_df_1)
+        print(extract_syuzai_df_1)
+        #print(syuzai_rank_list)
+        longitude = row['longitude']
+        latitude = row['latitude']
+        #print('latitude,longitude',latitude,longitude)
+        # グレースケールの画像データを作成
+        im= Image.new("L", (280, 100),color=(0))
+        im.putalpha(0)
+        im2= Image.new("L", (260, 50),color=(50))
+        im2.putalpha(128)
+        im3 = Image.open('icon.png')
+        draw = ImageDraw.Draw(im)
+        font = ImageFont.truetype('font/LightNovelPOPv2.otf',19)
+        syuzai_name_text = '◆' + tenpo_name
+        #print(syuzai_name_text)
+
+
+        # 画像を表示
+        im.paste(im3, (-15,-14))
+        im.paste(im2, (25,48))
+        draw.multiline_text(
+            (150, 50),
+            f'{syuzai_name_text}',
+            font=font,
+            fill='white',
+            align='center',
+            spacing=0,
+            anchor='ma'
+        )
+
+        im.save('syuzai_image.png', quality=95)
+        img = 'syuzai_image.png'
+        popup_df = extract_syuzai_df_1[['日付','差枚合計','平均差枚','平均G数','勝率']]
+        #popup_df['イベント日'] = popup_df['イベント日'].apply(convert_sql_date_to_jp_date_and_weekday) 
+        popup_df =  f'{tenpo_name}\n' + popup_df.to_html(escape=False,index=False,justify='center',classes='table table-striped table-hover table-sm')
+        popup_data = folium.Popup(popup_df,  max_width=1500,show=False,size=(700, 300))
+        folium.Marker(location=[latitude ,longitude],
+            tiles='https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png',
+            attr='国土地理院',
+            popup=popup_data,
+            icon = CustomIcon(
+                        icon_image = img,
+                        icon_size = (280, 100),
+                        icon_anchor = (30, 0),
+                        #shadow_image = shadow_img, # 影効果（今回は使用せず コメントアウト
+                        #shadow_size = (30, 30),
+                        shadow_anchor = (-4, -40),
+                        popup_anchor = (3, 3))).add_to(folium_map)
+        #break
+    
+    # set the iframe width and height
+    plugins.Fullscreen(
+                        position="topright",
+                        title="拡大する",
+                        title_cancel="元に戻す",
+                        force_separate_button=True,
+                    ).add_to(folium_map)
+    folium_map.get_root().width = "500px"
+    folium_map.get_root().height = "500px"
+    return folium_map.get_root()._repr_html_()
+
 def create_syuzai_map_iframe(report_df:pd.DataFrame):
     report_df = report_df.drop_duplicates(keep='first')
     report_df = report_df.dropna(subset=['latitude'])
@@ -1543,11 +1624,11 @@ def test4():
         #北海道が選択された場合 wordpressのタグのidは72
         
         data = {}
-        data['target_day'] = request.form.get('target_day')
+        data['target_day'] = target_day = request.form.get('target_day')
         data['pref_id'] = request.form.get('pref_id')
         data['wordpress_eventday_tag_id'] = wordpress_eventday_tag_id = int(request.form.get('target_day').split('_')[1]) + 17#event_0_dayの0の部分
         data['wordpress_prefecture_tag_id'] = wordpress_prefecture_tag_id = int(request.form.get('pref_id')) + 71
-
+        print('data',data) 
         # アクセス情報の設定
         SITE_URL = 'https://pachislo7.com/' 
         API_URL = f"{SITE_URL}/wp-json/wp/v2/"
@@ -1556,18 +1637,25 @@ def test4():
 
         #下書き状態の記事を取得
         #画像は取得するがurl以外は取得しない
-        label = 'posts?slug=tokyo-2023-11-05&status=draft&fields=id,slug,title,content,excerpt,featured_media'
-        parameter = ''
-        url = f"{API_URL}{label}{parameter}"
+        label = f'posts?slug=tokyo-2023-11-14&status=draft&fields=id,slug,title,content,excerpt,featured_media'
+        url = f"{API_URL}{label}"
         # すべてのアイテムを取得
         print(url)
         res = requests.get(url, auth=(AUTH_USER, AUTH_PASS)).json()
         print(res)
         parameter_id = res[0]['id']
         print('parameter_id',parameter_id)
-        write_html = res[0]['content']['rendered']
+        write_html = res[0]['content']['rendered'].split('ここまで')[-1]
+        content = res[0]['content']['rendered'].split('ここまで')[0]
+        dfs = pd.read_html(content)
+        print('dfs',dfs)
         data['write_html'] = write_html
         #data['tag_df'] = tag_df.to_html(justify='justify-all',classes='tb01')
+        dfs = pd.read_html(content)
+        groupby_date_kisyubetu_df = dfs[0]
+        location_name_df = dfs[1]
+        print('location_name_df',location_name_df)
+        data['iframe'] = create_post_map_iframe(location_name_df,groupby_date_kisyubetu_df)
         return render_template('test4.html',data=data,enumerate=enumerate)
     else:
         redirect(url_for('test3'))
