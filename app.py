@@ -83,7 +83,7 @@ def create_post_map_iframe(location_name_df,groupby_date_kisyubetu_df):
         
     print('新prefecture_latitude',prefecture_latitude,prefecture_longitude)
 
-    folium_map = folium.Map(location=[prefecture_latitude,prefecture_longitude], zoom_start=14, width="100%", height="100%")
+    folium_map = folium.Map(location=[prefecture_latitude,prefecture_longitude], zoom_start=11, width="100%", height="100%")
     # 地図表示
     # マーカープロット（ポップアップ設定，色変更，アイコン変更）
     print(location_name_df)
