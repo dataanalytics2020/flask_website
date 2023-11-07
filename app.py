@@ -72,6 +72,7 @@ def convert_sql_date_to_jp_date_and_weekday(sql_date:datetime.date) -> str:
     target_date = sql_date.strftime('%m').lstrip('0') + '月' + sql_date.strftime('%d').lstrip('0') + '日' + w_list[sql_date.weekday()]
     return target_date
 
+
 def create_post_map_iframe(location_name_df,groupby_date_kisyubetu_df):
 
     try:
@@ -87,6 +88,7 @@ def create_post_map_iframe(location_name_df,groupby_date_kisyubetu_df):
     # 地図表示
     # マーカープロット（ポップアップ設定，色変更，アイコン変更）
     print(location_name_df)
+    rank_num = 1
     for i,row in location_name_df.iterrows():
         tenpo_name = row['店舗名']
         print(tenpo_name)
@@ -105,7 +107,7 @@ def create_post_map_iframe(location_name_df,groupby_date_kisyubetu_df):
         im3 = Image.open('icon.png')
         draw = ImageDraw.Draw(im)
         font = ImageFont.truetype('font/LightNovelPOPv2.otf',19)
-        syuzai_name_text = '◆' + tenpo_name
+        syuzai_name_text ='お勧め店舗{rank_num}位 '+'◆' + tenpo_name
         #print(syuzai_name_text)
 
 
