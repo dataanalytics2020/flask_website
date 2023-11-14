@@ -3,6 +3,10 @@
 <div class='container'>
     <div class='row'>
         <div class='col-12'>
+            <div class= my-2>
+                <img src={{ data.thumbnail_url }} class="thumbnail" alt="thumbnail" width="100%">
+            </div>
+            <h2 class="heading-011 mt-4">{{ data.title }} 位置マップ</h1>
             <iframe class="embed-responsive-item" scrolling="no" height="450" width="100%" src={{ data.iframe|safe }}</iframe>
             {{data.write_html | safe}}
         </div>

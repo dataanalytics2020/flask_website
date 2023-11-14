@@ -88,8 +88,9 @@ def create_post_map_iframe(location_name_df,groupby_date_kisyubetu_df):
     # 地図表示
     # マーカープロット（ポップアップ設定，色変更，アイコン変更）
     print(location_name_df)
-    rank_num = 1
+    rank_num = 0
     for i,row in location_name_df.iterrows():
+        rank_num += 1
         tenpo_name = row['店舗名']
         print(tenpo_name)
         extract_syuzai_df_1 = groupby_date_kisyubetu_df[groupby_date_kisyubetu_df['店舗名'].str.contains(tenpo_name)]
@@ -107,7 +108,7 @@ def create_post_map_iframe(location_name_df,groupby_date_kisyubetu_df):
         im3 = Image.open('icon.png')
         draw = ImageDraw.Draw(im)
         font = ImageFont.truetype('font/LightNovelPOPv2.otf',19)
-        syuzai_name_text ='お勧め店舗{rank_num}位 '+'◆' + tenpo_name
+        syuzai_name_text =f'お勧め店舗{rank_num}位\n'+'◆' + tenpo_name
         #print(syuzai_name_text)
 
 
@@ -1598,9 +1599,8 @@ def test3():
             target_day_str_jp = target_day.strftime('%m/').lstrip('0')  +target_day.strftime('%d').lstrip('0') +  w_list[target_day.weekday()]
             target_day_str_number:str = belong_day_str[-1] + 'の付く日'
             display_date_list_dict[target_day_str_jp] = target_day_str_number
-            slug = f'event_{belong_day_str[-1]}_day'
             display_list_str = target_day_str_jp + ' ' + target_day_str_number
-            tag_dict[display_list_str] = slug
+            tag_dict[display_list_str] = belong_day_str
         print(tag_dict)
         data['tag_dict'] = tag_dict
         return render_template('test3.html',data=data,enumerate=enumerate)
@@ -1611,46 +1611,43 @@ def test3():
 @app.route("/test4", methods=['GET','POST'])
 def test4():
     if request.method == 'POST':
-        event_day_tag_dict = {
-        'event_0_day': '17',
-        'event_1_day': '18',
-        'event_2_day': '19',
-        'event_3_day': '20',
-        'event_4_day': '21',
-        'event_5_day': '22',
-        'event_6_day': '23',
-        'event_7_day': '24',
-        'event_8_day': '25',
-        'event_9_day': '26'}
-        
+        prefecture_df = pd.read_csv('csv/pref_lat_lon.csv')
+        #index番号で取り出す
+
         #北海道が選択された場合 wordpressのタグのidは72
         
         data = {}
         data['target_day'] = target_day = request.form.get('target_day')
         data['pref_id'] = request.form.get('pref_id')
-        data['wordpress_eventday_tag_id'] = wordpress_eventday_tag_id = int(request.form.get('target_day').split('_')[1]) + 17#event_0_dayの0の部分
-        data['wordpress_prefecture_tag_id'] = wordpress_prefecture_tag_id = int(request.form.get('pref_id')) + 71
+        data['wordpress_eventday_tag_id'] = 0
+        data['wordpress_prefecture_tag_id'] = 1
+        data['pref_name_en'] = pref_name_en = prefecture_df.iloc[int(data['pref_id'])-1]['pref_name_en']
+        print('pref_name_en',pref_name_en)  
         print('data',data) 
         # アクセス情報の設定
-        SITE_URL = 'https://pachislo7.com/' 
+        SITE_URL = os.getenv('WORDPRESS_PACHISLO7_URL')
         API_URL = f"{SITE_URL}/wp-json/wp/v2/"
-        AUTH_USER = 'tsc953u'
-        AUTH_PASS = 'IyQe A1m6 YL4e f66u YjBn zzEo'
+        AUTH_USER = os.getenv('WORDPRESS_PACHISLO7_ID')
+        AUTH_PASS = os.getenv('WORDPRESS_PACHISLO7_PW')
 
         #下書き状態の記事を取得
         #画像は取得するがurl以外は取得しない
-        label = f'posts?slug=tokyo-2023-11-14&status=draft&fields=id,slug,title,content,excerpt,featured_media'
+        label = f'posts?slug={pref_name_en}_{target_day}&status=draft&_embed'
         url = f"{API_URL}{label}"
         # すべてのアイテムを取得
         print(url)
         res = requests.get(url, auth=(AUTH_USER, AUTH_PASS)).json()
-        print(res)
+        #print(res)
+        thumbnail_url = res[0]['_embedded']['wp:featuredmedia'][0]['source_url']
+        print('thumbnail_url',thumbnail_url)
+        data['thumbnail_url'] = thumbnail_url
         parameter_id = res[0]['id']
         print('parameter_id',parameter_id)
         write_html = res[0]['content']['rendered'].split('ここまで')[-1]
         content = res[0]['content']['rendered'].split('ここまで')[0]
+        data['title'] = res[0]['title']['rendered']
         dfs = pd.read_html(content)
-        print('dfs',dfs)
+        #print('dfs',dfs)
         data['write_html'] = write_html
         #data['tag_df'] = tag_df.to_html(justify='justify-all',classes='tb01')
         dfs = pd.read_html(content)
