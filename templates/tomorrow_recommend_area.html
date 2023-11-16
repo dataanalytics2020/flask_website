@@ -36,7 +36,7 @@
                 
                 <div class="input-group-append">
                     <form action="{{ url_for('tomorrow_recommend_area',area_name=data.area_name) }}" method="POST">
-                        <input type="text" id="date_pick" name="date" value="{{data.date}}" class="form-control" placeholder="日付を選択" aria-label="日付を選択" aria-describedby="basic-addon2">
+                        <input type="text" id="date_pick" name="date" readonly="readonly" value="{{data.date}}" class="form-control" placeholder="日付を選択" aria-label="日付を選択" aria-describedby="basic-addon2">
                         <button class="btn btn-outline-secondary" type="submit" formmethod="POST">検索</button>
                     </form>
                 </div>

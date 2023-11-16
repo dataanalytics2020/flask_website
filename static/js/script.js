@@ -75,7 +75,7 @@ $(document).ready(function(){
         // ページングの件数切替機能 無効
         lengthMenu: [ 5, 10, 30, 100 ],
         // ページングの件数切替機能 無効
-        pageLength: 6,
+        pageLength: 30,
 
         //列の幅を調整する
         autoWidth: true,
