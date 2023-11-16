@@ -1341,7 +1341,7 @@ text-align: center; /* 内容は中央配置 */
   flex-direction: column;
   flex-wrap: nowrap;
   max-width: 600px;
-  height: 13em;
+  height: 14em;
   margin: 0 auto;
   overflow-y: scroll
 }
