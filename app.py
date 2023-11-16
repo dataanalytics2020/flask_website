@@ -129,7 +129,7 @@ def create_post_map_iframe(location_name_df,groupby_date_kisyubetu_df):
         img = 'syuzai_image.png'
         popup_df = extract_syuzai_df_1[['日付','差枚合計','平均差枚','平均G数','勝率']]
         #popup_df['イベント日'] = popup_df['イベント日'].apply(convert_sql_date_to_jp_date_and_weekday) 
-        popup_df =  f'{tenpo_name}\n' + popup_df.to_html(escape=False,index=False,justify='center',classes='table table-striped table-hover table-sm')
+        popup_df =  f'   お勧め店舗{rank_num}位  {tenpo_name}\n' + popup_df.to_html(escape=False,index=False,justify='center',classes='table table-striped table-hover table-sm')
         popup_data = folium.Popup(popup_df,  max_width=1500,show=False,size=(700, 300))
         folium.Marker(location=[latitude ,longitude],
             tiles='https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png',
