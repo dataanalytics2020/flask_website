@@ -1330,3 +1330,94 @@ text-align: center; /* 内容は中央配置 */
     text-align: center;
 }
 }
+
+
+.info {
+  -webkit-overflow-scrolling: touch;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  display: -webkit-box;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  max-width: 600px;
+  height: 13em;
+  margin: 0 auto;
+  overflow-y: scroll
+}
+
+@media (min-width:768px) {
+  .info {
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    flex-direction: row;
+    flex-wrap: wrap
+  }
+}
+
+.info dd,
+.info dt {
+  box-sizing: border-box;
+  width: 100%;
+  padding-bottom: .5em;
+  padding-left: .5em
+}
+
+.info dt {
+  font-style: normal;
+  font-weight: initial
+}
+
+@media (min-width:768px) {
+  .info dt {
+    width: 12.5em;
+    margin-bottom: .5em;
+    border-bottom: 1px dotted #343a40
+  }
+}
+
+.info dt:first-of-type {
+  padding-top: .5em;
+  border-top: 1px dotted #343a40
+}
+
+.info dt time {
+  margin-right: .5em
+}
+
+.info dt span {
+  box-sizing: border-box;
+  display: inline-block;
+  width: 7em;
+  margin-right: .5em;
+  padding: 0 .5em;
+  background-color: #009688;
+  color: #fff;
+  font-size: .8em;
+  line-height: 1.75;
+  text-align: center
+}
+
+.info time {
+  color: #adb5bd
+}
+
+.info dd {
+  margin-left: 0;
+  margin-bottom: .5em;
+  border-bottom: 1px dotted #343a40
+}
+
+@media (min-width:768px) {
+  .info dd {
+    width: calc(100% - 12.5em)
+  }
+  .info dd:first-of-type {
+    padding-top: .5em;
+    border-top: 1px dotted #343a40
+  }
+}
+
+.info dd:nth-of-type(-n+3) {
+  position: relative
+}
