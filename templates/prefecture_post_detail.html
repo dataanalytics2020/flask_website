@@ -3,6 +3,14 @@
 <div class='container'>
     <div class='row'>
         <div class='col-12'>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                  <li class="breadcrumb-item"><a href="/">HOME</a></li>
+                  <li class="breadcrumb-item"><a href="/post_prefecture_list/{{data.pref_name_en}}">{{data.pref_name_jp}}</a></li>
+                  <li class="breadcrumb-item active" aria-current="page">{{data.target_day}}</li>
+                </ol>
+            </nav>
+            <h1 class="heading-011 mt-4">{{ data.title }}</h1>
             <div class= my-2>
                 <img src={{ data.thumbnail_url }} class="thumbnail" alt="thumbnail" width="100%">
             </div>

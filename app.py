@@ -1,5 +1,6 @@
 #utf-8
 from flask import Flask, render_template, request, redirect 
+from flask_paginate import Pagination, get_page_parameter
 #from flask_sitemap import Sitemap
 from flask_mail import Mail
 from flask_wtf import FlaskForm
@@ -1576,8 +1577,8 @@ def post_test():
     return render_template('test2.html',data=data)
 
 
-@app.route("/test3", methods=['GET','POST'])
-def test3():
+@app.route("/serch-recommend-prefecture-day", methods=['GET','POST'])
+def serch_recommend_prefecture_day():
     if request.method == 'GET':
         data = {}
         date_list = []
@@ -1608,13 +1609,12 @@ def test3():
             tag_dict[display_list_str] = belong_day_str
         print(tag_dict)
         data['tag_dict'] = tag_dict
-        return render_template('test3.html',data=data,enumerate=enumerate)
+        return render_template('serch-recommend-prefecture-day.html',data=data,enumerate=enumerate)
     else:
         pass
-        #return render_template('test4.html',data=data,enumerate=enumerate)
     
-@app.route("/test4", methods=['GET','POST'])
-def test4():
+@app.route("/prefecture_post_detail", methods=['GET','POST'])
+def prefecture_post_detail():
     if request.method == 'POST':
         prefecture_df = pd.read_csv('csv/pref_lat_lon.csv')
         #index番号で取り出す
@@ -1623,9 +1623,8 @@ def test4():
         data = {}
         data['target_day'] = target_day = request.form.get('target_day')
         data['pref_id'] = request.form.get('pref_id')
-        data['wordpress_eventday_tag_id'] = 0
-        data['wordpress_prefecture_tag_id'] = 1
         data['pref_name_en'] = pref_name_en = prefecture_df.iloc[int(data['pref_id'])-1]['pref_name_en']
+        data['pref_name_jp'] = prefecture_df.iloc[int(data['pref_id'])-1]['pref_name']
         print('pref_name_en',pref_name_en)  
         print('data',data) 
         # アクセス情報の設定
@@ -1659,10 +1658,58 @@ def test4():
         location_name_df = dfs[1]
         print('location_name_df',location_name_df)
         data['iframe'] = create_post_map_iframe(location_name_df,groupby_date_kisyubetu_df)
-        return render_template('test4.html',data=data,enumerate=enumerate)
+        return render_template('prefecture_post_detail.html',data=data,enumerate=enumerate)
     else:
         redirect(url_for('test3'))
+        
+#post_prefecture_list.html
+@app.route("/post_prefecture_list/<pref_name_en>", methods=['GET','POST'])
+def post_prefecture_list(pref_name_en):
+    if request.method == 'GET':
+        data = {}
+        data['pref_name_en'] = pref_name_en
+        prefecture_df = pd.read_csv('csv/pref_lat_lon.csv')
+        #index番号で取り出す
+        data['pref_name_jp'] = prefecture_df[prefecture_df['pref_name_en'] == pref_name_en]['pref_name'].values[0]
+        #北海道が選択された場合 wordpressのタグのidは72
+        prefecture_tag_id:int = prefecture_df[prefecture_df['pref_name_en'] == pref_name_en].index[0] + 72
+        print('pref_name_en',pref_name_en)  
+        print('data',data) 
+        # アクセス情報の設定
+        SITE_URL = os.getenv('WORDPRESS_PACHISLO7_URL')
+        API_URL = f"{SITE_URL}/wp-json/wp/v2/"
+        AUTH_USER = os.getenv('WORDPRESS_PACHISLO7_ID')
+        AUTH_PASS = os.getenv('WORDPRESS_PACHISLO7_PW')
 
+
+        label = f'posts?_embed&tags={str(prefecture_tag_id)}+&status=draft'
+        url = f"{API_URL}{label}"
+        # すべてのアイテムを取得
+        print(url)
+        items = requests.get(url, auth=(AUTH_USER, AUTH_PASS)).json()
+        #thumbnail_url = res[0]['_embedded']['wp:featuredmedia'][0]['source_url']
+        print('items',type(items),items)
+        post_list_df = pd.DataFrame(items)
+        page = request.args.get(get_page_parameter(), type=int, default=1)
+        #jsonから取得したデータをページネーションで表示する
+        items = items[(page-1)*3:page*3]
+        pagination = Pagination(page=page, total=len(items),  per_page=1, css_framework='bootstrap4')
+
+        #サムネイル表示
+        # for i,row in post_list_df.iterrows():
+        #     #print(row)
+        #     thumbnail_url = row['_embedded']['wp:featuredmedia'][0]['source_url']
+        #     print(thumbnail_url)
+        #     title = row['title']['rendered']
+        #     print(title)
+        #     print(row['link'])
+        #     slug = row['slug']
+        #     break
+
+
+        return render_template('post_prefecture_list.html',items=items,data=data,enumerate=enumerate,pagination=pagination)
+    else:
+        redirect(url_for('test3'))
 
 @app.route("/privacy_policy")
 def privacy_policy():
@@ -1673,4 +1720,4 @@ def sitemap():
     return app.send_static_file("sitemap.xml")
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0",debug=False, port=int(os.environ.get('PORT', 5000)))
+    app.run(host="0.0.0.0",debug=True, port=int(os.environ.get('PORT', 5000)))
