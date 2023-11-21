@@ -207,7 +207,7 @@ ul, ol a {
   padding: 0.5em;
 }
 
-h1 {
+h1,h2{
   color: #6cb4e4;
   text-align: center;
   padding: 0.25em;
