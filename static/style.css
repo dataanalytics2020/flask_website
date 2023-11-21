@@ -1343,7 +1343,7 @@ text-align: center; /* 内容は中央配置 */
   flex-direction: column;
   flex-wrap: nowrap;
   max-width: 600px;
-  height: 14em;
+  height: 16em;
   margin: 0 auto;
   overflow-y: scroll
 }
