@@ -6,17 +6,18 @@
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="ナビゲーションの切替">
       <span class="navbar-toggler-icon"></span>
     </button>
-
     <div class="collapse navbar-collapse" id="navbar">
       <ul class="navbar-nav me-auto mb-2 mb-sm-0">
         <li class="nav-item">
           <a class="nav-link active text-white" href="/">ホーム</a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link text-white" href="/serch-recommend-prefecture-day">お勧め店舗検索</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link text-white" href="/tomorrow-recommend">取材予定一覧</a>
+        <li class="nav-item dropdown">
+          <a href="#" class="nav-link dropdown-toggle text-white" role="button" data-bs-toggle="dropdown"
+              aria-haspopup="true" aria-expanded="false">機能一覧</a>
+          <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="/serch-recommend-prefecture-day">お勧め店舗検索</a></li>
+              <li><a class="dropdown-item" href="/tomorrow-recommend">取材予定一覧</a></li>
+          </ul>
         </li>
         <li class="nav-item">
           <a class="nav-link text-white" href="/form">問い合わせ</a>

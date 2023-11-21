@@ -1661,7 +1661,7 @@ def prefecture_post_detail():
         return render_template('prefecture_post_detail.html',data=data,enumerate=enumerate)
     else:
         redirect(url_for('test3'))
-        
+
 #post_prefecture_list.html
 @app.route("/post_prefecture_list/<pref_name_en>", methods=['GET','POST'])
 def post_prefecture_list(pref_name_en):
