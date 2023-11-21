@@ -1708,6 +1708,48 @@ def post_prefecture_list(pref_name_en):
         return render_template('post_prefecture_list.html',items=items,data=data,enumerate=enumerate,pagination=pagination)
     else:
         redirect(url_for('test3'))
+        
+@app.route("/post_prefecture/<post_slug>", methods=['GET','POST'])
+def post_prefecture(post_slug):
+    if request.method == 'GET':
+        prefecture_df = pd.read_csv('csv/pref_lat_lon.csv')
+        data = {}
+        data['pref_name_en'] = pref_name_en = post_slug.split('_')[0]
+        data['pref_name_jp'] = prefecture_df[prefecture_df['pref_name_en'] == pref_name_en]['pref_name'].values[0]
+        print('pref_name_en',pref_name_en)  
+        print('data',data) 
+        # アクセス情報の設定
+        SITE_URL = os.getenv('WORDPRESS_PACHISLO7_URL')
+        API_URL = f"{SITE_URL}/wp-json/wp/v2/"
+        AUTH_USER = os.getenv('WORDPRESS_PACHISLO7_ID')
+        AUTH_PASS = os.getenv('WORDPRESS_PACHISLO7_PW')
+
+        #下書き状態の記事を取得
+        #画像は取得するがurl以外は取得しない
+        label = f'posts?slug={post_slug}&status=draft&_embed'
+        url = f"{API_URL}{label}"
+        # すべてのアイテムを取得
+        print(url)
+        res = requests.get(url, auth=(AUTH_USER, AUTH_PASS)).json()
+        #print(res)
+        thumbnail_url = res[0]['_embedded']['wp:featuredmedia'][0]['source_url']
+        print('thumbnail_url',thumbnail_url)
+        data['thumbnail_url'] = thumbnail_url
+        parameter_id = res[0]['id']
+        print('parameter_id',parameter_id)
+        write_html = res[0]['content']['rendered'].split('ここまで')[-1]
+        content = res[0]['content']['rendered'].split('ここまで')[0]
+        data['title'] = res[0]['title']['rendered']
+        dfs = pd.read_html(content)
+        #print('dfs',dfs)
+        data['write_html'] = write_html
+        #data['tag_df'] = tag_df.to_html(justify='justify-all',classes='tb01')
+        dfs = pd.read_html(content)
+        groupby_date_kisyubetu_df = dfs[0]
+        location_name_df = dfs[1]
+        print('location_name_df',location_name_df)
+        data['iframe'] = create_post_map_iframe(location_name_df,groupby_date_kisyubetu_df)
+        return render_template('prefecture_post_detail.html',data=data,enumerate=enumerate)
 
 @app.route("/privacy_policy")
 def privacy_policy():
