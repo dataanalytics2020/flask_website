@@ -1751,6 +1751,27 @@ def post_prefecture(post_slug):
         data['iframe'] = create_post_map_iframe(location_name_df,groupby_date_kisyubetu_df)
         return render_template('prefecture_post_detail.html',data=data,enumerate=enumerate)
 
+
+@app.route("/news/<post_slug>", methods=['GET','POST'])
+def news_detail(post_slug):
+    if request.method == 'GET':
+        data = {}
+        # アクセス情報の設定
+        SITE_URL = os.getenv('WORDPRESS_PACHISLO7_URL')
+        API_URL = f"{SITE_URL}/wp-json/wp/v2/"
+        AUTH_USER = os.getenv('WORDPRESS_PACHISLO7_ID')
+        AUTH_PASS = os.getenv('WORDPRESS_PACHISLO7_PW')
+
+        #下書き状態の記事を取得
+        label = f'posts?slug={post_slug}&status=draft&_embed'
+        url = f"{API_URL}{label}"
+        print(url)
+        res = requests.get(url, auth=(AUTH_USER, AUTH_PASS)).json()
+        data['date'] = res[0]['slug'].split('_')[1]
+        data['content'] = res[0]['content']['rendered']
+        data['title'] = res[0]['title']['rendered']
+        return render_template('news_post_detail.html',data=data,enumerate=enumerate)
+
 @app.route("/privacy_policy")
 def privacy_policy():
     return render_template('privacy_policy.html')
