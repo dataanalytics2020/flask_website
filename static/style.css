@@ -1459,5 +1459,5 @@ text-align: center; /* 内容は中央配置 */
 
 .card-body {
   flex: 1 1 auto;
-  padding: 0rem 0rem!important;
+  padding: 0.5rem 1rem!important;
 }

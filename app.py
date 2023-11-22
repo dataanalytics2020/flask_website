@@ -1350,9 +1350,7 @@ def tomorrow_recommend_area_hall_hallname(area_name,hall_name):
             FROM schedule as schedule2
             left join halldata as halldata2
             on schedule2.店舗名 = halldata2.hall_name
-            WHERE イベント日 >= current_date
-                AND イベント日 < current_date + 7
-                AND 店舗名 = '{hall_name}'
+            WHERE (店舗名 = '{hall_name}') or (hall_name = '{hall_name}')
                 AND 媒体名 != 'ホールナビ'
                 AND ({area_sql_text})
                 ORDER BY イベント日,都道府県 desc;''')
@@ -1364,8 +1362,12 @@ def tomorrow_recommend_area_hall_hallname(area_name,hall_name):
         except:
             data[column_name] = ''
     data['iframe'] = create_hall_map_iframe(extract_hall_name_df,zoom_size=10)
+    extract_hall_name_df = extract_hall_name_df[extract_hall_name_df['イベント日'] >= datetime.date.today()]
     table_df = extract_hall_name_df[['イベント日','都道府県','媒体名','取材名']]
-    table_df['イベント日'] = table_df['イベント日'].map(convert_sql_date_to_jp_date_and_weekday)
+    try:
+        table_df['イベント日'] = table_df['イベント日'].map(convert_sql_date_to_jp_date_and_weekday)
+    except:
+        pass
     table_df.rename(columns={'イベント日':'日'},inplace=True)
     table_df.drop_duplicates(keep='first',inplace=True)
     data['extract_hall_name_df'] = table_df
