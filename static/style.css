@@ -1425,3 +1425,33 @@ text-align: center; /* 内容は中央配置 */
 }
 
 
+.box-007 {
+  max-width: 400px;
+  margin: 0 auto;
+  border: 2px solid #ffb36b;
+  border-radius: 5px;
+  color: #333333;
+}
+
+.box-007 div {
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  top: -13px;
+  left: 10px;
+  margin: 0 7px;
+  padding: 0 8px;
+  background: #fff;
+  color: #ffb36b;
+  font-weight: 600;
+  vertical-align: top;
+}
+
+.box-007 svg {
+  padding-right: 4px;
+}
+
+.box-007 p {
+  margin: 0;
+  padding: 0 1.5em 1em;
+}
