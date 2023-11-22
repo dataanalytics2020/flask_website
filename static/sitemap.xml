@@ -4,65 +4,354 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
             http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
-<!-- created with Free Online Sitemap Generator www.xml-sitemaps.com -->
-
 
 <url>
   <loc>https://www.slo-map.com/</loc>
-  <lastmod>2023-10-05T06:33:39+00:00</lastmod>
+  <lastmod>2023-11-05</lastmod>
+  <changefreq>daily</changefreq>
   <priority>1.00</priority>
 </url>
 <url>
+  <loc>https://www.slo-map.com/serch-recommend-prefecture-day</loc>
+  <lastmod>2023-11-23</lastmod>
+  <priority>0.90</priority>
+</url>
+
+<url>
+  <loc>https://www.slo-map.com/post_prefecture_list/hokkaido</loc>
+  <lastmod>2023-11-23</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.90</priority>
+</url>
+<url>
+  <loc>https://www.slo-map.com/post_prefecture_list/aomori</loc>
+  <lastmod>2023-11-23</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.90</priority>
+</url>
+<url>
+  <loc>https://www.slo-map.com/post_prefecture_list/iwate</loc>
+  <lastmod>2023-11-23</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.90</priority>
+</url>
+<url>
+  <loc>https://www.slo-map.com/post_prefecture_list/miyagi</loc>
+  <lastmod>2023-11-23</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.90</priority>
+</url>
+<url>
+  <loc>https://www.slo-map.com/post_prefecture_list/akita</loc>
+  <lastmod>2023-11-23</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.90</priority>
+</url>
+<url>
+  <loc>https://www.slo-map.com/post_prefecture_list/yamagata</loc>
+  <lastmod>2023-11-23</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.90</priority>
+</url>
+<url>
+  <loc>https://www.slo-map.com/post_prefecture_list/fukushima</loc>
+  <lastmod>2023-11-23</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.90</priority>
+</url>
+<url>
+  <loc>https://www.slo-map.com/post_prefecture_list/ibaraki</loc>
+  <lastmod>2023-11-23</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.90</priority>
+</url>
+<url>
+  <loc>https://www.slo-map.com/post_prefecture_list/tochigi</loc>
+  <lastmod>2023-11-23</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.90</priority>
+</url>
+<url>
+  <loc>https://www.slo-map.com/post_prefecture_list/gunma</loc>
+  <lastmod>2023-11-23</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.90</priority>
+</url>
+<url>
+  <loc>https://www.slo-map.com/post_prefecture_list/saitama</loc>
+  <lastmod>2023-11-23</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.90</priority>
+</url>
+<url>
+  <loc>https://www.slo-map.com/post_prefecture_list/chiba</loc>
+  <lastmod>2023-11-23</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.90</priority>
+</url>
+<url>
+  <loc>https://www.slo-map.com/post_prefecture_list/tokyo</loc>
+  <lastmod>2023-11-23</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.90</priority>
+</url>
+<url>
+  <loc>https://www.slo-map.com/post_prefecture_list/kanagawa</loc>
+  <lastmod>2023-11-23</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.90</priority>
+</url>
+<url>
+  <loc>https://www.slo-map.com/post_prefecture_list/niigata</loc>
+  <lastmod>2023-11-23</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.90</priority>
+</url>
+<url>
+  <loc>https://www.slo-map.com/post_prefecture_list/toyama</loc>
+  <lastmod>2023-11-23</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.90</priority>
+</url>
+<url>
+  <loc>https://www.slo-map.com/post_prefecture_list/ishikawa</loc>
+  <lastmod>2023-11-23</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.90</priority>
+</url>
+<url>
+  <loc>https://www.slo-map.com/post_prefecture_list/fukui</loc>
+  <lastmod>2023-11-23</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.90</priority>
+</url>
+<url>
+  <loc>https://www.slo-map.com/post_prefecture_list/yamanashi</loc>
+  <lastmod>2023-11-23</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.90</priority>
+</url>
+<url>
+  <loc>https://www.slo-map.com/post_prefecture_list/nagano</loc>
+  <lastmod>2023-11-23</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.90</priority>
+</url>
+<url>
+  <loc>https://www.slo-map.com/post_prefecture_list/gifu</loc>
+  <lastmod>2023-11-23</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.90</priority>
+</url>
+<url>
+  <loc>https://www.slo-map.com/post_prefecture_list/shizuoka</loc>
+  <lastmod>2023-11-23</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.90</priority>
+</url>
+<url>
+  <loc>https://www.slo-map.com/post_prefecture_list/aichi</loc>
+  <lastmod>2023-11-23</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.90</priority>
+</url>
+<url>
+  <loc>https://www.slo-map.com/post_prefecture_list/mie</loc>
+  <lastmod>2023-11-23</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.90</priority>
+</url>
+<url>
+  <loc>https://www.slo-map.com/post_prefecture_list/shiga</loc>
+  <lastmod>2023-11-23</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.90</priority>
+</url>
+<url>
+  <loc>https://www.slo-map.com/post_prefecture_list/kyoto</loc>
+  <lastmod>2023-11-23</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.90</priority>
+</url>
+<url>
+  <loc>https://www.slo-map.com/post_prefecture_list/osaka</loc>
+  <lastmod>2023-11-23</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.90</priority>
+</url>
+<url>
+  <loc>https://www.slo-map.com/post_prefecture_list/hyogo</loc>
+  <lastmod>2023-11-23</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.90</priority>
+</url>
+<url>
+  <loc>https://www.slo-map.com/post_prefecture_list/nara</loc>
+  <lastmod>2023-11-23</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.90</priority>
+</url>
+<url>
+  <loc>https://www.slo-map.com/post_prefecture_list/wakayama</loc>
+  <lastmod>2023-11-23</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.90</priority>
+</url>
+<url>
+  <loc>https://www.slo-map.com/post_prefecture_list/tottori</loc>
+  <lastmod>2023-11-23</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.90</priority>
+</url>
+<url>
+  <loc>https://www.slo-map.com/post_prefecture_list/shimane</loc>
+  <lastmod>2023-11-23</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.90</priority>
+</url>
+<url>
+  <loc>https://www.slo-map.com/post_prefecture_list/okayama</loc>
+  <lastmod>2023-11-23</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.90</priority>
+</url>
+<url>
+  <loc>https://www.slo-map.com/post_prefecture_list/hiroshima</loc>
+  <lastmod>2023-11-23</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.90</priority>
+</url>
+<url>
+  <loc>https://www.slo-map.com/post_prefecture_list/tokushima</loc>
+  <lastmod>2023-11-23</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.90</priority>
+</url>
+<url>
+  <loc>https://www.slo-map.com/post_prefecture_list/kagawa</loc>
+  <lastmod>2023-11-23</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.90</priority>
+</url>
+<url>
+  <loc>https://www.slo-map.com/post_prefecture_list/ehime</loc>
+  <lastmod>2023-11-23</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.90</priority>
+</url>
+<url>
+  <loc>https://www.slo-map.com/post_prefecture_list/kochi</loc>
+  <lastmod>2023-11-23</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.90</priority>
+</url>
+<url>
+  <loc>https://www.slo-map.com/post_prefecture_list/yamaguchi</loc>
+  <lastmod>2023-11-23</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.90</priority>
+</url>
+<url>
+  <loc>https://www.slo-map.com/post_prefecture_list/fukuoka</loc>
+  <lastmod>2023-11-23</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.90</priority>
+</url>
+<url>
+  <loc>https://www.slo-map.com/post_prefecture_list/saga</loc>
+  <lastmod>2023-11-23</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.90</priority>
+</url>
+<url>
+  <loc>https://www.slo-map.com/post_prefecture_list/nagasaki</loc>
+  <lastmod>2023-11-23</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.90</priority>
+</url>
+<url>
+  <loc>https://www.slo-map.com/post_prefecture_list/kumamoto</loc>
+  <lastmod>2023-11-23</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.90</priority>
+</url>
+<url>
+  <loc>https://www.slo-map.com/post_prefecture_list/oita</loc>
+  <lastmod>2023-11-23</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.90</priority>
+</url>
+<url>
+  <loc>https://www.slo-map.com/post_prefecture_list/miyazaki</loc>
+  <lastmod>2023-11-23</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.90</priority>
+</url>
+<url>
+  <loc>https://www.slo-map.com/post_prefecture_list/kagoshima</loc>
+  <lastmod>2023-11-23</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.90</priority>
+</url>
+<url>
+  <loc>https://www.slo-map.com/post_prefecture_list/okinawa</loc>
+  <lastmod>2023-11-23</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.90</priority>
+</url>
+<url>
+  <loc>https://www.slo-map.com/tomorrow-recommend/</loc>
+  <lastmod>2023-11-23</lastmod>
+  <priority>0.90</priority>
+</url>
+<url>
   <loc>https://www.slo-map.com/form</loc>
-  <lastmod>2023-10-05T06:33:39+00:00</lastmod>
-  <priority>0.80</priority>
+  <lastmod>2023-10-05</lastmod>
+  <priority>0.20</priority>
 </url>
 <url>
   <loc>https://www.slo-map.com/privacy_policy</loc>
-  <lastmod>2023-10-05T06:33:39+00:00</lastmod>
-  <priority>0.80</priority>
+  <lastmod>2023-10-05</lastmod>
+  <priority>0.20</priority>
 </url>
 <url>
   <loc>https://www.slo-map.com/tomorrow-recommend/hokkaidoutouhoku/</loc>
-  <lastmod>2023-10-05T06:33:39+00:00</lastmod>
+  <lastmod>2023-10-05</lastmod>
   <priority>0.80</priority>
 </url>
 <url>
   <loc>https://www.slo-map.com/tomorrow-recommend/kitakantou/</loc>
-  <lastmod>2023-10-05T06:33:39+00:00</lastmod>
+  <lastmod>2023-10-05</lastmod>
   <priority>0.80</priority>
 </url>
 <url>
   <loc>https://www.slo-map.com/tomorrow-recommend/minamikantou/</loc>
-  <lastmod>2023-10-05T06:33:39+00:00</lastmod>
+  <lastmod>2023-10-05</lastmod>
   <priority>0.80</priority>
 </url>
 <url>
   <loc>https://www.slo-map.com/tomorrow-recommend/hokurikukoushinetsu/</loc>
-  <lastmod>2023-10-05T06:33:39+00:00</lastmod>
+  <lastmod>2023-10-05</lastmod>
   <priority>0.80</priority>
 </url>
 <url>
   <loc>https://www.slo-map.com/tomorrow-recommend/toukai/</loc>
-  <lastmod>2023-10-05T06:33:39+00:00</lastmod>
+  <lastmod>2023-10-05</lastmod>
   <priority>0.80</priority>
 </url>
 <url>
   <loc>https://www.slo-map.com/tomorrow-recommend/kansai/</loc>
-  <lastmod>2023-10-05T06:33:39+00:00</lastmod>
+  <lastmod>2023-10-05</lastmod>
   <priority>0.80</priority>
 </url>
 <url>
   <loc>https://www.slo-map.com/tomorrow-recommend/chugokushikoku/</loc>
-  <lastmod>2023-10-05T06:33:39+00:00</lastmod>
+  <lastmod>2023-10-05</lastmod>
   <priority>0.80</priority>
 </url>
 <url>
   <loc>https://www.slo-map.com/tomorrow-recommend/kyushu/</loc>
-  <lastmod>2023-10-05T06:33:39+00:00</lastmod>
+  <lastmod>2023-10-05</lastmod>
   <priority>0.80</priority>
 </url>
-
-
-
 </urlset>
