@@ -109,7 +109,12 @@ def create_post_map_iframe(location_name_df,groupby_date_kisyubetu_df):
         im3 = Image.open('icon.png')
         draw = ImageDraw.Draw(im)
         font = ImageFont.truetype('font/LightNovelPOPv2.otf',19)
-        syuzai_name_text =f'お勧め店舗{rank_num}位\n'+'◆' + tenpo_name
+        try:
+            rank_num:int = int((extract_syuzai_df_1.index[0]/ 3) + 1)
+            rank_num_str:str = f'お勧め店舗{rank_num}位'
+        except:
+            rank_num_str = 'お勧め店舗\n'
+        syuzai_name_text = rank_num_str +'\n◆' + tenpo_name
         #print(syuzai_name_text)
 
 
@@ -130,7 +135,8 @@ def create_post_map_iframe(location_name_df,groupby_date_kisyubetu_df):
         img = 'syuzai_image.png'
         popup_df = extract_syuzai_df_1[['日付','差枚合計','平均差枚','平均G数','勝率']]
         #popup_df['イベント日'] = popup_df['イベント日'].apply(convert_sql_date_to_jp_date_and_weekday) 
-        popup_df =  f'   お勧め店舗{rank_num}位  {tenpo_name}\n' + popup_df.to_html(escape=False,index=False,justify='center',classes='table table-striped table-hover table-sm')
+        popup_df =   popup_df.to_html(escape=False,index=False,justify='center',classes='table table-striped table-hover table-sm')
+        popup_df += f'<a href="#{tenpo_name}" target="_parent"> {tenpo_name} ※店舗詳細データに飛びます</a>'
         popup_data = folium.Popup(popup_df,  max_width=1500,show=False,size=(700, 300))
         folium.Marker(location=[latitude ,longitude],
             tiles='https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png',
@@ -682,7 +688,6 @@ def top():
                     on schedule2.店舗名 = halldata2.hall_name
                     WHERE イベント日 = '{target_day}'
                     AND 媒体名 != 'ホールナビ'
-                    AND 媒体名 != '旧イベ'
                     AND 都道府県 = '{prefecture}'
                     ORDER BY イベント日,都道府県 desc;''')
         cols = [col.name for col in cursor.description]
@@ -799,8 +804,8 @@ def top():
             img = 'syuzai_image.png'
             popup_df = extract_syuzai_df_1[['イベント日','店舗名','媒体名','取材名']].sort_values('店舗名')#.reset_index(drop=True)#.T
             popup_df['イベント日'] = popup_df['イベント日'].map(convert_sql_date_to_jp_date_and_weekday)
-            popup_df_html =f'<a href="/tomorrow_recommend/minamikantou/hall/{tenpo_name}"  target="_parent">{tenpo_name}※店舗詳細ページに飛びます </a>'
-            popup_df_html += popup_df.to_html(escape=False,index=False,table_id="mystyle",justify='center',classes='table table-striped table-hover table-sm')
+            popup_df_html = popup_df.to_html(escape=False,index=False,table_id="mystyle",justify='center',classes='table table-striped table-hover table-sm')
+            popup_df_html +=f'<a href="/tomorrow_recommend/minamikantou/hall/{tenpo_name}"  target="_parent">{tenpo_name}※店舗詳細ページに飛びます </a>'
             popup_data = folium.Popup(popup_df_html,  max_width=1500,show=False,size=(700, 300))
 
             folium.Marker(location=[latitude ,longitude],
@@ -1317,7 +1322,6 @@ def tomorrow_recommend_area_syuzai_syuzainame(area_name,syuzai_name):
                 WHERE イベント日 >= current_date
                     AND イベント日 < current_date + 7
                     AND 媒体名 != 'ホールナビ'
-                    AND 媒体名 != '旧イベ'
                     AND 取材名 = '{syuzai_name}'
                     AND ({area_sql_text})
                     ORDER BY イベント日,都道府県 desc;''')
@@ -1350,7 +1354,6 @@ def tomorrow_recommend_area_hall_hallname(area_name,hall_name):
                 AND イベント日 < current_date + 7
                 AND 店舗名 = '{hall_name}'
                 AND 媒体名 != 'ホールナビ'
-                AND 媒体名 != '旧イベ'
                 AND ({area_sql_text})
                 ORDER BY イベント日,都道府県 desc;''')
     cols = [col.name for col in cursor.description]
@@ -1432,7 +1435,6 @@ def tomorrow_recommend_area_prefecture_prefecturename(area_name,prefecture_name)
                 WHERE イベント日 >= current_date
                 AND イベント日 < current_date + 7
                 AND 媒体名 != 'ホールナビ'
-                AND 媒体名 != '旧イベ'
                 AND 都道府県 = '{prefecture_name}'
                 ORDER BY イベント日,都道府県 desc;''')
     cols = [col.name for col in cursor.description]
@@ -1480,7 +1482,6 @@ def tomorrow_recommend_area(area_name):
                     WHERE イベント日 >= current_date
                         AND イベント日 < current_date + 7
                         AND 媒体名 != 'ホールナビ'
-                        AND 媒体名 != '旧イベ'
                         AND イベント日 = '{target_date}'
                         AND ({area_sql_text})
                         ORDER BY イベント日,都道府県 desc;''')
