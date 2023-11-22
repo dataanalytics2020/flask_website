@@ -7,7 +7,7 @@
 
 <url>
   <loc>https://www.slo-map.com/</loc>
-  <lastmod>2023-11-05</lastmod>
+  <lastmod>2023-11-23</lastmod>
   <changefreq>daily</changefreq>
   <priority>1.00</priority>
 </url>
@@ -316,42 +316,50 @@
 </url>
 <url>
   <loc>https://www.slo-map.com/tomorrow-recommend/hokkaidoutouhoku/</loc>
-  <lastmod>2023-10-05</lastmod>
-  <priority>0.80</priority>
+  <lastmod>2023-11-23</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.60</priority>
 </url>
 <url>
   <loc>https://www.slo-map.com/tomorrow-recommend/kitakantou/</loc>
-  <lastmod>2023-10-05</lastmod>
-  <priority>0.80</priority>
+  <lastmod>2023-11-23</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.60</priority>
 </url>
 <url>
   <loc>https://www.slo-map.com/tomorrow-recommend/minamikantou/</loc>
-  <lastmod>2023-10-05</lastmod>
-  <priority>0.80</priority>
+  <lastmod>2023-11-23</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.60</priority>
 </url>
 <url>
   <loc>https://www.slo-map.com/tomorrow-recommend/hokurikukoushinetsu/</loc>
-  <lastmod>2023-10-05</lastmod>
-  <priority>0.80</priority>
+  <lastmod>2023-11-23</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.60</priority>
 </url>
 <url>
   <loc>https://www.slo-map.com/tomorrow-recommend/toukai/</loc>
-  <lastmod>2023-10-05</lastmod>
-  <priority>0.80</priority>
+  <lastmod>2023-11-23</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.60</priority>
 </url>
 <url>
   <loc>https://www.slo-map.com/tomorrow-recommend/kansai/</loc>
-  <lastmod>2023-10-05</lastmod>
-  <priority>0.80</priority>
+  <lastmod>2023-11-23</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.60</priority>
 </url>
 <url>
   <loc>https://www.slo-map.com/tomorrow-recommend/chugokushikoku/</loc>
-  <lastmod>2023-10-05</lastmod>
-  <priority>0.80</priority>
+  <lastmod>2023-11-23</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.60</priority>
 </url>
 <url>
   <loc>https://www.slo-map.com/tomorrow-recommend/kyushu/</loc>
-  <lastmod>2023-10-05</lastmod>
-  <priority>0.80</priority>
+  <lastmod>2023-11-23</lastmod>
+  <changefreq>daily</changefreq>
+  <priority>0.60</priority>
 </url>
 </urlset>
