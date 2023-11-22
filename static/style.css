@@ -895,6 +895,7 @@ h4:before {
 .snsButtons_pworld { background: #ca0000; }
 .snsButtons_line   { background: #009100; }
 .snsButtons_dmm   { background: #000000; }
+.snsButtons_slomap   { background: rgb(0, 110, 255); }
 
 
 .heading-008 {
@@ -1454,4 +1455,9 @@ text-align: center; /* 内容は中央配置 */
 .box-007 p {
   margin: 0;
   padding: 0 1.5em 1em;
+}
+
+.card-body {
+  flex: 1 1 auto;
+  padding: 0rem 0rem!important;
 }
