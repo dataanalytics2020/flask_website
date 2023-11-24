@@ -509,6 +509,12 @@ def convert_date(date):
     date = date[1].lstrip('0') + '/' + date[2].lstrip('0')
     return date
 
+def post_line(message):
+    url = "https://notify-api.line.me/api/notify"
+    token = os.environ['LINE_TOKEN']
+    headers = {"Authorization" : "Bearer "+ token}
+    payload = {"message" :  message}
+    post = requests.post(url ,headers = headers ,params=payload) 
 
 area_name_and_str_jp_area_name_dict = {'hokkaidoutouhoku':'北海道・東北', 'kitakantou':'北関東','minamikantou':'南関東','hokurikukoushinetsu':'北陸・甲信越','toukai':'東海','kansai':'関西','chugokushikoku':'中国・四国','kyushu':'九州・山口'}
 
@@ -609,6 +615,12 @@ def top():
         report_df =  pd.DataFrame(cursor.fetchall(),columns = cols )
         report_df = report_df.loc[:,~report_df.columns.duplicated()]
         all_kanto_display_df = report_df = report_df.drop_duplicates(keep='first')
+        latitude_isnull_df = report_df[report_df['latitude'].isnull()]
+        message = ''
+        if len(latitude_isnull_df) > 0:
+            for isnull_hall_name in latitude_isnull_df['店舗名'].unique():
+                message += f'{isnull_hall_name}の緯度経度が取得できていません。\n'
+            post_line(message)
         report_df = report_df.dropna(subset=['latitude'])
         #(取材ランク = 'S' OR 取材ランク = 'A')のみ抽出
         report_df = report_df[report_df['取材ランク'].isin(['S','A'])]
