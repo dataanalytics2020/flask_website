@@ -1,7 +1,7 @@
 #utf-8
 from flask import Flask, render_template, request, redirect 
 from flask_paginate import Pagination, get_page_parameter
-#from flask_sitemap import Sitemap
+from flask_caching import Cache
 from flask_mail import Mail
 from flask_wtf import FlaskForm
 from wtforms import DateField, SubmitField
@@ -33,7 +33,7 @@ import sympy
 from dotenv import load_dotenv
 load_dotenv()
 
-df:pd.DataFrame  = pd.read_csv(r'csv/2022-12-09_touhou.csv')
+#df:pd.DataFrame  = pd.read_csv(r'csv/2022-12-09_touhou.csv')
 heroku_port:int = int(os.environ.get("PORT", 5000))
 
 w_list = ['(月)', '(火)', '(水)', '(木)', '(金)', '(土)', '(日)']
@@ -491,7 +491,6 @@ def get_area_sql_text(target_area_name='minamikantou'):
     #print(area_sql_text)
     return area_sql_text
 
-
 def get_driver():
     users = os.getenv('HEROKU_PSGR_USER')    # DBにアクセスするユーザー名(適宜変更)
     dbnames = os.getenv('HEROKU_PSGR_DATABASE')   # 接続するデータベース名(適宜変更)
@@ -505,161 +504,28 @@ def get_driver():
     cursor = conn.cursor()
     return cursor
 
-def get_concat_h_multi_resize(im_list, resample=Image.BICUBIC):
-    min_height = min(im.height for im in im_list)
-    im_list_resize = [im.resize((int(im.width * min_height / im.height), min_height),resample=resample)
-                    for im in im_list]
-    total_width = sum(im.width for im in im_list_resize)
-    dst = Image.new('RGB', (total_width, min_height))
-    pos_x = 0
-    for im in im_list_resize:
-        dst.paste(im, (pos_x, 0))
-        pos_x += im.width
-    return dst
-
-def get_concat_v_multi_resize(im_list, resample=Image.BICUBIC):
-    min_width = min(im.width for im in im_list)
-    im_list_resize = [im.resize((min_width, int(im.height * min_width / im.width)),resample=resample)
-                    for im in im_list]
-    total_height = sum(im.height for im in im_list_resize)
-    dst = Image.new('RGB', (min_width, total_height))
-    pos_y = 0
-    for im in im_list_resize:
-        dst.paste(im, (0, pos_y))
-        pos_y += im.height
-    return dst
-
 def convert_date(date):
     date:str = str(date).split('-')
     date = date[1].lstrip('0') + '/' + date[2].lstrip('0')
     return date
 
-#テーブルタイプの画像出力
-def create_df_cell_image(_df,image_name):
-    global create_df_cell_image_path
-    width_concat_lists = []
-    font = ImageFont.truetype('font/MochiyPopOne-OTF-ExtraBold.otf', 18)
-    df_columns_list = list(_df.columns)
-    for column_number in range(len(_df.columns)):
-        height_concat_lists = []
-        #print(column_number)
-        print(df_columns_list[column_number])
-        if df_columns_list[column_number] == '機種名':
-            cell_width = 380
-        elif df_columns_list[column_number] == '店舗名':
-            cell_width = 300
-        elif df_columns_list[column_number] == '店舗平均差枚':
-            cell_width = 150
-        elif df_columns_list[column_number] == '店舗平均G数':
-            cell_width = 150
-        elif df_columns_list[column_number] == '勝率':
-            cell_width = 200
-        elif df_columns_list[column_number] == 'データ':
-            cell_width = 200
-        else:
-            cell_width = 100
-        cell_height = 40
-        im = Image.new('RGB', (cell_width, cell_height), (139, 0, 206))  # イメージオブジェクトの生成(黒のベタ画像)
-        draw = ImageDraw.Draw(im)  # Drawオブジェクトを生成  
-        # フォントの指定(メイリオ48pt)
-        draw.multiline_text((cell_width/2, 20), df_columns_list[column_number], fill=(255,255,255), font=font, align ="center",anchor="mm") # 文字の描画
-        w, h = im.size
-        draw.rectangle((0, 0, w-1, h-1), outline = (255,255,255))
-        height_concat_lists.append(im)
-        for index_number ,(i,record) in enumerate(_df.iterrows()):
-            if (index_number + 1 ) %  2 != 0:
-                im = Image.new('RGB', (cell_width, cell_height), (255, 255, 255))  # イメージオブジェクトの生成(黒のベタ画像)
-            else:
-                im = Image.new('RGB', (cell_width, cell_height), (202, 168, 255))  # イメージオブジェクトの生成(黒のベタ画像)
-            draw = ImageDraw.Draw(im)  # Drawオブジェクトを生成  
-            
-            draw.multiline_text((cell_width/2,10), f'{record[column_number]}', fill=(0,0,0), font=font,anchor="ma") 
-            w, h = im.size
-            
-            if df_columns_list[column_number] == '店舗平均差枚':
-                samai = record[column_number]
-                if samai > 0:
-                    samai_bunbo = 400
-                    samai_percet = samai / samai_bunbo
-                    draw.rectangle([(30, 0), (30+ samai_percet * 100, 40)], fill=(124, 233, 255))
-                else :
-                    samai_bunbo = 500
-                    samai_percet = samai / samai_bunbo
-                    draw.rectangle([(30, 0),  (30+ samai_percet * 100, 40)], fill=(255, 0,0))
-                draw.rectangle([(29, 0), (30, 40)], fill=(255, 255, 255)) 
-                
-            if df_columns_list[column_number] == '差枚' :
-                samai = record[column_number]
-                if samai > 0:
-                    samai_bunbo = 50000
-                    samai_percet = samai / samai_bunbo
-                    draw.rectangle([(30, 0), (30+ samai_percet * 100, 40)], fill=(124, 233, 255))
-                else :
-                    samai_bunbo = 50000
-                    samai_percet = samai / samai_bunbo
-                    draw.rectangle([(30, 0),  (30+ samai_percet * 50, 40)], fill=(255, 0,0))
-                draw.rectangle([(29, 0), (30, 40)], fill=(255, 255, 255))  
-                
-            if df_columns_list[column_number] == 'G数' or df_columns_list[column_number] == 'ゲーム数' or df_columns_list[column_number] == '店舗平均G数':
-                gamesuu = record[column_number]
-                samai_bunbo = 6000
-                samai_percet = gamesuu / samai_bunbo
-                #print(samai_percet)
-                draw.rectangle([(0, 0), (samai_percet * 100, 40)], fill=(0, 255, 206))
-
-            if df_columns_list[column_number] ==  'BB' or df_columns_list[column_number] ==  'RB' or df_columns_list[column_number] ==  'ART' :
-                atari_kaisuu = record[column_number]
-                bunbo = 35
-                percet = atari_kaisuu / bunbo
-                #print(percet)
-                draw.rectangle([(0, 0), (percet * 100, 40)], fill=(255, 193, 133))
-                
-            if df_columns_list[column_number] ==  '総台数'  :
-                atari_kaisuu = int(record[column_number])
-                bunbo = 20
-                percet = atari_kaisuu / bunbo
-                #print(percet)
-                draw.rectangle([(0, 0), (percet * 100, 40)], fill=(255, 193, 133))
-            if df_columns_list[column_number] ==  '台数'  :
-                atari_kaisuu = int(record[column_number])
-                bunbo = 500
-                percet = atari_kaisuu / bunbo
-                #print(percet)
-                draw.rectangle([(0, 0), (percet * 100, 40)], fill=(255, 193, 133))
-
-            if df_columns_list[column_number] ==  '勝率'  :
-                atari_kaisuu = float(record[column_number].split(')')[1].replace('%','').replace(' ',''))
-                #print(atari_kaisuu)
-                draw.rectangle([(0, 0), ((atari_kaisuu/100)*200, 40)], fill=(251, 244, 0))
-
-            else:
-                pass
-
-            draw.multiline_text((cell_width/2,10), f'{record[column_number]}', fill=(0,0,0), font=font,anchor="ma")
-            draw.rectangle((0, 0, w-1, h-1), outline = (0,0,0))
-            height_concat_lists.append(im)
-
-        #break
-        concat_image_path  = rf"image/temp_image/complted_cell_{column_number}.png"
-        get_concat_v_multi_resize(height_concat_lists).save(concat_image_path)
-        concat_im = Image.open(concat_image_path)
-        width_concat_lists.append(concat_im)
-    create_df_cell_image_path = rf"image/temp_image/temp_complted_df_image_cell_{image_name}.png"
-    get_concat_h_multi_resize(width_concat_lists).save(create_df_cell_image_path)
-    return create_df_cell_image_path
 
 area_name_and_str_jp_area_name_dict = {'hokkaidoutouhoku':'北海道・東北', 'kitakantou':'北関東','minamikantou':'南関東','hokurikukoushinetsu':'北陸・甲信越','toukai':'東海','kansai':'関西','chugokushikoku':'中国・四国','kyushu':'九州・山口'}
+
+config = {
+    "DEBUG": False,          # some Flask specific configs
+    "CACHE_TYPE": "SimpleCache",  # Flask-Caching related configs
+    "CACHE_DEFAULT_TIMEOUT": 300
+}
+
 app = Flask(__name__, static_folder="static")
-app.config['SECRET_KEY'] = 'o+UFANpa1rA35'
-#ext = Sitemap(app=app)
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY') 
+app.config.from_mapping(config)
+cache = Cache(app)
 bootstrap = Bootstrap(app)
 
-
-#pathがどこにあるか確認
-path=os.getcwd()
-print(path)
-
 @app.route('/', methods=['GET', 'POST'])
+@cache.cached(timeout=300)
 def top():
     if request.method == 'POST':
         user_data = request.form
@@ -1459,6 +1325,7 @@ class DateForm(FlaskForm):
     submit = SubmitField('検索')
 
 @app.route("/tomorrow-recommend/<area_name>/", methods=['GET','POST'])
+@cache.cached(timeout=300)
 def tomorrow_recommend_area(area_name):
     form = DateForm()
     area_sql_text = get_area_sql_text(area_name)
@@ -1557,6 +1424,7 @@ def tomorrow_recommend_area(area_name):
 #           /tomorrow_recommend/minamikanto/media/BASHtv-data
 
 @app.route("/tomorrow-recommend/<area_name>/<date>-data")
+@cache.cached(timeout=300)
 def tomorrow_recommend_area_date(area_name,date):
     data = {}
     data['area_name'] = area_name
@@ -1569,18 +1437,8 @@ def tomorrow_recommend_area_date(area_name,date):
         data['area_name_jp'] = '関東'
     return render_template('tomorrow_recommend_area_date.html',data=data)
 
-@app.route("/test2", methods=['GET','POST'])
-def post_test():
-    data = {}
-    prefecture_id_and_name_dict = {}
-    for i, prefecture_name in enumerate(prefecture_list):
-        i = i + 1
-        prefecture_id_and_name_dict[i] = prefecture_name
-    data['prefecture_id_and_name_dict'] = prefecture_id_and_name_dict
-    return render_template('test2.html',data=data)
-
-
 @app.route("/serch-recommend-prefecture-day", methods=['GET','POST'])
+@cache.cached(timeout=300)
 def serch_recommend_prefecture_day():
     if request.method == 'GET':
         data = {}
@@ -1667,6 +1525,7 @@ def prefecture_post_detail():
 
 #post_prefecture_list.html
 @app.route("/post_prefecture_list/<pref_name_en>", methods=['GET','POST'])
+@cache.cached(timeout=300)
 def post_prefecture_list(pref_name_en):
     if request.method == 'GET':
         data = {}
@@ -1713,6 +1572,7 @@ def post_prefecture_list(pref_name_en):
         redirect(url_for('test3'))
         
 @app.route("/post_prefecture/<post_slug>", methods=['GET','POST'])
+@cache.cached(timeout=300)
 def post_prefecture(post_slug):
     if request.method == 'GET':
         prefecture_df = pd.read_csv('csv/pref_lat_lon.csv')
@@ -1783,5 +1643,16 @@ def privacy_policy():
 def sitemap():
     return app.send_static_file("sitemap.xml")
 
+@app.route("/test2", methods=['GET','POST'])
+def post_test():
+    data = {}
+    prefecture_id_and_name_dict = {}
+    for i, prefecture_name in enumerate(prefecture_list):
+        i = i + 1
+        prefecture_id_and_name_dict[i] = prefecture_name
+    data['prefecture_id_and_name_dict'] = prefecture_id_and_name_dict
+    return render_template('test2.html',data=data)
+
+
 if __name__ == '__main__':
-    app.run(host="0.0.0.0",debug=True, port=int(os.environ.get('PORT', 5000)))
+    app.run(host="0.0.0.0",debug=False, port=int(os.environ.get('PORT', 5000)))

@@ -111,3 +111,4 @@ gspread_dataframe==3.3.1
 Janome==0.5.0
 wordcloud==1.9.2
 flask-paginate==2023.10.24
+Flask-Caching==2.1.0
