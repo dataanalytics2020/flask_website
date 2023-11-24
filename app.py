@@ -85,7 +85,7 @@ def create_post_map_iframe(location_name_df,groupby_date_kisyubetu_df):
         
     print('新prefecture_latitude',prefecture_latitude,prefecture_longitude)
 
-    folium_map = folium.Map(location=[prefecture_latitude,prefecture_longitude], zoom_start=11, width="100%", height="100%")
+    folium_map = folium.Map(location=[prefecture_latitude,prefecture_longitude], zoom_start=10, width="100%", height="100%")
     # 地図表示
     # マーカープロット（ポップアップ設定，色変更，アイコン変更）
     print(location_name_df)
@@ -179,7 +179,7 @@ def create_syuzai_map_iframe(report_df:pd.DataFrame):
         
     print('新prefecture_latitude',prefecture_latitude,prefecture_longitude)
 
-    folium_map = folium.Map(location=[prefecture_latitude,prefecture_longitude], zoom_start=14, width="100%", height="100%")
+    folium_map = folium.Map(location=[prefecture_latitude,prefecture_longitude], zoom_start=10, width="100%", height="100%")
     # 地図表示
     # マーカープロット（ポップアップ設定，色変更，アイコン変更）
     print(report_df)
@@ -269,7 +269,7 @@ def create_media_map_iframe(report_df:pd.DataFrame):
     except:
         prefecture_latitude = 35.681236
         prefecture_longitude = 139.767125
-    folium_map = folium.Map(location=[prefecture_latitude,prefecture_longitude], zoom_start=11, width="100%", height="100%")
+    folium_map = folium.Map(location=[prefecture_latitude,prefecture_longitude], zoom_start=10, width="100%", height="100%")
     # 地図表示
     # マーカープロット（ポップアップ設定，色変更，アイコン変更）
     #print(report_df)
@@ -346,7 +346,7 @@ def create_media_map_iframe(report_df:pd.DataFrame):
     folium_map.get_root().height = "500px"
     return folium_map.get_root()._repr_html_()
 
-def create_hall_map_iframe(extract_hall_name_df,zoom_size=16):
+def create_hall_map_iframe(extract_hall_name_df,zoom_size=10):
     longitude = extract_hall_name_df.iloc[0]['longitude']
     latitude = extract_hall_name_df.iloc[0]['latitude']
     folium_map = folium.Map(location=[latitude,longitude], zoom_start=zoom_size, width="100%", height="100%")
@@ -755,7 +755,7 @@ def top():
         prefecture_latitude = 35.68944
         prefecture_longitude = 139.69167
         
-        folium_map = folium.Map(location=[prefecture_latitude,prefecture_longitude], zoom_start=11, width="100%", height="100%")
+        folium_map = folium.Map(location=[prefecture_latitude,prefecture_longitude], zoom_start=10, width="100%", height="100%")
         # 地図表示
         # マーカープロット（ポップアップ設定，色変更，アイコン変更）
         print(map_report_df)
