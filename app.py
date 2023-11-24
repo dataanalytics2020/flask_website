@@ -530,199 +530,195 @@ app.config.from_mapping(config)
 cache = Cache(app)
 bootstrap = Bootstrap(app)
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/', methods=['GET'])
 @cache.cached(timeout=300)
-def top():
-    if request.method == 'POST':
-        user_data = request.form
-        today = datetime.date.today()
-        print('user_data',user_data)
-        prefecture_id = int(user_data['pref_id'])
-        print('prefecture_id',prefecture_id,type(prefecture_id))
-        prefecture = get_key_from_value(prefecture_id_and_name_dict, prefecture_id)
-        print(prefecture)
-        area_name_jp,area_name = get_prefecture_area_list(prefecture)
-        print(area_name_jp,area_name)
-        data = {}
-        data['prefecture_name'] = prefecture
-        data['area_name_jp'] = area_name_jp
-        data['area_name'] = area_name
-        print('dataは',data)
-        target_day = str(today.year) + '-' + user_data['target_day'].split('月')[0] + '-' + user_data['target_day'].split('月')[1].split('日')[0]
-        jpn_target_day = target_day.split('-')[1].lstrip('0') + '月' + target_day.split('-')[2].lstrip('0') + '日'
-        #print(prefecture,target_day)
-        #イベント日,店舗名,取材名,媒体名,アナスロ店舗名
-        cursor = get_driver()
-        print('prefectureは',prefecture)
-        cursor.execute(f'''SELECT *
-                    FROM schedule as schedule2
-                    left join halldata as halldata2
-                    on schedule2.店舗名 = halldata2.hall_name
-                    WHERE イベント日 = '{target_day}'
-                    AND 媒体名 != 'ホールナビ'
-                    AND 都道府県 = '{prefecture}'
-                    ORDER BY イベント日,都道府県 desc;''')
-        cols = [col.name for col in cursor.description]
-        extract_prefecture_name_df = pd.DataFrame(cursor.fetchall(),columns=cols)
-        extract_prefecture_name_df.drop_duplicates(keep='first',inplace=True)
-        table_df = extract_prefecture_name_df[['イベント日','店舗名','媒体名','取材名']]
-        table_df['イベント日'] = table_df['イベント日'].map(convert_sql_date_to_jp_date_and_weekday)
-        table_df = table_df.sort_values(['イベント日','店舗名','媒体名','取材名'],ascending=[True,True,True,True],inplace=False).reset_index(drop=True)
-        table_df.rename(columns={'イベント日':'日'},inplace=True)
-        table_df.drop_duplicates(keep='first',inplace=True)
-        #print(table_df)
-        data['iframe'] = create_media_map_iframe(extract_prefecture_name_df)
-        data['extract_prefecture_name_df'] = table_df
-        data['extract_prefecture_name_df_column_names'] = table_df.columns.values
-        data['extract_prefecture_name_df_row_data'] = list(table_df.values.tolist())
-        return render_template('tomorrow_recommend_area_prefecture_prefecturename.html',data=data,zip=zip)
-    else:
-        data = {}
-        data['prefecture_list'] = prefecture_list
-        #data['kanto_prefecture_list'] = ['東京都','神奈川県','千葉県','埼玉県']
+def get_top():
+    data = {}
+    data['prefecture_list'] = prefecture_list
+    today = date.today()
+    jp_str_day_list = []
+    for i in range(0,7):
+        day = today + timedelta(days=i)
+        jp_str_day = day.strftime('%m').lstrip('0') + '月' + day.strftime('%d').lstrip('0') + '日' + w_list[day.weekday()]
+        jp_str_day_list.append(jp_str_day)
+    data['jp_str_day_list'] = jp_str_day_list
+    tomorrow:date = today + timedelta(days=1)
+    print(tomorrow)
+    tommorow_jp_str_day = tomorrow.strftime('%m').lstrip('0') + '月' + tomorrow.strftime('%d').lstrip('0') + '日' + w_list[tomorrow.weekday()]
+    print(tommorow_jp_str_day)
+    data['tommorow_jp_str_day'] =  tommorow_jp_str_day
+    data['prefecture_id_and_name_dict'] = prefecture_id_and_name_dict
 
-        today = date.today()
-        jp_str_day_list = []
-        for i in range(0,7):
-            day = today + timedelta(days=i)
-            jp_str_day = day.strftime('%m').lstrip('0') + '月' + day.strftime('%d').lstrip('0') + '日' + w_list[day.weekday()]
-            jp_str_day_list.append(jp_str_day)
-        data['jp_str_day_list'] = jp_str_day_list
-        tomorrow:date = today + timedelta(days=1)
-        
-        print(tomorrow)
-        tommorow_jp_str_day = tomorrow.strftime('%m').lstrip('0') + '月' + tomorrow.strftime('%d').lstrip('0') + '日' + w_list[tomorrow.weekday()]
-        print(tommorow_jp_str_day)
-        data['tommorow_jp_str_day'] =  tommorow_jp_str_day
-        data['prefecture_id_and_name_dict'] = prefecture_id_and_name_dict
+    area_sql_text = get_area_sql_text('minamikantou')
+    cursor = get_driver()
+    sql = f'''SELECT イベント日,都道府県,店舗名,取材名,取材ランク,媒体名,latitude,longitude
+            FROM schedule as schedule2
+            left join halldata as halldata2
+            on schedule2.店舗名 = halldata2.hall_name
+            WHERE イベント日 > current_date
+            AND イベント日 <= current_date + 7
+            AND 媒体名 != 'ホールナビ'
+            AND 媒体名 != '旧イベ'
+            AND ({area_sql_text})
+            ORDER BY イベント日,都道府県,店舗名,媒体名,取材名 desc;'''#AND (取材ランク = 'S' OR 取材ランク = 'A')
+    print(sql)
+    cursor.execute(sql)
+    cols = [col[0] for col in cursor.description]
+    print('cols',cols)
+    report_df =  pd.DataFrame(cursor.fetchall(),columns = cols )
+    report_df = report_df.loc[:,~report_df.columns.duplicated()]
+    all_kanto_display_df = report_df = report_df.drop_duplicates(keep='first')
+    latitude_isnull_df = report_df[report_df['latitude'].isnull()]
+    message = ''
+    if len(latitude_isnull_df) > 0:
+        for isnull_hall_name in latitude_isnull_df['店舗名'].unique():
+            message += f'{isnull_hall_name}の緯度経度が取得できていません。\n'
+        post_line(message)
+    report_df = report_df.dropna(subset=['latitude'])
+    #(取材ランク = 'S' OR 取材ランク = 'A')のみ抽出
+    report_df = report_df[report_df['取材ランク'].isin(['S','A'])]
+    map_report_df = report_df[report_df['イベント日'] == tomorrow]
+    map_report_df = map_report_df[['店舗名','取材名','媒体名']].drop_duplicates(keep='first')
+    map_report_df = map_report_df.sort_values(['店舗名','媒体名']).reset_index(drop=True)
 
-        area_sql_text = get_area_sql_text('minamikantou')
-        cursor = get_driver()
-        sql = f'''SELECT イベント日,都道府県,店舗名,取材名,取材ランク,媒体名,latitude,longitude
+
+    #東京都に設定
+    prefecture_latitude = 35.68944
+    prefecture_longitude = 139.69167
+
+    folium_map = folium.Map(location=[prefecture_latitude,prefecture_longitude], zoom_start=10, width="100%", height="100%")
+    # 地図表示
+    # マーカープロット（ポップアップ設定，色変更，アイコン変更）
+    print(map_report_df)
+    for tenpo_name in map_report_df['店舗名'].unique():
+        print(tenpo_name)
+        extract_syuzai_df_1 = report_df[report_df['店舗名'] == tenpo_name]
+        extract_syuzai_df_1 = extract_syuzai_df_1[extract_syuzai_df_1['イベント日'] == tomorrow]
+        extract_syuzai_df_1.drop_duplicates(keep='first',inplace=True)
+        #display(extract_syuzai_df_1)
+        print(extract_syuzai_df_1)
+        #syuzai_rank_list = list(extract_syuzai_df_1['取材ランク'].unique())
+        #print(syuzai_rank_list)
+        longitude = extract_syuzai_df_1.iloc[0]['longitude']
+        latitude = extract_syuzai_df_1.iloc[0]['latitude']
+        print('latitude,longitude',latitude,longitude)
+        # グレースケールの画像データを作成
+        im= Image.new("L", (280, 100),color=(0))
+        im.putalpha(0)
+        im2= Image.new("L", (260, 50),color=(50))
+        im2.putalpha(128)
+        im3 = Image.open('icon.png')
+        draw = ImageDraw.Draw(im)
+        font = ImageFont.truetype('font/LightNovelPOPv2.otf',19)
+        if len(extract_syuzai_df_1)==1:
+            syuzai_name_text = '◆' + tenpo_name + f'\n {extract_syuzai_df_1["取材名"].values[0]}'
+        else:
+            syuzai_name_text = '◆' + tenpo_name + f'\n {extract_syuzai_df_1["取材名"].values[0]}、他{len(extract_syuzai_df_1)-1}件'
+        #print(syuzai_name_text)
+        draw = ImageDraw.Draw(im)
+        font = ImageFont.truetype('font/LightNovelPOPv2.otf',19)
+
+        # 画像を表示
+        im.paste(im3, (-15,-14))
+        im.paste(im2, (25,48))
+        draw.multiline_text(
+            (150, 50),
+            f'{syuzai_name_text}',
+            font=font,
+            fill='white',
+            align='center',
+            spacing=0,
+            anchor='ma'
+        )
+
+        im.save('syuzai_image.png', quality=95)
+        img = 'syuzai_image.png'
+        popup_df = extract_syuzai_df_1[['イベント日','店舗名','媒体名','取材名']].sort_values('店舗名')#.reset_index(drop=True)#.T
+        popup_df['イベント日'] = popup_df['イベント日'].map(convert_sql_date_to_jp_date_and_weekday)
+        popup_df_html = popup_df.to_html(escape=False,index=False,table_id="mystyle",justify='center',classes='table table-striped table-hover table-sm')
+        popup_df_html +=f'<a href="/tomorrow_recommend/minamikantou/hall/{tenpo_name}"  target="_parent">{tenpo_name}※店舗詳細ページに飛びます </a>'
+        popup_data = folium.Popup(popup_df_html,  max_width=1500,show=False,size=(700, 300))
+
+        folium.Marker(location=[latitude ,longitude],
+            tiles='https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png',
+            attr='国土地理院',
+            popup=popup_data,
+            icon = CustomIcon(
+                        icon_image = img,
+                        icon_size = (280, 100),
+                        icon_anchor = (30, 0),
+                        #shadow_image = shadow_img, # 影効果（今回は使用せず コメントアウト
+                        #shadow_size = (30, 30),
+                        shadow_anchor = (-4, -40),
+                        popup_anchor = (3, 3))).add_to(folium_map)
+        #break
+    plugins.Fullscreen(
+                        position="topright",
+                        title="拡大する",
+                        title_cancel="元に戻す",
+                        force_separate_button=True,
+                    ).add_to(folium_map)
+    folium_map.get_root().width = "500px"
+    folium_map.get_root().height = "500px"
+
+    data['iframe'] = folium_map.get_root()._repr_html_()
+    display_report_df = all_kanto_display_df[['イベント日','都道府県','店舗名','媒体名','取材名']].sort_values(['イベント日','都道府県','店舗名','媒体名','取材名'],ascending=[True,False,True,True,False],inplace=False).reset_index(drop=True)
+    print(display_report_df)
+    display_report_df = display_report_df.drop_duplicates(keep='first')
+    display_report_df['イベント日'] = display_report_df['イベント日'].map(convert_sql_date_to_jp_date_and_weekday)
+    display_report_df.rename(columns={'イベント日':'日','都道府県':'県'},inplace=True)
+    #display_report_df.sort_values(['イベント日','都道府県','店舗名','媒体名','取材名'],ascending=[True,False,True,True,False],inplace=True)
+    data['display_report_df_column_names'] = display_report_df.columns.values
+    data['display_report_df'] = display_report_df
+    data['display_report_df_row_data'] = list(display_report_df.values.tolist())
+    data['area_name'] = 'minamikantou'
+    data['area_name_jp'] = area_name_and_str_jp_area_name_dict['minamikantou']
+    return render_template('top.html',data=data,zip=zip)
+
+@app.route('/', methods=['POST'])
+def post_top():
+    user_data = request.form
+    today = datetime.date.today()
+    print('user_data',user_data)
+    prefecture_id = int(user_data['pref_id'])
+    print('prefecture_id',prefecture_id,type(prefecture_id))
+    prefecture = get_key_from_value(prefecture_id_and_name_dict, prefecture_id)
+    print(prefecture)
+    area_name_jp,area_name = get_prefecture_area_list(prefecture)
+    print(area_name_jp,area_name)
+    data = {}
+    data['prefecture_name'] = prefecture
+    data['area_name_jp'] = area_name_jp
+    data['area_name'] = area_name
+    print('dataは',data)
+    target_day = str(today.year) + '-' + user_data['target_day'].split('月')[0] + '-' + user_data['target_day'].split('月')[1].split('日')[0]
+    jpn_target_day = target_day.split('-')[1].lstrip('0') + '月' + target_day.split('-')[2].lstrip('0') + '日'
+    #print(prefecture,target_day)
+    #イベント日,店舗名,取材名,媒体名,アナスロ店舗名
+    cursor = get_driver()
+    print('prefectureは',prefecture)
+    cursor.execute(f'''SELECT *
                 FROM schedule as schedule2
                 left join halldata as halldata2
                 on schedule2.店舗名 = halldata2.hall_name
-                WHERE イベント日 > current_date
-                AND イベント日 <= current_date + 7
+                WHERE イベント日 = '{target_day}'
                 AND 媒体名 != 'ホールナビ'
-                AND 媒体名 != '旧イベ'
-                AND ({area_sql_text})
-                ORDER BY イベント日,都道府県,店舗名,媒体名,取材名 desc;'''#AND (取材ランク = 'S' OR 取材ランク = 'A')
-        print(sql)
-        cursor.execute(sql)
-        cols = [col[0] for col in cursor.description]
-        print('cols',cols)
-        report_df =  pd.DataFrame(cursor.fetchall(),columns = cols )
-        report_df = report_df.loc[:,~report_df.columns.duplicated()]
-        all_kanto_display_df = report_df = report_df.drop_duplicates(keep='first')
-        latitude_isnull_df = report_df[report_df['latitude'].isnull()]
-        message = ''
-        if len(latitude_isnull_df) > 0:
-            for isnull_hall_name in latitude_isnull_df['店舗名'].unique():
-                message += f'{isnull_hall_name}の緯度経度が取得できていません。\n'
-            post_line(message)
-        report_df = report_df.dropna(subset=['latitude'])
-        #(取材ランク = 'S' OR 取材ランク = 'A')のみ抽出
-        report_df = report_df[report_df['取材ランク'].isin(['S','A'])]
-        map_report_df = report_df[report_df['イベント日'] == tomorrow]
-        map_report_df = map_report_df[['店舗名','取材名','媒体名']].drop_duplicates(keep='first')
-        map_report_df = map_report_df.sort_values(['店舗名','媒体名']).reset_index(drop=True)
-        #明日のみ抽出
-        
-        #東京都に設定
-        prefecture_latitude = 35.68944
-        prefecture_longitude = 139.69167
-        
-        folium_map = folium.Map(location=[prefecture_latitude,prefecture_longitude], zoom_start=10, width="100%", height="100%")
-        # 地図表示
-        # マーカープロット（ポップアップ設定，色変更，アイコン変更）
-        print(map_report_df)
-        for tenpo_name in map_report_df['店舗名'].unique():
-            print(tenpo_name)
-            extract_syuzai_df_1 = report_df[report_df['店舗名'] == tenpo_name]
-            extract_syuzai_df_1 = extract_syuzai_df_1[extract_syuzai_df_1['イベント日'] == tomorrow]
-            extract_syuzai_df_1.drop_duplicates(keep='first',inplace=True)
-            #display(extract_syuzai_df_1)
-            print(extract_syuzai_df_1)
-            #syuzai_rank_list = list(extract_syuzai_df_1['取材ランク'].unique())
-            #print(syuzai_rank_list)
-            longitude = extract_syuzai_df_1.iloc[0]['longitude']
-            latitude = extract_syuzai_df_1.iloc[0]['latitude']
-            print('latitude,longitude',latitude,longitude)
-            # グレースケールの画像データを作成
-            im= Image.new("L", (280, 100),color=(0))
-            im.putalpha(0)
-            im2= Image.new("L", (260, 50),color=(50))
-            im2.putalpha(128)
-            im3 = Image.open('icon.png')
-            draw = ImageDraw.Draw(im)
-            font = ImageFont.truetype('font/LightNovelPOPv2.otf',19)
-            if len(extract_syuzai_df_1)==1:
-                syuzai_name_text = '◆' + tenpo_name + f'\n {extract_syuzai_df_1["取材名"].values[0]}'
-            else:
-                syuzai_name_text = '◆' + tenpo_name + f'\n {extract_syuzai_df_1["取材名"].values[0]}、他{len(extract_syuzai_df_1)-1}件'
-            #print(syuzai_name_text)
-            draw = ImageDraw.Draw(im)
-            font = ImageFont.truetype('font/LightNovelPOPv2.otf',19)
-
-            # 画像を表示
-            im.paste(im3, (-15,-14))
-            im.paste(im2, (25,48))
-            draw.multiline_text(
-                (150, 50),
-                f'{syuzai_name_text}',
-                font=font,
-                fill='white',
-                align='center',
-                spacing=0,
-                anchor='ma'
-            )
-
-            im.save('syuzai_image.png', quality=95)
-            img = 'syuzai_image.png'
-            popup_df = extract_syuzai_df_1[['イベント日','店舗名','媒体名','取材名']].sort_values('店舗名')#.reset_index(drop=True)#.T
-            popup_df['イベント日'] = popup_df['イベント日'].map(convert_sql_date_to_jp_date_and_weekday)
-            popup_df_html = popup_df.to_html(escape=False,index=False,table_id="mystyle",justify='center',classes='table table-striped table-hover table-sm')
-            popup_df_html +=f'<a href="/tomorrow_recommend/minamikantou/hall/{tenpo_name}"  target="_parent">{tenpo_name}※店舗詳細ページに飛びます </a>'
-            popup_data = folium.Popup(popup_df_html,  max_width=1500,show=False,size=(700, 300))
-
-            folium.Marker(location=[latitude ,longitude],
-                tiles='https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png',
-                attr='国土地理院',
-                popup=popup_data,
-                icon = CustomIcon(
-                            icon_image = img,
-                            icon_size = (280, 100),
-                            icon_anchor = (30, 0),
-                            #shadow_image = shadow_img, # 影効果（今回は使用せず コメントアウト
-                            #shadow_size = (30, 30),
-                            shadow_anchor = (-4, -40),
-                            popup_anchor = (3, 3))).add_to(folium_map)
-            #break
-        
-        # set the iframe width and height
-        plugins.Fullscreen(
-                            position="topright",
-                            title="拡大する",
-                            title_cancel="元に戻す",
-                            force_separate_button=True,
-                        ).add_to(folium_map)
-        folium_map.get_root().width = "500px"
-        folium_map.get_root().height = "500px"
-
-        data['iframe'] = folium_map.get_root()._repr_html_()
-        display_report_df = all_kanto_display_df[['イベント日','都道府県','店舗名','媒体名','取材名']].sort_values(['イベント日','都道府県','店舗名','媒体名','取材名'],ascending=[True,False,True,True,False],inplace=False).reset_index(drop=True)
-        print(display_report_df)
-        display_report_df = display_report_df.drop_duplicates(keep='first')
-        display_report_df['イベント日'] = display_report_df['イベント日'].map(convert_sql_date_to_jp_date_and_weekday)
-        display_report_df.rename(columns={'イベント日':'日','都道府県':'県'},inplace=True)
-        #display_report_df.sort_values(['イベント日','都道府県','店舗名','媒体名','取材名'],ascending=[True,False,True,True,False],inplace=True)
-        data['display_report_df_column_names'] = display_report_df.columns.values
-        data['display_report_df'] = display_report_df
-        data['display_report_df_row_data'] = list(display_report_df.values.tolist())
-        data['area_name'] = 'minamikantou'
-        data['area_name_jp'] = area_name_and_str_jp_area_name_dict['minamikantou']
-        return render_template('top.html',data=data,zip=zip)
+                AND 都道府県 = '{prefecture}'
+                ORDER BY イベント日,都道府県 desc;''')
+    cols = [col.name for col in cursor.description]
+    extract_prefecture_name_df = pd.DataFrame(cursor.fetchall(),columns=cols)
+    extract_prefecture_name_df.drop_duplicates(keep='first',inplace=True)
+    table_df = extract_prefecture_name_df[['イベント日','店舗名','媒体名','取材名']]
+    table_df['イベント日'] = table_df['イベント日'].map(convert_sql_date_to_jp_date_and_weekday)
+    table_df = table_df.sort_values(['イベント日','店舗名','媒体名','取材名'],ascending=[True,True,True,True],inplace=False).reset_index(drop=True)
+    table_df.rename(columns={'イベント日':'日'},inplace=True)
+    table_df.drop_duplicates(keep='first',inplace=True)
+    #print(table_df)
+    data['iframe'] = create_media_map_iframe(extract_prefecture_name_df)
+    data['extract_prefecture_name_df'] = table_df
+    data['extract_prefecture_name_df_column_names'] = table_df.columns.values
+    data['extract_prefecture_name_df_row_data'] = list(table_df.values.tolist())
+    return render_template('tomorrow_recommend_area_prefecture_prefecturename.html',data=data,zip=zip)
 
 @app.route('/heatmap', methods=['GET', 'POST'])#<prefecture>/<tenpo_name>
 def heatmap_test():#prefecture,tenpo_name
@@ -1332,108 +1328,110 @@ def tomorrow_recommend_area_prefecture_prefecturename(area_name,prefecture_name)
     data['extract_prefecture_name_df_row_data'] = list(table_df.values.tolist())
     return render_template('tomorrow_recommend_area_prefecture_prefecturename.html',data=data,zip=zip)
 
+
+@app.route("/tomorrow-recommend/<area_name>/", methods=['GET'])
+@cache.cached(timeout=300)
+def tomorrow_recommend_area(area_name):
+    area_sql_text = get_area_sql_text(area_name)
+    sql = f'''SELECT COUNT(媒体名), 媒体名
+    FROM schedule
+    WHERE イベント日 >= current_date
+    AND イベント日 <= current_date + 6
+    AND 媒体名 != 'ホールナビ'
+    AND 媒体名 != '旧イベ'
+    AND ({area_sql_text})
+    GROUP BY 媒体名
+    ORDER BY COUNT(媒体名) desc;'''
+
+    data = {}
+    today = date.today()
+    date_list = [today + timedelta(days=day) for day in range(0,9)]
+    date_list = [date.strftime("%Y-%m-%d") for date in date_list]
+    data['date_list'] = date_list
+    data['area_name'] = area_name
+    data['area_name_jp'] = area_name_and_str_jp_area_name_dict[area_name]
+    data['prefecture_name_list'] = get_area_prefecture_list(area_name)
+
+    cursor = get_driver()
+    #首都圏のイベントの媒体別の予約数を集計
+    cursor.execute(sql)
+    cols = [col.name for col in cursor.description]
+    groupby_media_name_count_df = pd.DataFrame(cursor.fetchall(),columns=cols)
+    #重複行を削除する
+    groupby_media_name_count_df.drop_duplicates(keep='first',inplace=True)
+    print('groupby_media_name_count_df:',groupby_media_name_count_df)
+    groupby_media_name_count_df.rename(columns={'count': '取材数'},inplace=True)
+    data['groupby_media_name_count_df'] = groupby_media_name_count_df
+    data['groupby_media_name_count_df_column_names'] = groupby_media_name_count_df.columns.values
+    data['groupby_media_name_count_df_row_data'] = list(groupby_media_name_count_df.values.tolist())
+    print('data',data)
+    cursor = get_driver()
+    cursor.execute(f'''SELECT COUNT(店舗名),都道府県, 店舗名
+            FROM schedule as schedule2
+            left join halldata as halldata2
+            on schedule2.店舗名 = halldata2.hall_name
+            WHERE イベント日 >= current_date
+            AND イベント日 <= current_date + 7
+            AND 媒体名 != 'ホールナビ'
+            AND 媒体名 != '旧イベ'
+            AND ({area_sql_text})
+            GROUP BY 店舗名,都道府県
+            ORDER BY COUNT(店舗名) desc;''')
+    cols = [col.name for col in cursor.description]
+    groupby_hall_name_count_df = pd.DataFrame(cursor.fetchall(),columns=cols)
+    #重複行を削除する
+    print(groupby_hall_name_count_df)
+    groupby_hall_name_count_df.drop_duplicates(keep='first',inplace=True)
+    print('groupby_hall_name_count_df:',groupby_hall_name_count_df)
+    groupby_hall_name_count_df.rename(columns={'count': '取材数'},inplace=True)
+    data['groupby_hall_name_count_df'] = groupby_hall_name_count_df
+    data['groupby_hall_name_count_df_column_names'] = groupby_hall_name_count_df.columns.values
+    data['groupby_hall_name_count_df_row_data'] = list(groupby_hall_name_count_df.values.tolist())
+    return render_template('tomorrow_recommend_area.html',data=data,zip=zip)
+
 class DateForm(FlaskForm):
     inputdate = DateField('', format='%Y/%m/%d')
     submit = SubmitField('検索')
-
-@app.route("/tomorrow-recommend/<area_name>/", methods=['GET','POST'])
-@cache.cached(timeout=300)
-def tomorrow_recommend_area(area_name):
+@app.route("/tomorrow-recommend/<area_name>/", methods=['POST'])
+def tomorrow_recommend_area_post(area_name):
     form = DateForm()
     area_sql_text = get_area_sql_text(area_name)
-    if request.method == 'POST':
-        data = request.form
-        print('dataは',data)
-        print('form.inputdate.data',form.inputdate.data)
-        target_date_jp:str = data['date']
-        target_date = data['date'].split(' (')[0].replace('年','-').replace('月','-').replace('日','')
-        print('target_date',target_date)
-        data = {}
-        data['target_date_jp'] = target_date_jp
-        data['area_name'] = area_name
-        data['target_date'] = target_date
-        data['area_name_jp'] = area_name_and_str_jp_area_name_dict[area_name]
-        area_sql_text = get_area_sql_text(area_name)
-        cursor = get_driver()
-        #首都圏のイベントの媒体別の予約数を集計
-        cursor.execute(f'''SELECT *
-                    FROM schedule as schedule2
-                    left join halldata as halldata2
-                    on schedule2.店舗名 = halldata2.hall_name
-                    WHERE イベント日 >= current_date
-                        AND イベント日 < current_date + 7
-                        AND 媒体名 != 'ホールナビ'
-                        AND イベント日 = '{target_date}'
-                        AND ({area_sql_text})
-                        ORDER BY イベント日,都道府県 desc;''')
-        cols = [col.name for col in cursor.description]
-        extract_target_date_df = pd.DataFrame(cursor.fetchall(),columns=cols)
-        extract_target_date_df.drop_duplicates(keep='first',inplace=True)
-        table_df = extract_target_date_df[['都道府県','店舗名','媒体名','取材名']]
-        table_df.sort_values(['都道府県','店舗名','媒体名','取材名'],ascending=[True,True,True,True],inplace=True)
-        table_df.drop_duplicates(keep='first',inplace=True)
-        data['iframe'] = create_syuzai_map_iframe(extract_target_date_df)
-        data['extract_target_date_df'] = table_df
-        data['extract_target_date_df_column_names'] = table_df.columns.values
-        data['extract_target_date_df_row_data'] = list(table_df.values.tolist())
-        return render_template('tomorrow_recommend_area_date.html',data=data,zip=zip)
-    else:
-        sql = f'''SELECT COUNT(媒体名), 媒体名
-        FROM schedule
-        WHERE イベント日 >= current_date
-        AND イベント日 <= current_date + 6
-        AND 媒体名 != 'ホールナビ'
-        AND 媒体名 != '旧イベ'
-        AND ({area_sql_text})
-        GROUP BY 媒体名
-        ORDER BY COUNT(媒体名) desc;'''
-            #data['form']=form
-        data = {}
-        today = date.today()
-        date_list = [today + timedelta(days=day) for day in range(0,9)]
-        date_list = [date.strftime("%Y-%m-%d") for date in date_list]
-        data['date_list'] = date_list
-        data['area_name'] = area_name
-        data['area_name_jp'] = area_name_and_str_jp_area_name_dict[area_name]
-        data['prefecture_name_list'] = get_area_prefecture_list(area_name)
-        
-        cursor = get_driver()
-        #首都圏のイベントの媒体別の予約数を集計
-        cursor.execute(sql)
-        cols = [col.name for col in cursor.description]
-        groupby_media_name_count_df = pd.DataFrame(cursor.fetchall(),columns=cols)
-        #重複行を削除する
-        groupby_media_name_count_df.drop_duplicates(keep='first',inplace=True)
-        print('groupby_media_name_count_df:',groupby_media_name_count_df)
-        groupby_media_name_count_df.rename(columns={'count': '取材数'},inplace=True)
-        data['groupby_media_name_count_df'] = groupby_media_name_count_df
-        data['groupby_media_name_count_df_column_names'] = groupby_media_name_count_df.columns.values
-        data['groupby_media_name_count_df_row_data'] = list(groupby_media_name_count_df.values.tolist())
-        print('data',data)
-        cursor = get_driver()
-        cursor.execute(f'''SELECT COUNT(店舗名),都道府県, 店舗名
+    data = request.form
+    print('dataは',data)
+    print('form.inputdate.data',form.inputdate.data)
+    target_date_jp:str = data['date']
+    target_date = data['date'].split(' (')[0].replace('年','-').replace('月','-').replace('日','')
+    print('target_date',target_date)
+    data = {}
+    data['target_date_jp'] = target_date_jp
+    data['area_name'] = area_name
+    data['target_date'] = target_date
+    data['area_name_jp'] = area_name_and_str_jp_area_name_dict[area_name]
+    area_sql_text = get_area_sql_text(area_name)
+    cursor = get_driver()
+    #首都圏のイベントの媒体別の予約数を集計
+    cursor.execute(f'''SELECT *
                 FROM schedule as schedule2
                 left join halldata as halldata2
                 on schedule2.店舗名 = halldata2.hall_name
                 WHERE イベント日 >= current_date
-                AND イベント日 <= current_date + 7
-                AND 媒体名 != 'ホールナビ'
-                AND 媒体名 != '旧イベ'
-                AND ({area_sql_text})
-                GROUP BY 店舗名,都道府県
-                ORDER BY COUNT(店舗名) desc;''')
-        cols = [col.name for col in cursor.description]
-        groupby_hall_name_count_df = pd.DataFrame(cursor.fetchall(),columns=cols)
-        #重複行を削除する
-        print(groupby_hall_name_count_df)
-        groupby_hall_name_count_df.drop_duplicates(keep='first',inplace=True)
-        print('groupby_hall_name_count_df:',groupby_hall_name_count_df)
-        groupby_hall_name_count_df.rename(columns={'count': '取材数'},inplace=True)
-        data['groupby_hall_name_count_df'] = groupby_hall_name_count_df
-        data['groupby_hall_name_count_df_column_names'] = groupby_hall_name_count_df.columns.values
-        data['groupby_hall_name_count_df_row_data'] = list(groupby_hall_name_count_df.values.tolist())
-        return render_template('tomorrow_recommend_area.html',data=data,zip=zip)
-#           /tomorrow_recommend/minamikanto/media/BASHtv-data
+                    AND イベント日 < current_date + 7
+                    AND 媒体名 != 'ホールナビ'
+                    AND イベント日 = '{target_date}'
+                    AND ({area_sql_text})
+                    ORDER BY イベント日,都道府県 desc;''')
+    cols = [col.name for col in cursor.description]
+    extract_target_date_df = pd.DataFrame(cursor.fetchall(),columns=cols)
+    extract_target_date_df.drop_duplicates(keep='first',inplace=True)
+    table_df = extract_target_date_df[['都道府県','店舗名','媒体名','取材名']]
+    table_df.sort_values(['都道府県','店舗名','媒体名','取材名'],ascending=[True,True,True,True],inplace=True)
+    table_df.drop_duplicates(keep='first',inplace=True)
+    data['iframe'] = create_syuzai_map_iframe(extract_target_date_df)
+    data['extract_target_date_df'] = table_df
+    data['extract_target_date_df_column_names'] = table_df.columns.values
+    data['extract_target_date_df_row_data'] = list(table_df.values.tolist())
+    return render_template('tomorrow_recommend_area_date.html',data=data,zip=zip)
+
 
 @app.route("/tomorrow-recommend/<area_name>/<date>-data")
 @cache.cached(timeout=300)
@@ -1667,4 +1665,4 @@ def post_test():
 
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0",debug=False, port=int(os.environ.get('PORT', 5000)))
+    app.run(host="0.0.0.0",debug=True, port=int(os.environ.get('PORT', 5000)))
