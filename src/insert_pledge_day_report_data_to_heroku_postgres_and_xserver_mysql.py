@@ -165,7 +165,7 @@ for area_name in ['hokkaido','tohoku','kanto','chubu','kansai','chugoku','sikoku
             break
         # if i > 5:
         #     break
-browser.quit()
+
 
 try:
     pattern = '東京都|北海道|(京都|大阪)府|.{2,3}県'
@@ -188,6 +188,7 @@ try:
     furture_syuzai_list_df_1['イベント日'] = pd.to_datetime(furture_syuzai_list_df_1['イベント日'])
     furture_syuzai_list_df_1 = furture_syuzai_list_df_1 [['都道府県','イベント日','曜日','店舗名','取材名','媒体名','取材ランク']]
     furture_syuzai_list_df_1.drop_duplicates(keep='first', inplace=True)
+    furture_syuzai_list_df_1['店舗名'] = furture_syuzai_list_df_1['店舗名'].map(lambda x: x.replace("'", "").replace(" ", "").replace("　", ""))
     #furture_syuzai_list_df_1 = furture_syuzai_list_df_1[~furture_syuzai_list_df_1['媒体名'] == 'ホールナビ']
 
 
@@ -316,3 +317,4 @@ except Exception as e:
     
 post_line_text(f'全ての処理が終わりました。',os.getenv('LINE_TOKEN'))
     #break
+browser.quit()
