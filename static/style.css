@@ -737,12 +737,15 @@ table > tr > th {
     align-items: center;/*上下間で中央*/
     color: #fff!important;
     display: flex!important;/*画面に合わせてサイズが変わる*/
- 　 flex-wrap:wrap!important;/*要素の折り返し設定*/
+    flex-wrap:wrap!important;/*要素の折り返し設定*/
     font-weight: bold;
     padding: 10px 4px;
-    border-radius: 10px;
-    box-shadow: none;
+    border-radius: 5px;
     transition: .2s;
+    border: 2px solid #000;
+    box-sizing: inherit;
+    box-shadow: 0 5px 0 0 rgba(0, 0, 0, .2);
+    background-color: #007acf;
     
 }
 .link-btn:hover {
@@ -752,7 +755,7 @@ table > tr > th {
 }
 /*ボタン色設定*/
 .colorname1 {
-    background: #46b5ff;
+    background: #00aaff;
 }
 .colorname2 {
     background: #ffffff;
