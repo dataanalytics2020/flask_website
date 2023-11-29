@@ -1,44 +1,57 @@
 {% extends "base.html" %}
 
 {% block head %}
-<title>明日のおすすめ店舗過去3回分析 入力画面<</title>
+<title>明日のおすすめ店舗過去3回分析 入力画面</title>
 {% endblock %}
 
 {% block content %}
 <div class="container">
-  <h3>明日のおすすめ店舗過去N回分析/h3>
-    <form action="" method="post">
-      <div class="input-group input-group-lg">
-        <span class="input-group-text" id="inputGroup-sizing-lg">店舗名</span>
-        <input type="text" id="tenpo-name" name="tenpo-name" value="{{tenpo_name}}" required>
-      </div>
-      <p>行きたい日付を選択：
-        <select class="form-select form-select-lg mb-2"  name="recommend-day">
-        {% for target_day in date_list %}
-        <option value="{{ target_day }}">{{ target_day }}</option>
-        {% endfor %}
-        </select>
-      </p>
+  <div class='row'>
+    <div class='col-12'>
       
-      <div>
-        <label for="user-age">過去何回分分析するか
-        <input type="number" id="n-times" name="n-times" min="1" max="5" value="3" required>回
-        </label>
-      <div class="heading-008 my-2 ">※過去合計1~5回まで分析可能です</div>
-      </div>
-      <div class="d-grid gap-2 col-6 mx-auto">
-        <button class="btn-lg btn-primary">検索</button>
-      </div>
-      <div class="d-grid gap-2 col-10 mx-auto text-center">
-        <p>※検索に10秒ほどかかります。</p>
-      </div>
-    </form>
+      <h1>明日のおすすめ店舗過去N回分析</h1>
+        <form action="{{url_for("target_date_recommend_report")}}" method="post">
+          <div class="input-group input-group-lg">
+            <span class="input-group-text" id="inputGroup-sizing-lg">店舗名</span>
+            <input type="text" id="tenpo-name" name="hall-name" value="{{hall_name}}" required>
+          </div>
+          <div class="d-grid gap-2 col-6 mx-auto">
+            <div id="multidatepicker"></div>
+            <input type="text" id="altField" name="target-date">
+          </div>
+          <div class="d-grid gap-2 col-6 mx-auto">
+            <button class="btn btn-outline-secondary" type="submit">検索</button>
+          </div>
+          <div class="d-grid gap-2 col-10 mx-auto text-center">
+            <p>※検索に10秒ほどかかります。</p>
+          </div>
+        </form>
+    </div>
+  </div>
 </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+<link href="https://cdn.rawgit.com/dubrox/Multiple-Dates-Picker-for-jQuery-UI/master/jquery-ui.multidatespicker.css" rel="stylesheet"/>
+<link href="https://code.jquery.com/ui/1.12.1/themes/pepper-grinder/jquery-ui.css" rel="stylesheet"/>
+<script src="https://cdn.rawgit.com/dubrox/Multiple-Dates-Picker-for-jQuery-UI/master/jquery-ui.multidatespicker.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1/i18n/jquery.ui.datepicker-ja.min.js"></script>
+<script>
+  $( document ).ready(function() {
+    $('#multidatepicker').multiDatesPicker(
+      {
+        dateFormat: 'yy/mm/dd',
+        minDate: -90,
+        maxDate: -1,
+        altField: '#altField',
+        maxPicks: 3,
+
+      })
+  });
+</script>
+
+
 {% endblock %}
 
 {% block footer %}
-<footer class="footer mt-auto py-3 bg-light">
-  <div class="container">
-    <span class="text-muted">© 2023 SloMap</span>
-  </div>
 {% endblock %}
