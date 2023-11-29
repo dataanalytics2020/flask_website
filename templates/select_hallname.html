@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}店舗検索{% endblock %}
+{% block content %}
+<div class='container'>
+    <div class='row'>
+        <div class='col-12'>
+            <div class = 'heatmap .table-wrap'>
+                <div class="scroll_area" style="width:100%;max-width:2000px;overflow-x:scroll;">
+                    <table id="hall_table" class="table table-striped">
+                        <thead>
+                            <tr>
+                                {% for col in data.select_hall_df_column_names %}
+                                <th>
+                                {{col}}
+                                </th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in data.select_hall_df_row_data %}
+                            <tr>
+                                {% for col, row_ in zip(data.select_hall_df_column_names, row) %}
+                                    {% if col == '店舗名' %}
+                                        <td><a href="/target_hallname//{{ row_ }}" >{{ row_ }}</a></td>
+                                    {% else %}
+                                        <td>{{row_}}</td>
+                                    {% endif %}
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
