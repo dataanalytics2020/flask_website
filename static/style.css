@@ -1567,6 +1567,7 @@ text-align: center; /* 内容は中央配置 */
     transition: transform .2s;
     transform: translateY(2px);
 }
+
 .button-014:hover div {
   transition: transform .2s;
   transform: translateY(2px);
