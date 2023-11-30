@@ -3,6 +3,12 @@
 https://www.slo-map.com/
 
 ## 製作過程のスクショ一覧
+### 2023/12/01時点のTOPページ
+#### TOPページにお知らせページとラベル付き機能ボタンを追加
+![image](https://github.com/dataanalytics2020/flask_website/assets/117744645/ff6e398f-384d-4c88-a2d8-81b3d86c48b0)
+![image](https://github.com/dataanalytics2020/flask_website/assets/117744645/f3c5b676-7fcf-44e5-b0ba-9cf87a25e14a)
+![image](https://github.com/dataanalytics2020/flask_website/assets/117744645/4fa2f908-bbb5-4200-bcc4-3f5a6249656d)
+![image](https://github.com/dataanalytics2020/flask_website/assets/117744645/78c8a9d6-e4a8-401e-808b-486796ffaa89)
 
 ### 2023/10/30時点の記事用サンプルサムネ
 ![Word_Cloud_test](https://github.com/dataanalytics2020/flask_website/assets/117744645/1b9b992f-46ca-4022-948d-ae269090f298)
