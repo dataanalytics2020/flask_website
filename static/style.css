@@ -1535,6 +1535,18 @@ text-align: center; /* 内容は中央配置 */
     line-height: 1.5;
 }
 
+.button-014 > div {
+  position: absolute;
+  top: -1.2em;
+  left: 0em;
+  padding: 0.2em 0.4em;
+  border-radius: 5px;
+  background-color: #01b;
+  color: #fff;
+  font-size: .7em;
+  z-index: 1;
+}
+
 .button-014 span::after {
     display: inline-block;
     transform: rotate(45deg);
@@ -1551,7 +1563,12 @@ text-align: center; /* 内容は中央配置 */
     box-shadow: 0 3px 0 0 rgba(0, 0, 0, .2);
 }
 
-.button-014:hover span {
+.button-014:hover span  {
     transition: transform .2s;
     transform: translateY(2px);
 }
+.button-014:hover div {
+  transition: transform .2s;
+  transform: translateY(2px);
+}
+

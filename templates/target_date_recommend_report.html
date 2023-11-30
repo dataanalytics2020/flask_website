@@ -32,7 +32,102 @@
         </table>
       </div>
     </div>
-  </div>
+
+    <div class="row">
+        <div class="col-12">
+            <h1><p>{{ user_data['tenpo-name'] }}<br>直近過去{{serch_number}}回合計分で最も出ていたお勧め機種TOP10</p></h1>
+            <div class="heading-008 my-2 ">※合計{{serch_number}}回分(バラは除く)</div>
+            <div class="heading-008 my-2 ">✅お勧め機種はここで確認しよう</div>
+            <div class='design16 .table-wrap'>
+              <div class="scroll_area" style="width:100%;max-width:1000px;overflow-x:scroll;">
+                <table style="width:100%;">
+              {{groupby_kisyu_table|safe}}
+                </table>
+              </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <h1>お勧め機種総差枚バブルチャート</h1>
+            <div class="heading-008 my-2 ">✅どの機種に大きな出玉配分があるか可視化</div>
+            <canvas id="bubblechart"></canvas>
+            <h1>ヒートマップ並び傾向分析</h1>
+            <div class="heading-008 my-2 ">✅6台並びやどの場所に入るか傾向があるか確認！</div>
+            <div class ='container'>
+                <div class="row">
+                    <div class="col-12">
+                        <div class = 'heatmap .table-wrap'>
+                            <div class="scroll_area" style="width:100%;max-width:2000px;overflow-x:scroll;">
+                                <table id="heatmap_table" class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            {% for col in heatmap_column_names %}
+                                            <th>
+                                            {{col}}
+                                            </th>
+                                            {% endfor %}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for row in heatmap_row_data %}
+                                        <tr>
+                                            {% for col, row_ in zip(heatmap_column_names, row) %}
+                                            <td>{{row_}}</td>
+                                            {% endfor %}
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <h1>日別機種別差枚順過去{{serch_number}}回合計データTOP30</h1>
+            <div class="heading-008 my-2 ">全台系はここから見ると👍</div>
+            <div class="scroll_area" style="width:100%;max-width:1000px;overflow-x:scroll;">
+                <table class='design17' style="width:100%;">
+                    <thead>
+                        <tr>
+                        {% for col in column_names %}
+                        <th>
+                            {{col}}
+                        </th>
+                        {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in row_data %}
+                        <tr>
+                        {% for col, row_ in zip(column_names, row) %}
+                        <td>{{row_}}</td>
+                        {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                </div>
+                </div>
+                <h1>日別機種別差枚順データTOP30</h1>
+                <div class="heading-008 my-2 ">日毎のデータはここでチェック</div>
+                {% for day_df , date in zip(display_day_df_list,target_day_list_jp) %}
+                <ul class = 'day_list '>{{ date }}</ul>
+                <div class='design16 .table-wrap'>
+                    <div class="scroll_area" style="width:100%;max-width:1000px;overflow-x:scroll;">
+                    <table style="width:100%;">
+                        {{day_df|safe}}
+                    </table>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -150,16 +245,7 @@ element.style.height = '600px';
 
 
 
-<h1><p>{{ user_data['tenpo-name'] }}<br>直近過去{{serch_number}}回合計分で最も出ていたお勧め機種TOP10</p></h1>
-<div class="heading-008 my-2 ">※合計{{serch_number}}回分(バラは除く)</div>
-<div class="heading-008 my-2 ">✅お勧め機種はここで確認しよう</div>
-<div class='design16 .table-wrap'>
-  <div class="scroll_area" style="width:100%;max-width:1000px;overflow-x:scroll;">
-    <table style="width:100%;">
-  {{groupby_kisyu_table|safe}}
-    </table>
-  </div>
-</div>
+
 
 <script>
   
@@ -304,42 +390,6 @@ element.style.height = '600px';
 
   </script>
  
-<h1>お勧め機種総差枚バブルチャート</h1>
-<div class="heading-008 my-2 ">✅どの機種に大きな出玉配分があるか可視化</div>
-<canvas id="bubblechart"></canvas>
-<h1>ヒートマップ並び傾向分析</h1>
-<div class="heading-008 my-2 ">✅6台並びやどの場所に入るか傾向があるか確認！</div>
-<div class ='container'>
-    <div class="row">
-        <div class="col-12">
-            <div class = 'heatmap .table-wrap'>
-                <div class="scroll_area" style="width:100%;max-width:2000px;overflow-x:scroll;">
-                    <table id="heatmap_table" class="table table-striped">
-                        <thead>
-                            <tr>
-                                {% for col in heatmap_column_names %}
-                                <th>
-                                {{col}}
-                                </th>
-                                {% endfor %}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for row in heatmap_row_data %}
-                            <tr>
-                                {% for col, row_ in zip(heatmap_column_names, row) %}
-                                <td>{{row_}}</td>
-                                {% endfor %}
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
 <script>
 $(document).ready(function(){
     $("#heatmap_table").DataTable({
@@ -714,43 +764,6 @@ $(document).ready(function() {
 });
 </script>
 
-<h1>日別機種別差枚順過去{{serch_number}}回合計データTOP30</h1>
-<div class="heading-008 my-2 ">全台系はここから見ると👍</div>
-<div class="scroll_area" style="width:100%;max-width:1000px;overflow-x:scroll;">
-  <table class='design17' style="width:100%;">
-      <thead>
-        <tr>
-          {% for col in column_names %}
-          <th>
-            {{col}}
-          </th>
-          {% endfor %}
-        </tr>
-      </thead>
-      <tbody>
-        {% for row in row_data %}
-        <tr>
-          {% for col, row_ in zip(column_names, row) %}
-          <td>{{row_}}</td>
-          {% endfor %}
-        </tr>
-        {% endfor %}
-      </tbody>
-  </table>
-  </div>
-</div>
-<h1>日別機種別差枚順データTOP30</h1>
-<div class="heading-008 my-2 ">日毎のデータはここでチェック</div>
-{% for day_df , date in zip(display_day_df_list,target_day_list_jp) %}
-  <ul class = 'day_list '>{{ date }}</ul>
-  <div class='design16 .table-wrap'>
-    <div class="scroll_area" style="width:100%;max-width:1000px;overflow-x:scroll;">
-      <table style="width:100%;">
-        {{day_df|safe}}
-      </table>
-    </div>
-  </div>
-{% endfor %}
 
 
 
