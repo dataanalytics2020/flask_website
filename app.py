@@ -31,6 +31,7 @@ from folium import plugins
 import branca
 import sympy
 from dotenv import load_dotenv
+import numpy as np
 load_dotenv()
 
 #df:pd.DataFrame  = pd.read_csv(r'csv/2022-12-09_touhou.csv')
@@ -542,13 +543,14 @@ def get_top():
         jp_str_day_list.append(jp_str_day)
     data['jp_str_day_list'] = jp_str_day_list
     tomorrow:date = today + timedelta(days=1)
+    datetime64_tomorrow = np.datetime64(tomorrow)
     print(tomorrow)
     tommorow_jp_str_day = tomorrow.strftime('%m').lstrip('0') + '月' + tomorrow.strftime('%d').lstrip('0') + '日' + w_list[tomorrow.weekday()]
     print(tommorow_jp_str_day)
     data['tommorow_jp_str_day'] =  tommorow_jp_str_day
     data['prefecture_id_and_name_dict'] = prefecture_id_and_name_dict
-    report_df = pd.read_csv('csv/top_location_df.csv')
-    if report_df[:1]["イベント日"].values[0] == datetime.date.today().strftime('%Y-%m-%d'):
+    report_df = pd.read_csv('csv/top_location_df.csv', parse_dates=['イベント日'])
+    if report_df[:1]["イベント日"].values[0] == np.datetime64('today', 'D'):
         print('今日のデータは取得済み')
     else:
         print('今日のデータは未取得')
@@ -572,6 +574,7 @@ def get_top():
         report_df =  pd.DataFrame(cursor.fetchall(),columns = cols )
         report_df = report_df.loc[:,~report_df.columns.duplicated()]
         report_df.to_csv('csv/top_location_df.csv',encoding='utf_8_sig',index=False)
+    report_df['イベント日'] = pd.to_datetime(report_df['イベント日'])
     all_kanto_display_df = report_df = report_df.drop_duplicates(keep='first')
     latitude_isnull_df = report_df[report_df['latitude'].isnull()]
     message = ''
@@ -580,10 +583,11 @@ def get_top():
             message += f'{isnull_hall_name}の緯度経度が取得できていません。\n'
         post_line(message)
     report_df = report_df.dropna(subset=['latitude'])
-    print('report_df',report_df)
     #(取材ランク = 'S' OR 取材ランク = 'A')のみ抽出
     report_df = report_df[report_df['取材ランク'].isin(['S','A'])]
-    map_report_df = report_df[report_df['イベント日'] == tomorrow.strftime('%Y-%m-%d')]
+    print('report_df_2',report_df)
+    map_report_df = report_df[report_df['イベント日'] == datetime64_tomorrow ]
+    print('map_report_df',map_report_df)
     map_report_df = map_report_df[['店舗名','取材名','媒体名']].drop_duplicates(keep='first')
     map_report_df = map_report_df.sort_values(['店舗名','媒体名']).reset_index(drop=True)
 
@@ -595,11 +599,11 @@ def get_top():
     folium_map = folium.Map(location=[prefecture_latitude,prefecture_longitude], zoom_start=10, width="100%", height="100%")
     # 地図表示
     # マーカープロット（ポップアップ設定，色変更，アイコン変更）
-    print('map_report_df',map_report_df)
+    print(map_report_df)
     for tenpo_name in map_report_df['店舗名'].unique():
         print(tenpo_name)
         extract_syuzai_df_1 = report_df[report_df['店舗名'] == tenpo_name]
-        extract_syuzai_df_1 = extract_syuzai_df_1[extract_syuzai_df_1['イベント日'] == tomorrow.strftime('%Y-%m-%d')]
+        extract_syuzai_df_1 = extract_syuzai_df_1[extract_syuzai_df_1['イベント日'] == datetime64_tomorrow ]
         extract_syuzai_df_1.drop_duplicates(keep='first',inplace=True)
         #display(extract_syuzai_df_1)
         print(extract_syuzai_df_1)
@@ -640,7 +644,6 @@ def get_top():
         im.save('syuzai_image.png', quality=95)
         img = 'syuzai_image.png'
         popup_df = extract_syuzai_df_1[['イベント日','店舗名','媒体名','取材名']].sort_values('店舗名')#.reset_index(drop=True)#.T
-        popup_df['イベント日'] = pd.to_datetime(popup_df['イベント日'])
         popup_df['イベント日'] = popup_df['イベント日'].map(convert_sql_date_to_jp_date_and_weekday)
         popup_df_html = popup_df.to_html(escape=False,index=False,table_id="mystyle",justify='center',classes='table table-striped table-hover table-sm')
         popup_df_html +=f'<a href="/tomorrow_recommend/minamikantou/hall/{tenpo_name}"  target="_parent">{tenpo_name}※店舗詳細ページに飛びます </a>'
