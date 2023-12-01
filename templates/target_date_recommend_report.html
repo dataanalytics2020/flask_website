@@ -50,7 +50,9 @@
         <div class="col-12">
             <h1>お勧め機種総差枚バブルチャート</h1>
             <div class="heading-008 my-2 ">✅どの機種に大きな出玉配分があるか可視化</div>
-            <canvas id="bubblechart" width="100%" height="600"></canvas>
+            <div class="canvas-container">
+                <canvas id="bubblechart"></canvas>
+            </div>
             <h1>ヒートマップ並び傾向分析</h1>
         </div>
     </div>
@@ -268,7 +270,7 @@ var bubble_chart_options = {
         legend: {             // 凡例の設定
         position: "bottom",     // 表示位置
         labels: {              // 凡例文字列の設定
-            fontSize: 13,
+            fontSize: 10,
         }
         },
         // タイトル
@@ -359,6 +361,12 @@ var bubble_chart_options = {
 
 var ctx = $("#bubblechart")[0].getContext("2d");
 // バブルチャートの描画
+$(function () {
+    var container = $('.canvas-container');
+    var ctx= $('#bubblechart');
+    ctx.attr('width', container.width());
+    ctx.attr('height', 500);
+});
 var bubbleChart = new Chart(ctx, 
         {
             type: 'bubble',
@@ -368,7 +376,8 @@ var bubbleChart = new Chart(ctx,
 });
 Chart.defaults.global.defaultFontFamily = "sans-serif";
 Chart.defaults.global.defaultFontSize = 13;
-Chart.defaults.global.height = 500;
+
+
 
 </script>
 
