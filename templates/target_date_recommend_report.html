@@ -50,9 +50,7 @@
         <div class="col-12">
             <h1>お勧め機種総差枚バブルチャート</h1>
             <div class="heading-008 my-2 ">✅どの機種に大きな出玉配分があるか可視化</div>
-            <div class="canvas-container">
-                <canvas id="bubblechart"></canvas>
-            </div>
+            <canvas id="bubblechart"></canvas>
             <h1>ヒートマップ並び傾向分析</h1>
         </div>
     </div>
@@ -362,10 +360,9 @@ var bubble_chart_options = {
 var ctx = $("#bubblechart")[0].getContext("2d");
 // バブルチャートの描画
 $(function () {
-    var container = $('.canvas-container');
-    var ctx= $('#bubblechart');
-    ctx.attr('width', container.width());
-    ctx.attr('height', 500);
+    var ctx1= $('#bubblechart');
+    ctx1.attr('width', "100%");
+    ctx1.attr('height', 500);
 });
 var bubbleChart = new Chart(ctx, 
         {

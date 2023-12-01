@@ -556,17 +556,13 @@ table > tr > th {
 }
 
 
-#bubblechart  {
-  position: relative !important;
-  font-family: sans-serif;
-}
-
 .canvas-container {
   position: relative;
-  width:  calc(100% - 0px);
-  height: 500px;
+  width:  100%;
+  height: calc(540vw / 3.75);
   overflow: hidden;
   margin-bottom : 5px;
+  margin: 3px;
 }
 
 .gmap-css-responsive {
