@@ -9,28 +9,27 @@
 {% block content %}
 <div class ='container'>
     <div class="row">
-      <div class="col-12">
-        <h1>分析結果</h1>
-        <div>
-          <p>比較するデータは{{ user_data['tenpo-name'] }}の</p>
-            {% for date in target_day_list_jp %}
-              <ul class = 'day_list '>{{ date }}</ul>
-            {% endfor %}
-          <p>{{serch_number}}回分データを今回集計しました。</p>
+        <div class="col-12">
+            <h1>分析結果</h1>
+            <div>
+                <p>比較するデータは{{ user_data['tenpo-name'] }}の</p>
+                    {% for date in target_day_list_jp %}
+                    <ul class = 'day_list '>{{ date }}</ul>
+                    {% endfor %}
+                <p>{{serch_number}}回分データを今回集計しました。</p>
+            </div>
         </div>
-      </div>
-    </div>
+        <div class="col-12">
+            <canvas id="canvas"></canvas>
+        </div>
 
-    <div class="col-12">
-      <canvas id="canvas"></canvas>
-    </div>
-
-    <div class="col-12">
-      <div class="scroll_area" style="width:100%;max-width:700px;overflow-x:scroll;">
-        <table style="width:100%;">
-          {{samai_table|safe}}
-        </table>
-      </div>
+        <div class="col-12">
+            <div class="scroll_area" style="width:100%;max-width:700px;overflow-x:scroll;">
+                <table style="width:100%;">
+                    {{samai_table|safe}}
+                </table>
+            </div>
+        </div>
     </div>
 
     <div class="row">
@@ -39,11 +38,11 @@
             <div class="heading-008 my-2 ">※合計{{serch_number}}回分(バラは除く)</div>
             <div class="heading-008 my-2 ">✅お勧め機種はここで確認しよう</div>
             <div class='design16 .table-wrap'>
-              <div class="scroll_area" style="width:100%;max-width:1000px;overflow-x:scroll;">
-                <table style="width:100%;">
-              {{groupby_kisyu_table|safe}}
-                </table>
-              </div>
+                <div class="scroll_area" style="width:100%;max-width:1000px;overflow-x:scroll;">
+                    <table style="width:100%;">
+                        {{groupby_kisyu_table|safe}}
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -51,37 +50,35 @@
         <div class="col-12">
             <h1>お勧め機種総差枚バブルチャート</h1>
             <div class="heading-008 my-2 ">✅どの機種に大きな出玉配分があるか可視化</div>
-            <canvas id="bubblechart"></canvas>
+            <canvas id="bubblechart" width="100%" height="600"></canvas>
             <h1>ヒートマップ並び傾向分析</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
             <div class="heading-008 my-2 ">✅6台並びやどの場所に入るか傾向があるか確認！</div>
-            <div class ='container'>
-                <div class="row">
-                    <div class="col-12">
-                        <div class = 'heatmap .table-wrap'>
-                            <div class="scroll_area" style="width:100%;max-width:2000px;overflow-x:scroll;">
-                                <table id="heatmap_table" class="table table-striped">
-                                    <thead>
-                                        <tr>
-                                            {% for col in heatmap_column_names %}
-                                            <th>
-                                            {{col}}
-                                            </th>
-                                            {% endfor %}
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for row in heatmap_row_data %}
-                                        <tr>
-                                            {% for col, row_ in zip(heatmap_column_names, row) %}
-                                            <td>{{row_}}</td>
-                                            {% endfor %}
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
+            <div class = 'heatmap .table-wrap'>
+                <div class="scroll_area" style="width:100%;max-width:2000px;overflow-x:scroll;">
+                    <table id="heatmap_table" class="table table-striped">
+                        <thead>
+                            <tr>
+                                {% for col in heatmap_column_names %}
+                                <th>
+                                {{col}}
+                                </th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in heatmap_row_data %}
+                            <tr>
+                                {% for col, row_ in zip(heatmap_column_names, row) %}
+                                <td>{{row_}}</td>
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -129,9 +126,8 @@
         </div>
     </div>
 </div>
-
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.bundle.min.js"></script>
 <script>
-
 window.onload = function() {
   ctx = document.getElementById("canvas").getContext("2d");
     window.myBar = new Chart(ctx, {
@@ -168,12 +164,6 @@ window.onload = function() {
   }
 };
 </script>
-
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.bundle.min.js"></script>
-
-
-  
-
 <script>
 var barChartData = {
     labels: {{ target_day_list_jp|safe }},
@@ -237,159 +227,151 @@ var complexChartOption = {
             },
         }],
     }
-
 };
-element.style.width = '400px';
-element.style.height = '600px';
 </script>
-
-
-
-
-
 <script>
-  
-  $(function(){
-    // バブルチャートのデータ
-    var bubleChartData = {
-        datasets: [
-        {% for index, row in output_bubble_chart_df.iterrows() %}
-            {
-              data: [{"x":{{ row['平均G数']  }} ,"y":{{ row['平均差枚'] }}, "r":{{ row['合計差枚'] * bubble_chart_division_calc_num }}} ,],
-              // 色（2個目）
-              {% autoescape false %}
-                backgroundColor:["{{ row['color'] }}"],
-              {% endautoescape %}
-              // ラベル（2個目）
-              {% autoescape false %}
-                label: ["{{ row['機種名'] }}"]  
-              {% endautoescape %}
-            },
-        {% endfor %}
-        ]};
+$(function(){
+// バブルチャートのデータ
+var bubleChartData = {
+    datasets: [
+    {% for index, row in output_bubble_chart_df.iterrows() %}
+        {
+            data: [{"x":{{ row['平均G数']  }} ,"y":{{ row['平均差枚'] }}, "r":{{ (row['合計差枚'] * bubble_chart_division_calc_num) + 17 }}} ,],
+            // 色（2個目）
+            {% autoescape false %}
+            backgroundColor:["{{ row['color'] }}"],
+            {% endautoescape %}
+            // ラベル（2個目）
+            {% autoescape false %}
+            label: ["{{ row['機種名'] }}"]  
+            {% endautoescape %}
+        },
+    {% endfor %}
+    ]};
 
-    // オプション
-    var bubble_chart_options = {
-          layout: {
-            font: {
-                size: 13,
-                weight: 'bold'
-            },
-            padding: {
-                left: 0,
-                right: 0,
-                top: 0,
-                bottom: 0
-              }
-            },
-          responsive: true,
-          maintainAspectRatio: false,
-          legend: {             // 凡例の設定
-            position: "bottom",     // 表示位置
-            labels: {              // 凡例文字列の設定
-                fontSize: 13,
+// オプション
+var bubble_chart_options = {
+        layout: {
+        font: {
+            size: 13,
+            weight: 'bold'
+        },
+        padding: {
+            left: 0,
+            right: 0,
+            top: 0,
+            bottom: 0
             }
-          },
-          // タイトル
+        },
+        responsive: true,
+        maintainAspectRatio: false,
+        legend: {             // 凡例の設定
+        position: "bottom",     // 表示位置
+        labels: {              // 凡例文字列の設定
+            fontSize: 13,
+        }
+        },
+        // タイトル
 
-          tooltips: {
-            callbacks: {
-               label: function(t, d) {
-                  var rLabel = d.datasets[t.datasetIndex].data[t.index].r;
-                  return d.datasets[t.datasetIndex].label + '\n'
-                  + '平均' + t.xLabel + 'G 平差' + t.yLabel + '枚 総差' + (rLabel /{{bubble_chart_division_calc_num}} /10000).toFixed(1) + '万枚';
-               }
+        tooltips: {
+        callbacks: {
+            label: function(t, d) {
+                var rLabel = d.datasets[t.datasetIndex].data[t.index].r;
+                return d.datasets[t.datasetIndex].label + '\n'
+                + '平均' + t.xLabel + 'G 平差' + t.yLabel + '枚 総差' + ( (rLabel /{{bubble_chart_division_calc_num}} /10000)).toFixed(1) + '万枚';
             }
-          },
-              // 平均G数
-          scales: {
-              x: {
-                  ticks: {
-                    padding:10,    // 個別設定不可
-                    stepSize: 1000,
-                    font: {
-                      size: 13,
-                    },
-                    showLabelBackdrop: true,
-                    backdropPadding: { x: 1, y: 2 },
-                    major: {
-                      enabled: true,
-                    },
-                    align: 'center',
-                    crossAlign: 'center',
-                    sampleSize: 24,
-                    callback: function(label, index, labels) {
-                        return '平均' + value + '枚';}
-                  },
-                  title: {
-                    display: true,
-                    text: '平均G数',
-                    padding: {
-                      top: 0,    // 右側
-                      bottom: 0  // 左側
-                    },
-                    font: {
-                      size: 13,
-                      weight: 'bold'
-                    },
-                    color: '#000'},
- 
-              },
-              y: {
+        }
+        },
+            // 平均G数
+        scales: {
+            x: {
+                ticks: {
+                padding:10,    // 個別設定不可
+                stepSize: 1000,
+                font: {
+                    size: 13,
+                },
+                showLabelBackdrop: true,
+                backdropPadding: { x: 1, y: 2 },
+                major: {
+                    enabled: true,
+                },
+                align: 'center',
+                crossAlign: 'center',
+                sampleSize: 24,
+                callback: function(label, index, labels) {
+                    return '平均' + value + '枚';}
+                },
                 title: {
-                  display: true,
-                  text: '平均差枚',
-                  padding: {
+                display: true,
+                text: '平均G数',
+                padding: {
                     top: 0,    // 右側
                     bottom: 0  // 左側
-                  },
-                  font: {
-                    size: 13,
-                    weight: 'bold'
-                  },
-                  color: '#000'},
-                // 最小値・最大値
-                // 目盛ラベル
-                ticks: {
-                  padding: 15,    // 個別設定不可
-                  stepSize: 1000,
-                  font: {
-                    size: 13,
-                    weight: 'bold'
-                  },
-                  showLabelBackdrop: true,
-                  backdropPadding: { x: 4, y: 2 },
-                  major: {
-                    enabled: true,
-                  },
-                  align: 'center',
-                  crossAlign: 'center',
-                  sampleSize: 24,
-                  callback: function(label, index, labels) {
-                    return label + '枚';
-                  }
                 },
+                font: {
+                    size: 13,
+                    weight: 'bold'
+                },
+                color: '#000'},
 
-              },
-          },
-    };
+            },
+            y: {
+            title: {
+                display: true,
+                text: '平均差枚',
+                padding: {
+                top: 0,    // 右側
+                bottom: 0  // 左側
+                },
+                font: {
+                size: 13,
+                weight: 'bold'
+                },
+                color: '#000'},
+            // 最小値・最大値
+            // 目盛ラベル
+            ticks: {
+                padding: 15,    // 個別設定不可
+                stepSize: 1000,
+                font: {
+                size: 13,
+                weight: 'bold'
+                },
+                showLabelBackdrop: true,
+                backdropPadding: { x: 4, y: 2 },
+                major: {
+                enabled: true,
+                },
+                align: 'center',
+                crossAlign: 'center',
+                sampleSize: 24,
+                callback: function(label, index, labels) {
+                return label + '枚';
+                }
+            },
 
-    // コンテキストのオブジェクト
-    
-    var ctx = $("#bubblechart")[0].getContext("2d");
-    // バブルチャートの描画
-    var bubbleChart = new Chart(ctx, 
-            {
-               type: 'bubble',
-               data: bubleChartData,
-               options: bubble_chart_options
-            });
-  });
-  Chart.defaults.global.defaultFontFamily = "sans-serif";
-  Chart.defaults.global.defaultFontSize = 13;
+            },
+        },
+};
 
-  </script>
- 
+// コンテキストのオブジェクト
+
+var ctx = $("#bubblechart")[0].getContext("2d");
+// バブルチャートの描画
+var bubbleChart = new Chart(ctx, 
+        {
+            type: 'bubble',
+            data: bubleChartData,
+            options: bubble_chart_options
+        });
+});
+Chart.defaults.global.defaultFontFamily = "sans-serif";
+Chart.defaults.global.defaultFontSize = 13;
+Chart.defaults.global.height = 500;
+
+</script>
+
 <script>
 $(document).ready(function(){
     $("#heatmap_table").DataTable({
@@ -763,8 +745,5 @@ $(document).ready(function() {
     });
 });
 </script>
-
-
-
 
 {% endblock %}

@@ -556,8 +556,7 @@ table > tr > th {
 }
 
 
-#bubblechart {
-  width: 100%;
+#bubblechart  {
   position: relative !important;
   font-family: sans-serif;
 }
