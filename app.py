@@ -583,10 +583,12 @@ def get_top():
             message += f'{isnull_hall_name}の緯度経度が取得できていません。\n'
         post_line(message)
     report_df = report_df.dropna(subset=['latitude'])
+    tomorrow_report_df = report_df
     #(取材ランク = 'S' OR 取材ランク = 'A')のみ抽出
-    report_df = report_df[report_df['取材ランク'].isin(['S','A'])]
+    report_df =  report_df[report_df['取材ランク'].isin(['S','A'])]
     print('report_df_2',report_df)
     map_report_df = report_df[report_df['イベント日'] == datetime64_tomorrow ]
+    tomorrow_report_df = tomorrow_report_df[tomorrow_report_df['イベント日'] == datetime64_tomorrow ]
     print('map_report_df',map_report_df)
     map_report_df = map_report_df[['店舗名','取材名','媒体名']].drop_duplicates(keep='first')
     map_report_df = map_report_df.sort_values(['店舗名','媒体名']).reset_index(drop=True)
@@ -602,7 +604,7 @@ def get_top():
     print(map_report_df)
     for tenpo_name in map_report_df['店舗名'].unique():
         print(tenpo_name)
-        extract_syuzai_df_1 = report_df[report_df['店舗名'] == tenpo_name]
+        extract_syuzai_df_1 = tomorrow_report_df[tomorrow_report_df['店舗名'] == tenpo_name]
         extract_syuzai_df_1 = extract_syuzai_df_1[extract_syuzai_df_1['イベント日'] == datetime64_tomorrow ]
         extract_syuzai_df_1.drop_duplicates(keep='first',inplace=True)
         #display(extract_syuzai_df_1)
@@ -1172,7 +1174,7 @@ def tomorrow_recommend_area_syuzai_syuzainame(area_name,syuzai_name):
                     AND 媒体名 != 'ホールナビ'
                     AND 取材名 = '{syuzai_name}'
                     AND ({area_sql_text})
-                    ORDER BY イベント日,都道府県 desc;''')
+                    ORDER BY イベント日,都道府県,媒体名 desc;''')
     cols = [col.name for col in cursor.description]
     extract_syuzai_name_df = pd.DataFrame(cursor.fetchall(),columns=cols)
     extract_syuzai_name_df.drop_duplicates(keep='first',inplace=True)
@@ -1201,7 +1203,7 @@ def tomorrow_recommend_area_hall_hallname(area_name,hall_name):
             WHERE (店舗名 = '{hall_name}') or (hall_name = '{hall_name}')
                 AND 媒体名 != 'ホールナビ'
                 AND ({area_sql_text})
-                ORDER BY イベント日,都道府県 desc;''')
+                ORDER BY イベント日,都道府県,媒体名 desc;''')
     cols = [col.name for col in cursor.description]
     extract_hall_name_df = pd.DataFrame(cursor.fetchall(),columns=cols)
     for column_name in ['twitter_url','pworld_url','dmm_url','line_url']:
@@ -1246,7 +1248,7 @@ def tomorrow_recommend_area_media_medianame(area_name,media_name):
                 AND イベント日 < current_date + 7
                 AND 媒体名 = '{media_name}'
                 AND ({area_sql_text})
-                ORDER BY イベント日,都道府県 desc;''')
+                ORDER BY イベント日,都道府県,媒体名 desc;''')
     cols = [col.name for col in cursor.description]
     extract_media_name_df = pd.DataFrame(cursor.fetchall(),columns=cols)
     extract_media_name_df.drop_duplicates(keep='first',inplace=True)
@@ -1286,7 +1288,7 @@ def tomorrow_recommend_area_prefecture_prefecturename(area_name,prefecture_name)
                 AND イベント日 < current_date + 7
                 AND 媒体名 != 'ホールナビ'
                 AND 都道府県 = '{prefecture_name}'
-                ORDER BY イベント日,都道府県 desc;''')
+                ORDER BY イベント日,都道府県,媒体名 desc;''')
     cols = [col.name for col in cursor.description]
     extract_prefecture_name_df = pd.DataFrame(cursor.fetchall(),columns=cols)
     extract_prefecture_name_df.drop_duplicates(keep='first',inplace=True)
@@ -1393,7 +1395,7 @@ def tomorrow_recommend_area_post(area_name):
                     AND 媒体名 != 'ホールナビ'
                     AND イベント日 = '{target_date}'
                     AND ({area_sql_text})
-                    ORDER BY イベント日,都道府県 desc;''')
+                    ORDER BY イベント日,都道府県,媒体名 desc;''')
     cols = [col.name for col in cursor.description]
     extract_target_date_df = pd.DataFrame(cursor.fetchall(),columns=cols)
     extract_target_date_df.drop_duplicates(keep='first',inplace=True)
@@ -1508,53 +1510,38 @@ def prefecture_post_detail():
         redirect(url_for('test3'))
 
 #post_prefecture_list.html
-@app.route("/post_prefecture_list/<pref_name_en>", methods=['GET','POST'])
+@app.route("/post_prefecture_list/<pref_name_en>", methods=['GET'])
 @cache.cached(timeout=300)
 def post_prefecture_list(pref_name_en):
-    if request.method == 'GET':
-        data = {}
-        data['pref_name_en'] = pref_name_en
-        prefecture_df = pd.read_csv('csv/pref_lat_lon.csv')
-        #index番号で取り出す
-        data['pref_name_jp'] = prefecture_df[prefecture_df['pref_name_en'] == pref_name_en]['pref_name'].values[0]
-        #北海道が選択された場合 wordpressのタグのidは72
-        prefecture_tag_id:int = prefecture_df[prefecture_df['pref_name_en'] == pref_name_en].index[0] + 72
-        print('pref_name_en',pref_name_en)  
-        print('data',data) 
-        # アクセス情報の設定
-        SITE_URL = os.getenv('WORDPRESS_PACHISLO7_URL')
-        API_URL = f"{SITE_URL}/wp-json/wp/v2/"
-        AUTH_USER = os.getenv('WORDPRESS_PACHISLO7_ID')
-        AUTH_PASS = os.getenv('WORDPRESS_PACHISLO7_PW')
-        label = f'posts?_embed&tags={str(prefecture_tag_id)}+&status=draft'
-        url = f"{API_URL}{label}"
-        # すべてのアイテムを取得
-        print(url)
-        items = requests.get(url, auth=(AUTH_USER, AUTH_PASS)).json()
-        #thumbnail_url = res[0]['_embedded']['wp:featuredmedia'][0]['source_url']
-        print('items',type(items),items)
-        post_list_df = pd.DataFrame(items)
-        page = request.args.get(get_page_parameter(), type=int, default=1)
-        #jsonから取得したデータをページネーションで表示する
-        items = items[(page-1)*10:page*10]
-        pagination = Pagination(page=page, total=len(items),  per_page=1, css_framework='bootstrap4')
 
-        #サムネイル表示
-        # for i,row in post_list_df.iterrows():
-        #     #print(row)
-        #     thumbnail_url = row['_embedded']['wp:featuredmedia'][0]['source_url']
-        #     print(thumbnail_url)
-        #     title = row['title']['rendered']
-        #     print(title)
-        #     print(row['link'])
-        #     slug = row['slug']
-        #     break
+    data = {}
+    data['pref_name_en'] = pref_name_en
+    prefecture_df = pd.read_csv('csv/pref_lat_lon.csv')
+    #index番号で取り出す
+    data['pref_name_jp'] = prefecture_df[prefecture_df['pref_name_en'] == pref_name_en]['pref_name'].values[0]
+    #北海道が選択された場合 wordpressのタグのidは72
+    prefecture_tag_id:int = prefecture_df[prefecture_df['pref_name_en'] == pref_name_en].index[0] + 72
+    print('pref_name_en',pref_name_en)  
+    print('data',data) 
+    # アクセス情報の設定
+    SITE_URL = os.getenv('WORDPRESS_PACHISLO7_URL')
+    API_URL = f"{SITE_URL}/wp-json/wp/v2/"
+    AUTH_USER = os.getenv('WORDPRESS_PACHISLO7_ID')
+    AUTH_PASS = os.getenv('WORDPRESS_PACHISLO7_PW')
+    label = f'posts?_embed&tags={str(prefecture_tag_id)}+&status=draft'
+    url = f"{API_URL}{label}"
+    # すべてのアイテムを取得
+    print(url)
+    items = requests.get(url, auth=(AUTH_USER, AUTH_PASS)).json()
+    #thumbnail_url = res[0]['_embedded']['wp:featuredmedia'][0]['source_url']
+    print('items',type(items),items)
+    post_list_df = pd.DataFrame(items)
+    page = request.args.get(get_page_parameter(), type=int, default=1)
+    #jsonから取得したデータをページネーションで表示する
+    items = items[(page-1)*10:page*10]
+    pagination = Pagination(page=page, total=len(items),  per_page=1, css_framework='bootstrap4')
+    return render_template('post_prefecture_list.html',items=items,data=data,enumerate=enumerate,pagination=pagination)
 
-
-        return render_template('post_prefecture_list.html',items=items,data=data,enumerate=enumerate,pagination=pagination)
-    else:
-        redirect(url_for('test3'))
-        
 @app.route("/post_prefecture/<post_slug>", methods=['GET','POST'])
 @cache.cached(timeout=300)
 def post_prefecture(post_slug):
@@ -1598,7 +1585,6 @@ def post_prefecture(post_slug):
         data['iframe'] = create_post_map_iframe(location_name_df,groupby_date_kisyubetu_df)
         return render_template('prefecture_post_detail.html',data=data,enumerate=enumerate)
 
-
 @app.route("/news/<post_slug>", methods=['GET','POST'])
 def news_detail(post_slug):
     if request.method == 'GET':
@@ -1628,14 +1614,14 @@ def select_hallname():
         data['select_hall_df_column_names'] = select_hall_df.columns.values
         data['select_hall_df_row_data'] = list(select_hall_df.values.tolist())
         return render_template('select_hallname.html',data=data,zip=zip)
-    
+
 @app.route("/target_hallname/<hall_name>", methods=['GET'])
 def target_hallname(hall_name):
     today = date.today()
     date_list = [today + timedelta(days=day) for day in range(0,9)]
     date_list = [date.strftime("%Y-%m-%d") for date in date_list]
     return render_template('target_date_recommend_schedule.html',date_list=date_list,hall_name=hall_name)
-    
+
 @app.route("/privacy_policy")
 def privacy_policy():
     return render_template('privacy_policy.html')
@@ -1654,6 +1640,5 @@ def post_test():
     data['prefecture_id_and_name_dict'] = prefecture_id_and_name_dict
     return render_template('test2.html',data=data)
 
-
 if __name__ == '__main__':
-    app.run(host="0.0.0.0",debug=True, port=int(os.environ.get('PORT', 5000)))
+    app.run(host="0.0.0.0",debug=False, port=int(os.environ.get('PORT', 5000)))
