@@ -549,7 +549,7 @@ def get_top():
     print(tommorow_jp_str_day)
     data['tommorow_jp_str_day'] =  tommorow_jp_str_day
     data['prefecture_id_and_name_dict'] = prefecture_id_and_name_dict
-    report_df = pd.read_csv('csv/top_location_df.csv', parse_dates=['イベント日'])
+    report_df = pd.read_csv('csv/kanto_top_location_df.csv', parse_dates=['イベント日'])
     if report_df[:1]["イベント日"].values[0] == np.datetime64('today', 'D'):
         print('今日のデータは取得済み')
     else:
@@ -573,7 +573,7 @@ def get_top():
         print('cols',cols)
         report_df =  pd.DataFrame(cursor.fetchall(),columns = cols )
         report_df = report_df.loc[:,~report_df.columns.duplicated()]
-        report_df.to_csv('csv/top_location_df.csv',encoding='utf_8_sig',index=False)
+        report_df.to_csv('csv/kanto_top_location_df.csv',encoding='utf_8_sig',index=False)
     report_df['イベント日'] = pd.to_datetime(report_df['イベント日'])
     all_kanto_display_df = report_df = report_df.drop_duplicates(keep='first')
     latitude_isnull_df = report_df[report_df['latitude'].isnull()]
