@@ -112,4 +112,4 @@ Janome==0.5.0
 wordcloud==1.9.2
 flask-paginate==2023.10.24
 Flask-Caching==2.1.0
-numpy==1.26.2
+numpy==1.24.3
