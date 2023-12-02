@@ -1648,4 +1648,4 @@ def post_test():
     return render_template('test2.html',data=data)
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0",debug=False, port=int(os.environ.get('PORT', 5000)))
+    app.run(host="0.0.0.0",debug=True, port=int(os.environ.get('PORT', 5000)))
