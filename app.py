@@ -549,10 +549,14 @@ def get_top():
     print(tommorow_jp_str_day)
     data['tommorow_jp_str_day'] =  tommorow_jp_str_day
     data['prefecture_id_and_name_dict'] = prefecture_id_and_name_dict
+    try:
+        report_row_1 = report_df[:1]["イベント日"].values[0]
+    except:
+        report_row_1 = 'NONE'
     report_df = pd.read_csv(r'csv\kanto_top_location_df.csv', parse_dates=['イベント日'])
-    if report_df[:1]["イベント日"].values[0] == np.datetime64('today', 'D'):
+    if report_row_1 == np.datetime64('today', 'D'):
         post_line('今日のデータは取得済み'+str(type(report_df[:1]['イベント日'].values[0]))+"to"+str(np.datetime64('today', 'D')))
-        post_line('report_df'+str(report_df[:1]["イベント日"].values[0]))
+        post_line('report_df'+str(report_row_1))
     else:
         print('今日のデータは未取得')
         post_line("report_df[:1]['イベント日'].values[0] == np.datetime64('today', 'D')"+str(type(report_df[:1]['イベント日'].values[0]))+"to"+str(np.datetime64('today', 'D')))
@@ -575,7 +579,7 @@ def get_top():
         report_df =  pd.DataFrame(cursor.fetchall(),columns = cols )
         report_df = report_df.loc[:,~report_df.columns.duplicated()]
         print(report_df)
-        post_line('report_df'+str(report_df[:1]["イベント日"].values[0]))
+        post_line('report_df'+str(report_row_1))
         report_df.to_csv(r'csv\kanto_top_location_df.csv',index=False)
     report_df['イベント日'] = pd.to_datetime(report_df['イベント日'])
     all_kanto_display_df = report_df = report_df.drop_duplicates(keep='first')
