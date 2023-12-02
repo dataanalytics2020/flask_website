@@ -549,12 +549,13 @@ def get_top():
     print(tommorow_jp_str_day)
     data['tommorow_jp_str_day'] =  tommorow_jp_str_day
     data['prefecture_id_and_name_dict'] = prefecture_id_and_name_dict
-    report_df = pd.read_csv('csv/kanto_top_location_df.csv', parse_dates=['イベント日'])
+    report_df = pd.read_csv(r'csv\kanto_top_location_df.csv', parse_dates=['イベント日'])
     if report_df[:1]["イベント日"].values[0] == np.datetime64('today', 'D'):
-        print('今日のデータは取得済み')
+        post_line('今日のデータは取得済み'+str(type(report_df[:1]['イベント日'].values[0]))+"to"+str(np.datetime64('today', 'D')))
+        post_line('report_df'+str(report_df[:1]["イベント日"].values[0]))
     else:
         print('今日のデータは未取得')
-        post_line('今日のデータは未取得です')
+        post_line("report_df[:1]['イベント日'].values[0] == np.datetime64('today', 'D')"+str(type(report_df[:1]['イベント日'].values[0]))+"to"+str(np.datetime64('today', 'D')))
         area_sql_text = get_area_sql_text('minamikantou')
         cursor = get_driver()
         sql = f'''SELECT イベント日,都道府県,店舗名,取材名,取材ランク,媒体名,latitude,longitude
@@ -562,7 +563,7 @@ def get_top():
                 left join halldata as halldata2
                 on schedule2.店舗名 = halldata2.hall_name
                 WHERE イベント日 > current_date
-                AND イベント日 <= current_date + 7
+                AND イベント日 <= current_date + 3
                 AND 媒体名 != 'ホールナビ'
                 AND 媒体名 != '旧イベ'
                 AND ({area_sql_text})
@@ -573,7 +574,9 @@ def get_top():
         print('cols',cols)
         report_df =  pd.DataFrame(cursor.fetchall(),columns = cols )
         report_df = report_df.loc[:,~report_df.columns.duplicated()]
-        report_df.to_csv('csv/kanto_top_location_df.csv',encoding='utf_8_sig',index=False)
+        print(report_df)
+        post_line('report_df'+str(report_df[:1]["イベント日"].values[0]))
+        report_df.to_csv(r'csv\kanto_top_location_df.csv',index=False)
     report_df['イベント日'] = pd.to_datetime(report_df['イベント日'])
     all_kanto_display_df = report_df = report_df.drop_duplicates(keep='first')
     latitude_isnull_df = report_df[report_df['latitude'].isnull()]
