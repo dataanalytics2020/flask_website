@@ -556,7 +556,7 @@ def get_top():
         report_row_1 = 'NONE'
     if report_row_1 == np.datetime64('today', 'D'):
         post_line('今日のデータは取得済み'+str(type(report_df[:1]['イベント日'].values[0]))+"to"+str(np.datetime64('today', 'D')))
-        post_line('report_df' +heroku run bash str(report_row_1))
+        post_line('report_df' + str(report_row_1))
     else:
         print('今日のデータは未取得')
         post_line("report_df[:1]['イベント日'].values[0] == np.datetime64('today', 'D')は" + str(type(report_df[:1]['イベント日'].values[0]))+"と"+str(type(np.datetime64('today', 'D'))))
