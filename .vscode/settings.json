@@ -3,5 +3,7 @@
         "csv",
         "django-html",
         "jinja"
-    ]
+    ],
+    "cSpell.workspaceRootPath": "${workspaceFolder:client}",
+    "typescript.workspaceSymbols.scope": "currentProject"
 }
