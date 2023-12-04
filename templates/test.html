@@ -11,7 +11,7 @@
                     <table id="heatmap_table" class="table table-striped">
                         <thead>
                             <tr>
-                                {% for col in column_names %}
+                                {% for col in heatmap_column_names %}
                                 <th>
                                 {{col}}
                                 </th>
@@ -19,9 +19,9 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for row in row_data %}
+                            {% for row in heatmap_row_data %}
                             <tr>
-                                {% for col, row_ in zip(column_names, row) %}
+                                {% for col, row_ in zip(heatmap_column_names, row) %}
                                 <td>{{row_}}</td>
                                 {% endfor %}
                             </tr>

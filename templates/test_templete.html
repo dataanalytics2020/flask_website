@@ -1,10 +1,11 @@
 {% extends "base.html" %}
-{% block title %}Home{% endblock %}
+{% block title %}ポストテスト{% endblock %}
 {% block content %}
 <div class='container'>
     <div class='row'>
         <div class='col-12'>
-        
+            対象の日付:{{ data.target_date_list }}
+            対象の店舗名:{{ data.hall_name }}
         </div>
     </div>
 </div>
