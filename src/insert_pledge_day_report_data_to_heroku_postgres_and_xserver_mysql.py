@@ -120,7 +120,7 @@ for area_name in ['hokkaido','tohoku','kanto','chubu','kansai','chugoku','sikoku
             if baitai_name == 'ホールナビ':
                 i += 1
                 continue
-            baitai_name = baitai_name.replace('パチマガスロマガじゃ…','パチマガスロマガ').replace('パチンコ店長のホール…','パチンコ店長のホール攻略')
+            baitai_name = baitai_name.replace('よっしー社長プロデュ…','よっしー社長プロデュース').replace('パチマガスロマガじゃ…','パチマガスロマガ').replace('パチンコ店長のホール…','パチンコ店長のホール攻略')
             if  ('県' in baitai_name) or ('府' in baitai_name) or ('東京都' in baitai_name) or ('北海道' in baitai_name):
                 print('県がついているためパスを処理しました',baitai_name)
                 i += 1
@@ -137,17 +137,18 @@ for area_name in ['hokkaido','tohoku','kanto','chubu','kansai','chugoku','sikoku
                     tenpo_name = syuzai_tenpo_data.find_element(By.CLASS_NAME,"oslh2").text.replace('\n', '').replace(' ', '').replace('　', '')
                     #print(tenpo_name.text)
                     syuzai_date = syuzai_tenpo_data.find_element(By.CLASS_NAME,"oslmd").text
-                    rank_and_syuzai_name = syuzai_tenpo_data.find_element(By.CLASS_NAME,"list_event_name").text
-                    syuzai_rank = rank_and_syuzai_name.split('\n')[0]
-                    syuzai_name = rank_and_syuzai_name.split('\n')[1]
-                    prefectures = syuzai_tenpo_data.find_elements(By.CLASS_NAME,"oslha")[0].text
-                    #print(baitai_name,syuzai_date ,syuzai_rank,syuzai_name,prefectures)#prefectures
-                    record = pd.Series([prefectures,syuzai_date, tenpo_name,syuzai_name,baitai_name,syuzai_rank], index=furture_syuzai_list_df.columns)
-                    record_df =  pd.DataFrame(record)
-                    furture_syuzai_list_df = pd.concat([furture_syuzai_list_df,record_df.T])
-                    #print(record)
-                    #break
-                    browser.implicitly_wait(10)
+                    rank_and_syuzai_name_list = syuzai_tenpo_data.find_elements(By.CLASS_NAME,"list_event_name")
+                    for rank_and_syuzai_name in rank_and_syuzai_name_list:
+                        syuzai_rank = rank_and_syuzai_name.text.split('\n')[0]
+                        syuzai_name = rank_and_syuzai_name.text.split('\n')[1]
+                        prefectures = syuzai_tenpo_data.find_elements(By.CLASS_NAME,"oslha")[0].text
+                        #print(baitai_name,syuzai_date ,syuzai_rank,syuzai_name,prefectures)#prefectures
+                        record = pd.Series([prefectures,syuzai_date, tenpo_name,syuzai_name,baitai_name,syuzai_rank], index=furture_syuzai_list_df.columns)
+                        record_df =  pd.DataFrame(record)
+                        furture_syuzai_list_df = pd.concat([furture_syuzai_list_df,record_df.T])
+                        print(record)
+                        #break
+                        browser.implicitly_wait(10)
                 # if num > 6:
                 #     break
                 if browser.find_element(By.CLASS_NAME,'navi_1_next').text == '次へ':
@@ -241,7 +242,7 @@ try:
 
     concat_df = furture_syuzai_list_df_1
     concat_df['イベント日'] = concat_df['イベント日'].astype(str)   
-    concat_df = concat_df[~concat_df.duplicated(keep=False)]
+    concat_df = concat_df.drop_duplicates(subset=['イベント日','店舗名','取材名','媒体名','取材ランク'], keep='first')
     concat_df['取得時間'] = today_str
     concat_df['取得時間'] = concat_df['取得時間'].astype(str)   
     concat_df
@@ -251,7 +252,6 @@ try:
             DELETE
             FROM schedule
             WHERE イベント日 BETWEEN '{today_str}' AND '{eight_days_after}'
-            AND  都道府県 in {prefectures}
             """
     print(sql)
     cursor.execute(sql)
@@ -300,12 +300,11 @@ try:
             DELETE
             FROM schedule
             WHERE イベント日 BETWEEN '{today_str}' AND '{eight_days_after}'
-            AND  都道府県 in {prefectures}
             """
     print(sql)
     cursor.execute(sql)
     conn.commit()
-
+    concat_df.to_csv('csv/heroku_schedule_latest.csv',index=False)
     insert_data_bulk(concat_df ,conn)
     conn.commit()
     post_line_text(f'{len(concat_df)}件のpostgresへの全国の取材予定追加おわり',os.getenv('LINE_TOKEN'))

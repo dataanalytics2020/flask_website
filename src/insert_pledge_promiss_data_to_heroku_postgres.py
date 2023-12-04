@@ -203,12 +203,11 @@ count = 0
 concat_pledge_df = pd.DataFrame(index=[], columns=[])
 increment_id = max(list(sql_syuzai_report_all_df['id']))
 print(increment_id)
-
+text = ''
 for i,row in insert_pledge_df.iterrows():
     dicision_df = sql_syuzai_report_all_df[sql_syuzai_report_all_df['syuzai_name'] == row['syuzai_name']]
     #display(dicision_df)
     increment_id += 1
-    
     if len(dicision_df) == 0:
         count += 1
         print('追加',row['syuzai_name'],row['media_name'],None)

@@ -65,7 +65,7 @@ def delete_data(cnx,day):
     cursor.execute(sql)
     cnx.commit()
 
-prefecture_list = ['東京都','静岡県','岐阜県','愛知県','三重県','新潟県','富山県','石川県','福井県','山梨県','長野県','神奈川県','千葉県','埼玉県','群馬県','栃木県','茨城県','福島県','山形県','秋田県','宮城県','岩手県','青森県','北海道']#,'東京都''静岡県','岐阜県','愛知県','三重県'
+prefecture_list = ['東京都','神奈川県','千葉県','埼玉県','静岡県','岐阜県','愛知県','三重県','新潟県','富山県','石川県','福井県','山梨県','長野県','群馬県','栃木県','茨城県','福島県','山形県','秋田県','宮城県','岩手県','青森県','北海道']#,'東京都''静岡県','岐阜県','愛知県','三重県'
 line_token = os.getenv('LINE_TOKEN')
 #print(line_token)
 for prefecture in prefecture_list:
@@ -176,14 +176,13 @@ for prefecture in prefecture_list:
                 charset="utf8",
                 use_pure=True
                 )
-
-            # 接続確認
+            # 接続確認[[[@]]]
             print(f"sql connection status: {cnx.is_connected()}")
             cursor = cnx.cursor()
             insert_data_bulk(ichiran_all_tennpo_df,cnx)
             tenpo_name_number = len(ichiran_all_tennpo_df['店舗名'].unique())
             post_line_text(f'{prefecture} {tenpo_name_number}/{str(len(concat_df))}件のSQL追加処理に成功しました',line_token)
-            delete_data(cnx,35)
+            delete_data(cnx,60)
             # 終了
             cnx.close()
             
