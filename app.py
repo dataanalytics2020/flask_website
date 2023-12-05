@@ -551,16 +551,18 @@ def get_top():
     data['prefecture_id_and_name_dict'] = prefecture_id_and_name_dict
     report_df = pd.read_csv('csv/kanto_top_location_df.csv', parse_dates=['イベント日'])
     try:
-        report_row_1 = report_df[:1]["イベント日"].values[0]
+        report_row_1 = str(report_df[:1]["イベント日"].values[0]).split('T')[0]
+        print(report_row_1)
     except:
         report_row_1 = 'NONE'
-    if report_row_1 == np.datetime64('today', 'D'):
-        post_line('今日のデータは取得済み'+str(type(report_df[:1]['イベント日'].values[0]))+"to"+str(np.datetime64('today', 'D')))
+    compare_date:str = tomorrow.strftime('%Y-%m-%d')
+    if report_row_1 == compare_date:
+        print('今日のデータは取得済み'+report_row_1+"と"+compare_date)
+        post_line('今日のデータは取得済み'+report_row_1+"と"+compare_date)
         post_line('report_df' + str(report_row_1))
     else:
-        post_line('今日のデータは未取得')
-        post_line("report_df[:1]['イベント日'].values[0] == np.datetime64('today', 'D')は" + str(type(report_df[:1]['イベント日'].values[0]))+"と"+str(type(np.datetime64('today', 'D'))))
-        post_line(f"{report_row_1}:rowとdatetime:{np.datetime64('today', 'D')}")
+        post_line('今日のデータは未取得'+report_row_1+"と"+compare_date)
+        post_line('今日のデータは未取得'+report_row_1+"と"+compare_date)
         area_sql_text = get_area_sql_text('minamikantou')
         cursor = get_driver()
         sql = f'''SELECT イベント日,都道府県,店舗名,取材名,取材ランク,媒体名,latitude,longitude
