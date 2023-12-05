@@ -926,6 +926,11 @@ def target_date_recommend_report():
                 tmp_df = df
                 #tmp_df['店舗名'] = user_data['tenpo-name']
                 tmp_df['日付'] = target_day
+                df['機種名'] = df['機種名'].map(lambda x: x \
+                    .replace('[前編]始まりの物語/[後編]永遠の物語','') \
+                    .replace('劇場版','') \
+                    .replace('解き放たれし','') \
+                    .replace('もっと！',''))
                 #tmp_df['機種名'] = tmp_df['機種名'].map(removal_text)
                 break
         concat_df_list.append(df)
@@ -948,7 +953,7 @@ def target_date_recommend_report():
         groupby_date_df['台番号'] = groupby_date_df['台番号'].astype(int)
         groupby_date_df.sort_values(['台番号'],inplace=True)
         groupby_date_df['台番号'] = groupby_date_df['台番号'].astype(str)
-        groupby_date_df['機種名'] = groupby_date_df['台番号'] + '_' + groupby_date_df['機種名']
+        groupby_date_df['機種名'] = groupby_date_df['台番号'] + '番_' + groupby_date_df['機種名']
         groupby_date_df = groupby_date_df.drop(['台番号'],axis=1)
         column_date_name:str = groupby_date_df['日付'].loc[0].split('-')[1].lstrip('0') + '/' + groupby_date_df['日付'].loc[0].split('-')[2].lstrip('0')
         groupby_date_df = groupby_date_df.drop(['日付'],axis=1)
@@ -958,7 +963,7 @@ def target_date_recommend_report():
         horizon_concat_list.append(groupby_date_df)
 
     horizon_concat_df = pd.concat(horizon_concat_list,axis=1)
-    horizon_concat_df_html = re.sub(' target', '" id="target', horizon_concat_df.to_html(classes='target',index=False))
+    horizon_concat_df_html = re.sub(' target', '" id="target', horizon_concat_df.to_html(classes='compact nowrap',index=False))
 
     groupby_date_kisyubetu_df = pre_concat_df.groupby(['日付','機種名']).sum()
     groupby_date_kisyubetu_df['総台数'] = pre_concat_df.groupby(['日付','機種名']).size()
@@ -997,7 +1002,6 @@ def target_date_recommend_report():
     groupby_date_kisyubetu_df['合計G数'] = groupby_date_kisyubetu_df['合計G数'].astype(str) + 'G'
     groupby_date_kisyubetu_df['総台数'] = groupby_date_kisyubetu_df['総台数'].astype(str) + '台'
 
-    
     #バブルチャートの大きさが相対的な値になるように調整
     bubble_chart_division_top10_samai_ave = sum(bubble_chart_samai_division_list) / len(bubble_chart_samai_division_list)
     bubble_chart_division_top10_samai_ave = int(bubble_chart_division_top10_samai_ave)
@@ -1009,7 +1013,6 @@ def target_date_recommend_report():
     calc_str = str(sympy.solve(expr)[0])
     bubble_chart_division_calc_num = int(calc_str.split("/")[0]) / int(calc_str.split("/")[1])
     print(bubble_chart_division_calc_num)
-    
     ########
     concat_df =  concat_df.groupby(['日付','機種名']).mean().sort_values('差枚',ascending=False)#機種毎に集計
     for column_name in ['差枚','G数','BB','RB','ART']:
@@ -1030,7 +1033,6 @@ def target_date_recommend_report():
     print('samai_list',samai_list)
     gamesuu_list:str = str(groupby_samai_game_mean_df['G数'].tolist())
     concat_df = concat_df.rename(columns={'差枚': '平均差枚', 'G数': '平均G数'})
-
     record = [groupby_samai_game_mean_df['差枚'].tolist(),groupby_samai_game_mean_df['G数'].tolist()]
     print(record)
     
@@ -1089,7 +1091,7 @@ def target_date_recommend_report():
     groupby_kisyubetu_df = groupby_kisyubetu_df[['お勧め順位','機種名','勝率','機種平均出率','平均G数','平均差枚','合計差枚','合計G数','総台数']]
     # groupby_kisyubetu_df = groupby_kisyubetu_df.rename(columns={'機種順位': 'お勧め順位'})
     groupby_kisyubetu_df = groupby_kisyubetu_df[:10]
-    concat_df = groupby_date_kisyubetu_df[:30]
+    concat_df = groupby_date_kisyubetu_df
     print('concat_df',concat_df)
     display_day_df_list = []
     
@@ -1099,13 +1101,13 @@ def target_date_recommend_report():
         extract_groupby_day_df = groupby_date_kisyubetu_df[groupby_date_kisyubetu_df['日付'] == target_day]
         print(extract_groupby_day_df)
         extract_groupby_day_df['日付'] = extract_groupby_day_df['日付'].map(convert_date)
-        extract_groupby_day_df = extract_groupby_day_df.to_html(justify='justify-all',index=False)
+        extract_groupby_day_df = extract_groupby_day_df.to_html(justify='justify-all',classes='display compact nowrap',index=False)
         display_day_df_list.append(extract_groupby_day_df)
     print(concat_df)
     concat_df['日付'] = concat_df['日付'].map(convert_date)
     bubble_chart_color_dict = {'purple':'rgb(255,0,255)','red':'rgb(255,0,0)','green':'rgb(0,128,0)','lime':'rgb(0,255,0)','yellow':'rgb(255,255,0)',\
 'blue':'rgb(0,0,255)','aqua':'rgb(0,255,255)','gray':'rgb(128,128,128)','white':'rgb(192,192,192)','black':'rgb(0,0,0)'}
-    bubble_chart_color_list = list(bubble_chart_color_dict .values())
+    bubble_chart_color_list = list(bubble_chart_color_dict.values())
     output_bubble_chart_df = output_bubble_chart_df[:10]
     output_bubble_chart_df['順位'] = ['1位','2位','3位','4位','5位','6位','7位','8位','9位','10位']
     output_bubble_chart_df['機種名'] = output_bubble_chart_df['順位'] +' ' + output_bubble_chart_df['機種名']
@@ -1122,8 +1124,8 @@ def target_date_recommend_report():
                                         display_day_df_list=display_day_df_list,\
                                         samai_list=str(samai_list),\
                                         gamesuu_list=str(gamesuu_list),\
-                                        samai_table = ave_tenpo_df.to_html(justify='justify-all',classes='tb01'),\
-                                        groupby_kisyu_table = groupby_kisyubetu_df.to_html(justify='justify-all',classes='tb01',index=False),\
+                                        samai_table = ave_tenpo_df.to_html(justify='justify-all'),\
+                                        groupby_kisyu_table = groupby_kisyubetu_df.to_html(justify='justify-all',classes='display compact nowrap',index=False),\
                                         heatmap_column_names=horizon_concat_df.columns.values, \
                                         heatmap_row_data=list(horizon_concat_df.values.tolist()) )
 

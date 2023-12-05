@@ -4,8 +4,6 @@
 <title>明日のおすすめ店舗過去3回分析 結果画面</title>
 {% endblock %}
 
-
-
 {% block content %}
 <div class ='container'>
     <div class="row">
@@ -37,7 +35,7 @@
             <h1><p>{{ user_data['tenpo-name'] }}<br>直近過去{{serch_number}}回合計分で最も出ていたお勧め機種TOP10</p></h1>
             <div class="heading-008 my-2 ">※合計{{serch_number}}回分(バラは除く)</div>
             <div class="heading-008 my-2 ">✅お勧め機種はここで確認しよう</div>
-            <div class='design16 .table-wrap'>
+            <div class=' .table-wrap'>
                 <div class="scroll_area" style="width:100%;max-width:1000px;overflow-x:scroll;">
                     <table style="width:100%;">
                         {{groupby_kisyu_table|safe}}
@@ -59,7 +57,7 @@
             <div class="heading-008 my-2 ">✅6台並びやどの場所に入るか傾向があるか確認！</div>
             <div class = 'heatmap .table-wrap'>
                 <div class="scroll_area" style="width:100%;max-width:2000px;overflow-x:scroll;">
-                    <table id="heatmap_table" class="table table-striped">
+                    <table id="heatmap_table" class="compact nowrap">
                         <thead>
                             <tr>
                                 {% for col in heatmap_column_names %}
@@ -85,10 +83,10 @@
     </div>
     <div class="row">
         <div class="col-12">
-            <h1>日別機種別差枚順過去{{serch_number}}回合計データTOP30</h1>
+            <h1>日別機種別差枚順過去{{serch_number}}回データ</h1>
             <div class="heading-008 my-2 ">全台系はここから見ると👍</div>
             <div class="scroll_area" style="width:100%;max-width:1000px;overflow-x:scroll;">
-                <table class='design17' style="width:100%;">
+                <table class='display compact nowrap' style="width:100%;">
                     <thead>
                         <tr>
                         {% for col in column_names %}
@@ -113,8 +111,8 @@
                 <h1>日別機種別差枚順データTOP30</h1>
                 <div class="heading-008 my-2 ">日毎のデータはここでチェック</div>
                 {% for day_df , date in zip(display_day_df_list,target_day_list_jp) %}
-                <ul class = 'day_list '>{{ date }}</ul>
-                <div class='design16 .table-wrap'>
+                <ul class = 'day_list '>{{ date }} 機種別全台データ</ul>
+                <div class=' .table-wrap'>
                     <div class="scroll_area" style="width:100%;max-width:1000px;overflow-x:scroll;">
                     <table style="width:100%;">
                         {{day_df|safe}}
@@ -373,9 +371,34 @@ var bubbleChart = new Chart(ctx,
 });
 Chart.defaults.global.defaultFontFamily = "sans-serif";
 Chart.defaults.global.defaultFontSize = 13;
-
-
-
+Chart.defaults.global.defaultFontColor = "#000";
+</script>
+<script>
+$(document).ready(function() {
+    $('table.display').dataTable({
+        "language":{url:"https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json",},
+            // 件数切替機能 無効
+        lengthChange: false,
+        // 検索機能 無効
+        searching: true,
+        // ソート機能 無効
+        ordering: true,
+        // 情報表示 無効
+        info: true,
+        // ページング機能 無効
+        paging: false,
+        // 初期表示の並び替えなし
+        order: [],
+        // 横スクロールバーを有効にする (scrollXはtrueかfalseで有効無効を切り替えます)
+        scrollX: true,
+        // 縦スクロールバーを有効にする (scrollYは200, "200px"など「最大の高さ」を指定します)
+        scrollY: 300,
+        columnDefs: [
+        // 2列目(0から始まるため1になっています)の幅を100pxにする
+        { targets: [1], width: 150 }
+    ]
+    });
+});
 </script>
 
 <script>
