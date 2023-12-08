@@ -159,9 +159,9 @@
         <div class="col-12 text-center">
             <h1 class='mt-4'>明日{{data.tommorow_jp_str_day}}の関東お勧めマップ(※タップで地図を動かせます)</h1>
             <h4 data-text="※明日みんなが注目の取材のみマップに表示中">※明日{{data.tommorow_jp_str_day}} 要注目の取材のみマップに表示中</h4>
-            <iframe class="embed-responsive-item" loading="lazy" scrolling="no" height="450" width="100%" src={{ data.iframe|safe }}</iframe>
+            <iframe class="embed-responsive-item" loading="lazy" scrolling="no" height="450" width="100%" src= "{{url_for('show_iframe')}}" ></iframe>
             <div class="mx-auto mt-4" style="width: 400px;">
-                <div class="heading-008 mb-2　">南関東直近三日分の取材一覧</div>
+                <div class="heading-008 mb-2 ">南関東直近三日分の取材一覧</div>
             </div>
             <div class = 'heatmap .table-wrap'>
                 <div class="scroll_area" style="width:100%;max-width:2000px;overflow-x:scroll;">
