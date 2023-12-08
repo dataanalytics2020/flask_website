@@ -588,6 +588,7 @@ def get_top():
 
     all_kanto_display_df = report_df = report_df.drop_duplicates(keep='first')
     if report_row_1 != compare_date:
+        post_line('今日のデータはマップ未取得'+report_row_1+"と"+compare_date)
         report_df['イベント日'] = pd.to_datetime(report_df['イベント日'])
         latitude_isnull_df = report_df[report_df['latitude'].isnull()]
         message = ''
