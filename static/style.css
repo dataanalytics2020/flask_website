@@ -724,12 +724,28 @@ table > tr > th {
 	display: flex;
 	flex-wrap:wrap;
 }
+
 .top-btn li {
 	width: calc(100%/3);/*3つ並べる場合*/
 	padding:0 2px;/*左右に余白を入れる場合*/
 	box-sizing:border-box;
 }
 .top-btn li img {
+	max-width:100%; /*はみだしを防ぐ*/
+	height: auto; /*縦横比を維持 */
+}
+
+.top-btn2{
+	display: flex;
+	flex-wrap:wrap;
+}
+
+.top-btn2 li {
+	width: calc(100%/2);/*3つ並べる場合*/
+	padding:0 2px;/*左右に余白を入れる場合*/
+	box-sizing:border-box;
+}
+.top-btn2 li img {
 	max-width:100%; /*はみだしを防ぐ*/
 	height: auto; /*縦横比を維持 */
 }
