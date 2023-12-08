@@ -543,7 +543,7 @@ def get_top():
         jp_str_day = day.strftime('%m').lstrip('0') + '月' + day.strftime('%d').lstrip('0') + '日' + w_list[day.weekday()]
         jp_str_day_list.append(jp_str_day)
     data['jp_str_day_list'] = jp_str_day_list
-    tomorrow:date = today + timedelta(days=0)
+    tomorrow:date = today + timedelta(days=1)
     datetime64_tomorrow = np.datetime64(tomorrow)
     print(tomorrow)
     tommorow_jp_str_day = tomorrow.strftime('%m').lstrip('0') + '月' + tomorrow.strftime('%d').lstrip('0') + '日' + w_list[tomorrow.weekday()]
@@ -1671,4 +1671,4 @@ def post_test():
     return render_template('test2.html',data=data)
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0",debug=True, port=int(os.environ.get('PORT', 5000)))
+    app.run(host="0.0.0.0",debug=False, port=int(os.environ.get('PORT', 5000)))
