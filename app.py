@@ -691,6 +691,8 @@ def get_top():
         with open('templates/top_map.html', mode='w', encoding='utf-8') as f:
             f.write(top_map_html)
     else:
+        print('今日のデータは取得済み'+report_row_1+"と"+compare_date)
+        post_line('今日のデータはマップ取得済み'+report_row_1+"と"+compare_date)
         pass
         # with open('templates/top_map.html', mode='r', encoding='utf-8') as f:
         #     top_map_html = f.read()
