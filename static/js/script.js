@@ -1,3 +1,22 @@
+$(function() {
+    $("form").on('submit', function(){
+      $.LoadingOverlay("show", {
+        text :"Loading..."
+      });
+    });
+  });
+
+
+$(function() {
+$('.loading').click(function () {
+    $.LoadingOverlay("show", {
+        text :"Loading..."
+    });
+    });
+});
+
+
+
 $(function () { 
     $('#accordion li span').click(function() { 
         $(this).next('ul').slideToggle(); 
@@ -156,19 +175,3 @@ $(function() {
         });
 });
 
-$(function() {
-    $("form").on('submit', function(){
-      $.LoadingOverlay("show", {
-        text :"Loading..."
-      });
-    });
-  });
-
-
-  $(function() {
-    $('.loading').click(function () {
-        $.LoadingOverlay("show", {
-          text :"Loading..."
-        });
-      });
-  });
