@@ -1660,6 +1660,12 @@ def privacy_policy():
 def sitemap():
     return app.send_static_file("sitemap.xml")
 
+@app.route("/test", methods=['GET','POST'])
+def test():
+    data = {}
+    data['hall_name'] = 'ホール名'
+    return render_template('test_templete.html',data=data)
+
 @app.route("/test2", methods=['GET','POST'])
 def post_test():
     data = {}

@@ -22,6 +22,36 @@ body {
   padding-left:6px !important;
 }
 
+.profile {
+  background: rgb(255, 255, 255);
+  width: 90%;
+  padding: 2rem;
+  border: 1px solid #000000;
+}
+
+.profile__img {
+  display: block;
+  width: 160px;
+  height: 160px;
+  border-radius:50%;
+  border: 1px solid #000000;
+  margin: 0 auto;
+}
+
+.profile__name {
+  text-align:center;
+  font-weight:bold;
+  font-size:1.4rem;
+  margin: 1rem auto 1rem;
+  letter-spacing:.1rem;
+}
+
+.profile__desc {
+  line-height:1.6rem;
+}
+
+
+
 
 .table-wrap {
     overflow-x: scroll;
@@ -155,26 +185,6 @@ body {
       font-size: 3vw;
   }
 }
-
-/* @media (min-width: 1400px){
-  .container,.container-xxl ,.container-xl ,.container-lg, .container-md, .container-sm {
-      max-width: 720px;
-  }}
-
-@media (min-width: 1200px){
-  .container,.container-xl ,.container-lg, .container-md, .container-sm {
-      max-width: 720px;
-  }} */
-
-
-
-
-@media screen and (min-width:768px){
-    /*　画面サイズが768px以上の場合読み込む　*/
-    .container { max-width: 720px;}
-}
-
-
 
 
 li{
@@ -840,10 +850,10 @@ td.ui-datepicker-week-end a.ui-state-highlight{
 h4 {
   position: relative;
   background: #1e00b7;
-  padding: 2px 5px 2px 35px;
+  padding: 12px 5px 12px 45px;
   font-size: 16px;
   color: #ffffff;
-  border-radius: 0 10px 10px 0;
+  border-radius: 5px;
 }
 
 h4:before {

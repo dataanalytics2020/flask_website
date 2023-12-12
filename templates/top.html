@@ -5,7 +5,7 @@
 {% block content %}
 <div class="container">
     <div class="row">
-        <div class="col">
+        <div class="column col-lg-9">
             <dl class="info">
                 <dt><span>新機能追加</span><time>2023.11.17</time></dt>
                 <dd><a href="news/news_2023-11-17-1">TOPページにお知らせ機能を追加しました</a></dd>
@@ -14,38 +14,28 @@
                 <dt><span>お知らせ</span><time>2023.7.28</time></dt>
                 <dd><a tabindex="-1">スロマップをオープンしました</a></dd>
             </dl>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col">
             <a href="/serch-recommend-prefecture-day"><button class="button-014 my-3"><div><i class="fa-solid fa-building-circle-exclamation"></i> サイト初訪問者・スロット初心者にオススメ</div><span>➀過去差枚データから<br>お勧め店舗・機種を探す</span></button></a>
             <a href="/tomorrow-recommend"><button class="button-014 my-4"><div><i class="fa-solid fa-magnifying-glass-location"></i> 取材・公約をわかる中級者以上にオススメ</div><span>➁マップから<br>取材のある店舗を探す</span></button></a>
             <div class="heading-008 my-2 ">エリアから取材予定を地図で探す</div>
-            <div class="row">
-                <ul class="top-btn" style="list-style: none; padding: 0;  margin:0;">
-                    <li><a class="link-btn colorname1" href="{{ url_for('tomorrow_recommend_area', area_name='hokkaidoutouhoku')}}">北海道・東北</a></li>
-                    <li><a class="link-btn colorname1" href="{{ url_for('tomorrow_recommend_area', area_name='kitakantou')}}">北関東</a></li>
-                    <li><a class="link-btn colorname1" href="{{ url_for('tomorrow_recommend_area', area_name='minamikantou')}}">南関東</a></li>
-                </ul>
-            </div>
-            <div class="row">
-                <ul class="top-btn" style="list-style: none; padding: 0;  margin:0;">
-                    <li><a class="link-btn colorname1" href="{{ url_for('tomorrow_recommend_area', area_name='hokurikukoushinetsu')}}">北陸・甲信越</a></li>
-                    <li><a class="link-btn colorname1" href="{{ url_for('tomorrow_recommend_area', area_name='toukai')}}">東海</a></li>
-                    <li><a class="link-btn colorname1" href="{{ url_for('tomorrow_recommend_area', area_name='kansai')}}">関西</a></li>
-                </ul>
-            </div>
-            <div class="row">
-                <ul class="top-btn" style="list-style: none; padding: 0;  margin:0;">
-                    <li><a class="link-btn colorname1" href="{{ url_for('tomorrow_recommend_area', area_name='chugokushikoku')}}">中国・四国</a></li>
-                    <li><a class="link-btn colorname1" href="{{ url_for('tomorrow_recommend_area', area_name='kyushu')}}">九州・山口</a></li>
-                </ul>
-            </div>
-        </div>
-    </div>
+            <ul class="top-btn" style="list-style: none; padding: 0;  margin:0;">
+                <li><a class="link-btn colorname1" href="{{ url_for('tomorrow_recommend_area', area_name='hokkaidoutouhoku')}}">北海道・東北</a></li>
+                <li><a class="link-btn colorname1" href="{{ url_for('tomorrow_recommend_area', area_name='kitakantou')}}">北関東</a></li>
+                <li><a class="link-btn colorname1" href="{{ url_for('tomorrow_recommend_area', area_name='minamikantou')}}">南関東</a></li>
+            </ul>
 
-    <div class="row">
-        <div class="col">
+            <ul class="top-btn" style="list-style: none; padding: 0;  margin:0;">
+                <li><a class="link-btn colorname1" href="{{ url_for('tomorrow_recommend_area', area_name='hokurikukoushinetsu')}}">北陸・甲信越</a></li>
+                <li><a class="link-btn colorname1" href="{{ url_for('tomorrow_recommend_area', area_name='toukai')}}">東海</a></li>
+                <li><a class="link-btn colorname1" href="{{ url_for('tomorrow_recommend_area', area_name='kansai')}}">関西</a></li>
+            </ul>
+
+
+            <ul class="top-btn" style="list-style: none; padding: 0;  margin:0;">
+                <li><a class="link-btn colorname1" href="{{ url_for('tomorrow_recommend_area', area_name='chugokushikoku')}}">中国・四国</a></li>
+                <li><a class="link-btn colorname1" href="{{ url_for('tomorrow_recommend_area', area_name='kyushu')}}">九州・山口</a></li>
+            </ul>
+
+
             <div class="heading-008 my-2 ">日付と都道府県から予定を探す</div>
             <form action="{{ url_for('post_top') }}" method="post">
                 <div class='col-12'>
@@ -150,38 +140,29 @@
                     <button class="btn btn-primary" type="submit" value="送信">検索</button>
                 </div>
             </form>
-        </div>
-    </div>
 
-    <div class="row">
-        <div class="col-12 text-center">
             <h1 class='mt-4'>明日{{data.tommorow_jp_str_day}}の関東お勧めマップ(※タップで地図を動かせます)</h1>
-            <h4 data-text="※明日みんなが注目の取材のみマップに表示中">※明日{{data.tommorow_jp_str_day}} 要注目の取材のみマップに表示中</h4>
+            <h4 data-text="※明日みんなが注目の取材のみマップに表示中">※明日{{data.tommorow_jp_str_day}}<br>要注目の取材のみマップに表示中</h4>
             <iframe class="embed-responsive-item" loading="lazy" scrolling="no" height="450" width="100%" src= "{{url_for('show_iframe')}}" ></iframe>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-12 text-center">
+
+
             <h4 class="mt-3" >南関東の日別差枚順お勧め店舗記事一覧</h4>
             <ul class="top-btn2" style="list-style: none; padding: 0;  margin:0;">
                 <li><a class="link-btn colorname1mt-1" href="/post_prefecture_list/tokyo">東京都一覧</a></li>
                 <li><a class="link-btn colorname1mt-1" href="/post_prefecture_list/saitama">埼玉県一覧</a></li>
             </ul>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-12 text-center">
+
+
             <ul class="top-btn2" style="list-style: none; padding: 0;  margin:0;">
                 <li><a class="link-btn colorname1mt-1" href="/post_prefecture_list/kanagawa">神奈川県一覧</a></li>
                 <li><a class="link-btn colorname1mt-1" href="/post_prefecture_list/chiba">千葉県一覧</a></li>
             </ul>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-12 text-center">
+
+
             <div class="mx-auto mt-4" style="width: 400px;">
                 <div class="heading-008 mb-2 ">南関東直近三日分の取材一覧</div>
             </div>
+
             <div class = 'heatmap .table-wrap'>
                 <div class="scroll_area" style="width:100%;max-width:2000px;overflow-x:scroll;">
                     <table id="syuzai_table" class="table table-striped compact">
@@ -215,7 +196,17 @@
                 </div>
             </div>
         </div>
+        <div class="side col-lg-3">
+            <div class="profile m-2 p-3 text-center mx-auto">
+                <div class="navbar-brand">PROFILE</div>
+                <img class="profile__img" src="/static/img/slomap_profile.jpg"alt="profile-image">
+                <div class="profile__name m-2">運営者:斎藤</div>
+                <div class="profile__desc m-2">家の近くの取材がマップで見れたらいいなを形にしてみました。随時機能追加していきますので要望やバグなどありましたらご連絡はDMか<a href="/form">お問い合わせ</a>からよろしくお願いいたします。</div>
+                <div class="profile__desc m-2">好きな機種:ゴッド凱旋、新鬼武者、CR北斗無双...etc</div>
+                <div><a href="https://twitter.com/slo_map" class="m-2 fa fa-twitter twitter-follow-button" data-show-count="false">@slo_map</a></div>
+                <div><a href="/form" class="m-2 fa fa-envelope" aria-hidden="true" data-show-count="false">お問い合わせ</a></div>
+              </div>
+        </div>
     </div>
 </div>
-
 {% endblock %}
