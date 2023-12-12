@@ -155,3 +155,20 @@ $(function() {
         'padding': 'auto',
         });
 });
+
+$(function() {
+    $("form").on('submit', function(){
+      $.LoadingOverlay("show", {
+        text :"Loading..."
+      });
+    });
+  });
+
+
+  $(function() {
+    $('.loading').click(function () {
+        $.LoadingOverlay("show", {
+          text :"Loading..."
+        });
+      });
+  });
