@@ -1,5 +1,5 @@
-$(function() {
-    $("form").on('submit', function(){
+$(function delay() {
+    $("form").delay(800).on('submit', function(){
       $.LoadingOverlay("show", {
         text :"Loading..."
       });
@@ -7,8 +7,8 @@ $(function() {
   });
 
 
-$(function() {
-$('.loading').click(function () {
+$(function delay_click() {
+$('.loading').delay(800).click(function () {
     $.LoadingOverlay("show", {
         text :"Loading..."
     });
