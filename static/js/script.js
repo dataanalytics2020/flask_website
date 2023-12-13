@@ -1,20 +1,13 @@
-$(function delay() {
-    $("form").delay(800).on('submit', function(){
-      $.LoadingOverlay("show", {
-        text :"Loading..."
-      });
-    });
-  });
+// $(window).delay(800).on('submit', function delay1(){
+//     $.LoadingOverlay("show", {
+//     text :"Loading..."
+//     });
+// });
 
-
-$(function delay_click() {
-$('.loading').delay(800).click(function () {
-    $.LoadingOverlay("show", {
-        text :"Loading..."
-    });
-    });
-});
-
+// var targets1 = document.getElementsByClassName("loading");
+// console.log(targets1);
+// var triggers = document.querySelectorAll(".loading");
+// console.log(triggers);
 
 
 $(function () { 
