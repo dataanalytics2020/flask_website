@@ -33,7 +33,8 @@
     <meta name="description" content="東京・埼玉・神奈川・千葉を中心に全国のスロット・パチンコの取材予定や取材の公約をマップで確認できるサイトです。登録なしで完全無料で見れます。">
 
     <!-- loading -->
-    <script src="https://cdn.jsdelivr.net/npm/gasparesganga-jquery-loading-overlay@2.1.7/dist/loadingoverlay.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-loading-overlay/2.1.7/loadingoverlay.min.js" integrity="sha512-hktawXAt9BdIaDoaO9DlLp6LYhbHMi5A36LcXQeHgVKUH6kJMOQsAtIw2kmQ9RERDpnSTlafajo6USh9JUXckw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
     <!-- OGP -->
     <meta property="og:title" content="スロマップ -マップで見れるパチンコスロット取材予定無料サイト-">
@@ -53,6 +54,13 @@
     {% block head %}
     <title>スロマップ -マップで見れるパチンコスロット取材予定無料サイト-</title>
     {% endblock %}
+    <!-- ローディング画面 -->
+    <div id="js-loader" class="loader">
+      <div class="loader-container">
+        <p class="loader-text">Loading...</p>
+        <div class="loader-animation"></div>
+      </div>
+    </div>
   </head>
 
   <script>

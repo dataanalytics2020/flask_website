@@ -1,13 +1,26 @@
-// $(window).delay(800).on('submit', function delay1(){
-//     $.LoadingOverlay("show", {
-//     text :"Loading..."
-//     });
-// });
 
-// var targets1 = document.getElementsByClassName("loading");
-// console.log(targets1);
-// var triggers = document.querySelectorAll(".loading");
-// console.log(triggers);
+// ローディング画面をフェードインさせてページ遷移
+$(function(){
+    // リンクをクリックしたときの処理。外部リンクやページ内移動のスクロールリンクなどではフェードアウトさせたくないので少し条件を加えてる。
+    $(`a[href ^= "${location.href}"]` + 'a[target != "_blank"]').click(function(){
+        var url = $(this).attr('href'); // クリックされたリンクのURLを取得
+        $('#js-loader').fadeIn(600);    // ローディング画面をフェードイン
+        setTimeout(function(){ location.href = url; }, 800); // URLにリンクする
+        return false;
+    });
+});
+
+// ページのロードが終わった後の処理
+$(window).on('load', function(){
+  $('#js-loader').delay(300).fadeOut(400); //ローディング画面をフェードアウトさせることでメインコンテンツを表示
+});
+
+// ページのロードが終わらなくても20秒たったら強制的に処理を実行
+$(function(){ setTimeout('stopload()', 20000); });
+function stopload(){
+  $('#js-loader').delay(300).fadeOut(400); //ローディング画面をフェードアウトさせることでメインコンテンツを表示
+}
+
 
 
 $(function () { 
@@ -16,7 +29,7 @@ $(function () {
     }); 
 });
 
-
+// 日本地図の表示
 $(function(){
     //地域を選択
     $('.area_btn').click(function(){
