@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block head %}
+<title>プロフィールページ</title>
+{% endblock %}
+
+{% block content %}
+<section class="section about-section gray-bg" id="about">
+    <div class="container">
+        <div class="pt-2 px-3">
+            <h1>プロフィール</h1>
+        </div>
+        <div class="profile m-2 p-2 text-center mx-auto">
+            <div class="row">
+                <div class="col-lg-6">
+                    <h3 class="m-1 mb-3">スロマップ運営者</h3>
+                    <img class="profile__img  my-auto mb-2" src="/static/img/slomap_profile.jpg"alt="profile-image">
+                </div>
+                <div class="col-lg-6">
+                    <div class="profile__name m-2">名前:ないとー</div>
+                    <div class="profile__desc mt-2 m-2">家の近くの取材がマップで見れたらいいなを形にしています。過去の出玉から分析する機能なども随時機能追加していきますので要望やバグなどありましたらご連絡はDMか<a href="/form">お問い合わせ</a>からよろしくお願いいたします。</div>
+                    <div class="profile__desc m-2">好きなスロット:ゴッド凱旋、新鬼武者、緑ドンシリーズ</div>
+                    <div class="profile__desc m-2">好きなパチンコ:CR北斗無双、エヴァシリーズ</div>
+                    <div><a href="https://twitter.com/slo_map" class="m-2 fa fa-twitter twitter-follow-button" data-show-count="false">@slo_map</a></div>
+                    <div><a href="/form" class="m-2 fa fa-envelope" aria-hidden="true" data-show-count="false">お問い合わせ</a></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

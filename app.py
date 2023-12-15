@@ -1656,6 +1656,10 @@ def target_hallname(hall_name):
 def privacy_policy():
     return render_template('privacy_policy.html')
 
+@app.route("/profile")
+def profile():
+    return render_template('profile.html')
+
 @app.route("/sitemap.xml")
 def sitemap():
     return app.send_static_file("sitemap.xml")
