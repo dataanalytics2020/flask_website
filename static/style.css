@@ -230,6 +230,19 @@ h1,h2{
   font-weight: bold;
 }
 
+.heading_h1{
+  color: #6cb4e4;
+  text-align: center;
+  padding: 0.25em;
+  border-top: solid 2px #6cb4e4;
+  border-bottom: solid 2px #6cb4e4;
+  background: -webkit-repeating-linear-gradient(-45deg, #f0f8ff, #f0f8ff 3px,#e9f4ff 3px, #e9f4ff 7px);
+  background: repeating-linear-gradient(-45deg, #f0f8ff, #f0f8ff 3px,#e9f4ff 3px, #e9f4ff 7px);
+  font-size: calc(1.025rem + .1vw);
+  margin-bottom: 0px;
+  font-weight: bold;
+}
+
 .design16 {
   width: 100%;
   text-align: center;

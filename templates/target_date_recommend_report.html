@@ -8,7 +8,7 @@
 <div class ='container'>
     <div class="row">
         <div class="col-12">
-            <h1>分析結果</h1>
+            <div class="heading_h1">分析結果</div>
             <div>
                 <p>比較するデータは{{ user_data['tenpo-name'] }}の</p>
                     {% for date in target_day_list_jp %}
@@ -32,7 +32,7 @@
 
     <div class="row">
         <div class="col-12">
-            <h1><p>{{ user_data['tenpo-name'] }}<br>直近過去{{serch_number}}回合計分で最も出ていたお勧め機種TOP10</p></h1>
+            <div class="heading_h1"><p>{{ user_data['tenpo-name'] }}<br>直近過去{{serch_number}}回合計分で最も出ていたお勧め機種TOP10</p></div>
             <div class="heading-008 my-2 ">※合計{{serch_number}}回分(バラは除く)</div>
             <div class="heading-008 my-2 ">✅お勧め機種はここで確認しよう</div>
             <div class=' .table-wrap'>
@@ -46,10 +46,10 @@
     </div>
     <div class="row">
         <div class="col-12">
-            <h1>お勧め機種総差枚バブルチャート</h1>
+            <div class="heading_h1">お勧め機種総差枚バブルチャート</div>
             <div class="heading-008 my-2 ">✅どの機種に大きな出玉配分があるか可視化</div>
             <canvas id="bubblechart"></canvas>
-            <h1>ヒートマップ並び傾向分析</h1>
+            <div class="heading_h1">ヒートマップ並び傾向分析</div>
         </div>
     </div>
     <div class="row">
@@ -83,7 +83,7 @@
     </div>
     <div class="row">
         <div class="col-12">
-            <h1>日別機種別差枚順過去{{serch_number}}回データ</h1>
+            <div class="heading_h1">日別機種別差枚順過去{{serch_number}}回データ</div>
             <div class="heading-008 my-2 ">全台系はここから見ると👍</div>
             <div class="scroll_area" style="width:100%;max-width:1000px;overflow-x:scroll;">
                 <table class='display compact nowrap' style="width:100%;">
@@ -108,7 +108,7 @@
                 </table>
                 </div>
                 </div>
-                <h1>日別機種別差枚順データTOP30</h1>
+                <div class="heading_h1">日別機種別差枚順データTOP30</div>
                 <div class="heading-008 my-2 ">日毎のデータはここでチェック</div>
                 {% for day_df , date in zip(display_day_df_list,target_day_list_jp) %}
                 <ul class = 'day_list '>{{ date }} 機種別全台データ</ul>
