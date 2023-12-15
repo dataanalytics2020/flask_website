@@ -531,7 +531,7 @@ config = {
     "CACHE_DEFAULT_TIMEOUT": 300
 }
 
-app = Flask(__name__, static_folder="static", static_url_path='')
+app = Flask(__name__, static_folder="static")
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY') 
 app.config.from_mapping(config)
 cache = Cache(app)
