@@ -365,17 +365,19 @@
 <url>
   <loc>https://www.slo-map.com/profile</loc>
   <lastmod>2023-12-15</lastmod>
-  <changefreq>month</changefreq>
+  <changefreq>monthly</changefreq>
   <priority>0.50</priority>
 </url>
 <url>
   <loc>https://www.slo-map.com/privacy_policy</loc>
   <lastmod>2023-12-15</lastmod>
+  <changefreq>monthly</changefreq>
   <priority>0.50</priority>
 </url>
 <url>
   <loc>https://www.slo-map.com/form</loc>
   <lastmod>2023-12-15</lastmod>
+  <changefreq>yearly</changefreq>
   <priority>0.50</priority>
 </url>
 
