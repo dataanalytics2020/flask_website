@@ -1573,7 +1573,7 @@ def post_prefecture_list(pref_name_en):
     post_list_df = pd.DataFrame(items)
     page = request.args.get(get_page_parameter(), type=int, default=1)
     #jsonから取得したデータをページネーションで表示する
-    items = items[(page-1)*10:page*10]
+    items = items[(page-1)*8:page*8]
     pagination = Pagination(page=page, total=len(items),  per_page=1, css_framework='bootstrap4')
     return render_template('post_prefecture_list.html',items=items,data=data,enumerate=enumerate,pagination=pagination)
 
