@@ -1,4 +1,10 @@
 
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-F9XKYM3YYV');
+
+
 // ローディング画面をフェードインさせてページ遷移
 $(function(){
     // リンクをクリックしたときの処理。外部リンクやページ内移動のスクロールリンクなどではフェードアウトさせたくないので少し条件を加えてる。
@@ -21,8 +27,7 @@ function stopload(){
   $('#js-loader').delay(300).fadeOut(400); //ローディング画面をフェードアウトさせることでメインコンテンツを表示
 }
 
-
-
+// ハンバーガーメニュー
 $(function () { 
     $('#accordion li span').click(function() { 
         $(this).next('ul').slideToggle(); 
@@ -62,7 +67,7 @@ $(function(){
     }
 });
 
-
+//トップへ戻るボタン
 $(function() {
     var topBtn = $('.page-top');    
     topBtn.hide();
@@ -81,7 +86,7 @@ $(function() {
     });
 });
 
-
+// #syuzai_tableのデータテーブルの設定
 $(document).ready(function(){
     $("#syuzai_table").DataTable({
         "language":{url:"https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json",},
@@ -110,6 +115,7 @@ $(document).ready(function(){
     });
 });
 
+// #media_tableのデータテーブルの設定
 $(document).ready(function(){
     $("#media_table").DataTable({
         "language":{url:"https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json",},
