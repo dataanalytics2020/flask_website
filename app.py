@@ -93,67 +93,72 @@ def create_post_map_iframe(location_name_df,groupby_date_kisyubetu_df):
     print(location_name_df)
     rank_num = 0
     for i,row in location_name_df.iterrows():
-        rank_num += 1
-        tenpo_name = row['店舗名']
-        print(tenpo_name)
-        extract_syuzai_df_1 = groupby_date_kisyubetu_df[groupby_date_kisyubetu_df['店舗名'].str.contains(tenpo_name)]
-        #display(extract_syuzai_df_1)
-        print(extract_syuzai_df_1)
-        #print(syuzai_rank_list)
-        longitude = row['longitude']
-        latitude = row['latitude']
-        #print('latitude,longitude',latitude,longitude)
-        # グレースケールの画像データを作成
-        im= Image.new("L", (280, 100),color=(0))
-        im.putalpha(0)
-        im2= Image.new("L", (260, 50),color=(50))
-        im2.putalpha(128)
-        im3 = Image.open('icon.png')
-        draw = ImageDraw.Draw(im)
-        font = ImageFont.truetype('font/LightNovelPOPv2.otf',19)
         try:
-            rank_num:int = int((extract_syuzai_df_1.index[0]/ 3) + 1)
-            rank_num_str:str = f'お勧め店舗{rank_num}位'
+            print("row",row)
+            rank_num += 1
+            tenpo_name = row['店舗名']
+            print(tenpo_name)
+            
+            extract_syuzai_df_1 = groupby_date_kisyubetu_df[groupby_date_kisyubetu_df['店舗名'].str.contains(tenpo_name)]
+            #display(extract_syuzai_df_1)
+            print(extract_syuzai_df_1)
+            #print(syuzai_rank_list)
+            longitude = row['longitude']
+            latitude = row['latitude']
+            #print('latitude,longitude',latitude,longitude)
+            # グレースケールの画像データを作成
+            im= Image.new("L", (280, 100),color=(0))
+            im.putalpha(0)
+            im2= Image.new("L", (260, 50),color=(50))
+            im2.putalpha(128)
+            im3 = Image.open('icon.png')
+            draw = ImageDraw.Draw(im)
+            font = ImageFont.truetype('font/LightNovelPOPv2.otf',19)
+            try:
+                rank_num:int = int((extract_syuzai_df_1.index[0]/ 3) + 1)
+                rank_num_str:str = f'お勧め店舗{rank_num}位'
+            except:
+                rank_num_str = 'お勧め店舗\n'
+            syuzai_name_text = rank_num_str +'\n◆' + tenpo_name
+            #print(syuzai_name_text)
+
+
+            # 画像を表示
+            im.paste(im3, (-15,-14))
+            im.paste(im2, (25,48))
+            draw.multiline_text(
+                (150, 50),
+                f'{syuzai_name_text}',
+                font=font,
+                fill='white',
+                align='center',
+                spacing=0,
+                anchor='ma'
+            )
+
+            im.save('syuzai_image.png', quality=95)
+            img = 'syuzai_image.png'
+            popup_df = extract_syuzai_df_1[['日付','差枚合計','平均差枚','平均G数','勝率']]
+            #popup_df['イベント日'] = popup_df['イベント日'].apply(convert_sql_date_to_jp_date_and_weekday) 
+            popup_df =   popup_df.to_html(escape=False,index=False,justify='center',classes='table table-striped table-hover table-sm')
+            popup_df += f'<a href="#{tenpo_name}" target="_parent"> {tenpo_name} ※店舗詳細データに飛びます</a>'
+            popup_data = folium.Popup(popup_df,  max_width=1500,show=False,size=(700, 300))
+            folium.Marker(location=[latitude ,longitude],
+                tiles='https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png',
+                attr='国土地理院',
+                popup=popup_data,
+                icon = CustomIcon(
+                            icon_image = img,
+                            icon_size = (280, 100),
+                            icon_anchor = (30, 0),
+                            #shadow_image = shadow_img, # 影効果（今回は使用せず コメントアウト
+                            #shadow_size = (30, 30),
+                            shadow_anchor = (-4, -4),
+                            popup_anchor = (3, 3))).add_to(folium_map)
+            #break
         except:
-            rank_num_str = 'お勧め店舗\n'
-        syuzai_name_text = rank_num_str +'\n◆' + tenpo_name
-        #print(syuzai_name_text)
-
-
-        # 画像を表示
-        im.paste(im3, (-15,-14))
-        im.paste(im2, (25,48))
-        draw.multiline_text(
-            (150, 50),
-            f'{syuzai_name_text}',
-            font=font,
-            fill='white',
-            align='center',
-            spacing=0,
-            anchor='ma'
-        )
-
-        im.save('syuzai_image.png', quality=95)
-        img = 'syuzai_image.png'
-        popup_df = extract_syuzai_df_1[['日付','差枚合計','平均差枚','平均G数','勝率']]
-        #popup_df['イベント日'] = popup_df['イベント日'].apply(convert_sql_date_to_jp_date_and_weekday) 
-        popup_df =   popup_df.to_html(escape=False,index=False,justify='center',classes='table table-striped table-hover table-sm')
-        popup_df += f'<a href="#{tenpo_name}" target="_parent"> {tenpo_name} ※店舗詳細データに飛びます</a>'
-        popup_data = folium.Popup(popup_df,  max_width=1500,show=False,size=(700, 300))
-        folium.Marker(location=[latitude ,longitude],
-            tiles='https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png',
-            attr='国土地理院',
-            popup=popup_data,
-            icon = CustomIcon(
-                        icon_image = img,
-                        icon_size = (280, 100),
-                        icon_anchor = (30, 0),
-                        #shadow_image = shadow_img, # 影効果（今回は使用せず コメントアウト
-                        #shadow_size = (30, 30),
-                        shadow_anchor = (-4, -40),
-                        popup_anchor = (3, 3))).add_to(folium_map)
-        #break
-    
+            post_line(f'create_post_map_iframeでエラー発生。{row["prefecture"]} {tenpo_name}の位置情報がありません\n{tenpo_name}')
+            pass
     # set the iframe width and height
     plugins.Fullscreen(
                         position="topright",

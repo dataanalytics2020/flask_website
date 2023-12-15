@@ -1687,3 +1687,40 @@ text-align: center; /* 内容は中央配置 */
     height:5em;
   }
 }
+
+
+/* fotter部分のCSS */
+.footer-001 {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  padding: 25px 10px 10px;
+  background-color: #0d6efd;
+}
+
+.footer-001__logo {
+  width: 50px;
+  height: 50px;
+}
+
+.footer-001__list {
+  justify-content: center;
+  align-items: center;
+  gap: 0 1.5em;
+  list-style-type: none;
+  margin: 0 0 .5em;
+  padding: .5em;
+}
+
+.footer-001__link {
+  color: #fff;
+  font-weight: 200;
+  text-decoration: none;
+}
+
+.footer-001__copyright {
+  margin: 0;
+  color: #ffffffb3;
+  font-weight: 200;
+  font-size: .8em;
+}

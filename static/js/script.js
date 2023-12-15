@@ -27,6 +27,17 @@ function stopload(){
   $('#js-loader').delay(300).fadeOut(400); //ローディング画面をフェードアウトさせることでメインコンテンツを表示
 }
 
+// 画像が読み込めなかった場合に表示しない
+document.addEventListener('DOMContentLoaded', () => {
+    const images = [].slice.call(document.querySelectorAll('img'));
+    images.forEach(el => {
+      el.addEventListener('error', () => {
+        el.remove();
+      });
+    });
+  });
+
+
 // ハンバーガーメニュー
 $(function () { 
     $('#accordion li span').click(function() { 
