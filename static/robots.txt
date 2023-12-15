@@ -1,0 +1,3 @@
+User-agent: *
+Disallow：
+Sitemap: https://www.slo-map.com/sitemap.xml

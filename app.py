@@ -531,7 +531,7 @@ config = {
     "CACHE_DEFAULT_TIMEOUT": 300
 }
 
-app = Flask(__name__, static_folder="static")
+app = Flask(__name__, static_folder="static", static_url_path='')
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY') 
 app.config.from_mapping(config)
 cache = Cache(app)
@@ -1668,6 +1668,10 @@ def profile():
 @app.route("/sitemap.xml")
 def sitemap():
     return app.send_static_file("sitemap.xml")
+
+@app.route("/robots.txt")
+def robots():
+    return app.send_static_file("robots.txt")
 
 @app.route("/test", methods=['GET','POST'])
 def test():
