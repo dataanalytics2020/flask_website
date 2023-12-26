@@ -521,7 +521,25 @@ def post_line(message):
     token = os.environ['LINE_TOKEN']
     headers = {"Authorization" : "Bearer "+ token}
     payload = {"message" :  message}
-    post = requests.post(url ,headers = headers ,params=payload) 
+    post = requests.post(url ,headers = headers ,params=payload)
+
+def generate_past_data_n_day_sql_text(n_day:int) -> str:
+    target_day = datetime.date.today() + datetime.timedelta(days=n_day)
+    target_day_str = target_day.strftime('%Y-%m-%d')
+    sql_date_text = ''
+    for i in range(39):
+        belong_day = datetime.date.today() - datetime.timedelta(days= i)
+        belong_day_str = belong_day.strftime('%Y-%m-%d')
+        ##print(belong_day_str[-2:])
+        if belong_day_str[-1] == target_day_str[-1]:
+            if belong_day_str[-2:] == '31':
+                continue
+            day_str = belong_day.strftime('%m月%d日').lstrip('0')
+            belong_day_str
+            sql_date_text += f"'{belong_day_str}'" + ',' 
+    sql_date_text = sql_date_text.rstrip(',')
+    print(sql_date_text)
+    return sql_date_text
 
 area_name_and_str_jp_area_name_dict = {'hokkaidoutouhoku':'北海道・東北', 'kitakantou':'北関東','minamikantou':'南関東','hokurikukoushinetsu':'北陸・甲信越','toukai':'東海','kansai':'関西','chugokushikoku':'中国・四国','kyushu':'九州・山口'}
 
@@ -561,13 +579,12 @@ def get_top():
         print(report_row_1)
     except:
         report_row_1 = 'NONE'
-    compare_date:str = tomorrow.strftime('%Y-%m-%d')
+    compare_date:str = tomorrow.strftime('%Y-%m-%d')#-%d
     if report_row_1 == compare_date:
         print('今日のデータは取得済み'+report_row_1+"と"+compare_date)
         post_line('今日のデータは取得済み'+report_row_1+"と"+compare_date)
         post_line('report_df' + str(report_row_1))
     else:
-        post_line('今日のデータは未取得'+report_row_1+"と"+compare_date)
         post_line('今日のデータは未取得'+report_row_1+"と"+compare_date)
         area_sql_text = get_area_sql_text('minamikantou')
         cursor = get_driver()
@@ -576,10 +593,10 @@ def get_top():
                 left join halldata as halldata2
                 on schedule2.店舗名 = halldata2.hall_name
                 WHERE イベント日 > current_date
-                AND イベント日 <= current_date + 3
+                AND イベント日 <= current_date + 1
                 AND 媒体名 != 'ホールナビ'
-                AND 媒体名 != '旧イベ'
-                AND ({area_sql_text})
+                AND 取材名 LIKE '%のつく日%'
+                AND 都道府県 = '東京都'
                 ORDER BY イベント日,都道府県,店舗名,媒体名,取材名 desc;'''#AND (取材ランク = 'S' OR 取材ランク = 'A')
         print(sql)
         cursor.execute(sql)
@@ -588,8 +605,26 @@ def get_top():
         report_df =  pd.DataFrame(cursor.fetchall(),columns = cols )
         report_df = report_df.loc[:,~report_df.columns.duplicated()]
         print(report_df)
+        sql_hall_name_text = ''
+        for hall_name_text in list(report_df['店舗名'].unique()):
+            sql_hall_name_text += f"'{hall_name_text}'" + ','
+        sql_hall_name_text = sql_hall_name_text.rstrip(',')
+        sql_date_text = generate_past_data_n_day_sql_text(1) 
+        cursor.execute(f"""SELECT date,hall_name,sum_diffcoins,ave_diffcoins,ave_game,win_rate
+               FROM groupby_date_hall_diffcoins
+               WHERE date in ({sql_date_text})
+               AND hall_name in  ({sql_hall_name_text})""")
+        print("sql_hall_name_text",sql_hall_name_text)
+        cols = [col.name for col in cursor.description]
+        past_diffconis_df = pd.DataFrame(cursor.fetchall(),columns=cols)
+        past_diffconis_df['date'] = past_diffconis_df['date'].apply(convert_sql_date_to_jp_date_and_weekday)
+        past_diffconis_df.rename(columns={'date':'日付','hall_name':'店舗名','sum_diffcoins':'総差枚','ave_diffcoins':'平均差枚','ave_game':'平均G数','win_rate':'勝率'},inplace=True)
+        past_diffconis_df['平均差枚'] = past_diffconis_df['平均差枚'].astype(str) + '枚'
+        past_diffconis_df['総差枚'] = past_diffconis_df['総差枚'].map(lambda x: round(x,-2)).astype(str) + '枚'
+        past_diffconis_df['平均G数'] = past_diffconis_df['平均G数'].astype(str) + 'G'
         post_line('report_df'+str(report_row_1))
         report_df.to_csv('csv/kanto_top_location_df.csv',index=False)
+        past_diffconis_df.to_csv('csv/tokyo_past_diffconis_df.csv',index=False)
 
     all_kanto_display_df = report_df = report_df.drop_duplicates(keep='first')
     if report_row_1 != compare_date:
@@ -604,10 +639,10 @@ def get_top():
         report_df = report_df.dropna(subset=['latitude'])
         tomorrow_report_df = report_df
         #(取材ランク = 'S' OR 取材ランク = 'A')のみ抽出
-        report_df =  report_df[report_df['取材ランク'].isin(['S','A'])]
+        #report_df =  report_df[report_df['取材ランク'].isin(['S','A'])]
         print('report_df_2',report_df)
-        map_report_df = report_df[report_df['イベント日'] == datetime64_tomorrow ]
-        tomorrow_report_df = tomorrow_report_df[tomorrow_report_df['イベント日'] == datetime64_tomorrow ]
+        map_report_df = report_df#[report_df['イベント日'] == datetime64_tomorrow ]
+        tomorrow_report_df = report_df
         print('map_report_df',map_report_df)
         map_report_df = map_report_df[['店舗名','取材名','媒体名']].drop_duplicates(keep='first')
         map_report_df = map_report_df.sort_values(['店舗名','媒体名']).reset_index(drop=True)
@@ -619,75 +654,86 @@ def get_top():
         folium_map = folium.Map(location=[prefecture_latitude,prefecture_longitude], zoom_start=10, width="100%", height="100%")
         # 地図表示
         # マーカープロット（ポップアップ設定，色変更，アイコン変更）
-        print(map_report_df)
+        print('map_report_df',map_report_df)
+        print('past_diffconis_df',past_diffconis_df.columns)
         for tenpo_name in map_report_df['店舗名'].unique():
             print(tenpo_name)
             extract_syuzai_df_1 = tomorrow_report_df[tomorrow_report_df['店舗名'] == tenpo_name]
-            extract_syuzai_df_1 = extract_syuzai_df_1[extract_syuzai_df_1['イベント日'] == datetime64_tomorrow ]
+            #extract_syuzai_df_1 = extract_syuzai_df_1[extract_syuzai_df_1['イベント日'] == datetime64_tomorrow ]
             extract_syuzai_df_1.drop_duplicates(keep='first',inplace=True)
             #display(extract_syuzai_df_1)
-            print(extract_syuzai_df_1)
+            print('extract_syuzai_df_1',extract_syuzai_df_1)
             #syuzai_rank_list = list(extract_syuzai_df_1['取材ランク'].unique())
             #print(syuzai_rank_list)
-            longitude = extract_syuzai_df_1.iloc[0]['longitude']
-            latitude = extract_syuzai_df_1.iloc[0]['latitude']
-            print('latitude,longitude',latitude,longitude)
-            # グレースケールの画像データを作成
-            im= Image.new("L", (280, 100),color=(0))
-            im.putalpha(0)
-            im2= Image.new("L", (260, 50),color=(50))
-            im2.putalpha(128)
-            im3 = Image.open('icon.png')
-            draw = ImageDraw.Draw(im)
-            font = ImageFont.truetype('font/LightNovelPOPv2.otf',19)
-            if len(extract_syuzai_df_1)==1:
-                syuzai_name_text = '◆' + tenpo_name + f'\n {extract_syuzai_df_1["取材名"].values[0]}'
-            else:
-                syuzai_name_text = '◆' + tenpo_name + f'\n {extract_syuzai_df_1["取材名"].values[0]}、他{len(extract_syuzai_df_1)-1}件'
-            #print(syuzai_name_text)
-            draw = ImageDraw.Draw(im)
-            font = ImageFont.truetype('font/LightNovelPOPv2.otf',19)
+            try:
+                longitude = extract_syuzai_df_1.iloc[0]['longitude']
+                latitude = extract_syuzai_df_1.iloc[0]['latitude']
+                print('latitude,longitude',latitude,longitude)
+                # グレースケールの画像データを作成
+                im= Image.new("L", (280, 100),color=(0))
+                im.putalpha(0)
+                im2= Image.new("L", (260, 50),color=(50))
+                im2.putalpha(128)
+                im3 = Image.open('icon.png')
+                draw = ImageDraw.Draw(im)
+                font = ImageFont.truetype('font/LightNovelPOPv2.otf',19)
+                if len(extract_syuzai_df_1)==1:
+                    syuzai_name_text = '◆' + tenpo_name + f'\n {extract_syuzai_df_1["取材名"].values[0]}'
+                else:
+                    syuzai_name_text = '◆' + tenpo_name + f'\n {extract_syuzai_df_1["取材名"].values[0]}、他{len(extract_syuzai_df_1)-1}件'
+                #print(syuzai_name_text)
+                draw = ImageDraw.Draw(im)
+                font = ImageFont.truetype('font/LightNovelPOPv2.otf',19)
 
-            # 画像を表示
-            im.paste(im3, (-15,-14))
-            im.paste(im2, (25,48))
-            draw.multiline_text(
-                (150, 50),
-                f'{syuzai_name_text}',
-                font=font,
-                fill='white',
-                align='center',
-                spacing=0,
-                anchor='ma'
-            )
+                # 画像を表示
+                im.paste(im3, (-15,-14))
+                im.paste(im2, (25,48))
+                draw.multiline_text(
+                    (150, 50),
+                    f'{syuzai_name_text}',
+                    font=font,
+                    fill='white',
+                    align='center',
+                    spacing=0,
+                    anchor='ma'
+                )
 
-            im.save('syuzai_image.png', quality=95)
-            img = 'syuzai_image.png'
-            popup_df = extract_syuzai_df_1[['イベント日','店舗名','媒体名','取材名']].sort_values('店舗名')#.reset_index(drop=True)#.T
-            popup_df['イベント日'] = popup_df['イベント日'].map(convert_sql_date_to_jp_date_and_weekday)
-            popup_df_html = popup_df.to_html(escape=False,index=False,table_id="mystyle",justify='center',classes='table table-striped table-hover table-sm')
-            popup_df_html +=f'<a href="/tomorrow_recommend/minamikantou/hall/{tenpo_name}"  target="_parent">{tenpo_name}※店舗詳細ページに飛びます </a>'
-            popup_data = folium.Popup(popup_df_html,  max_width=1500,show=False,size=(700, 300))
+                im.save('syuzai_image.png', quality=95)
+                img = 'syuzai_image.png'
+                popup_df = extract_syuzai_df_1[['イベント日','店舗名','媒体名','取材名']].sort_values('店舗名')#.reset_index(drop=True)#.T
+                popup_df['イベント日'] = popup_df['イベント日'].map(convert_sql_date_to_jp_date_and_weekday)
+                popup_df_html = popup_df.to_html(escape=False,index=False,table_id="mystyle",justify='center',classes='table table-striped table-hover table-sm')
+                extract_hall_df = past_diffconis_df[past_diffconis_df['店舗名'] == tenpo_name]
+                if len(extract_hall_df) == 0:
+                    continue
+                popup_df_html += extract_hall_df.to_html(escape=False,index=False,table_id="mystyle",justify='center',classes='table table-striped table-hover table-sm')
+                popup_df_html +=f'<a href="/tomorrow_recommend/minamikantou/hall/{tenpo_name}"  target="_parent">{tenpo_name}※店舗詳細ページに飛びます </a>'
+                popup_data = folium.Popup(popup_df_html,  max_width=1500,show=False,size=(700, 300))
 
-            folium.Marker(location=[latitude ,longitude],
-                tiles='https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png',
-                attr='国土地理院',
-                popup=popup_data,
-                icon = CustomIcon(
-                            icon_image = img,
-                            icon_size = (280, 100),
-                            icon_anchor = (30, 0),
-                            #shadow_image = shadow_img, # 影効果（今回は使用せず コメントアウト
-                            #shadow_size = (30, 30),
-                            shadow_anchor = (-4, -40),
-                            popup_anchor = (3, 3))).add_to(folium_map)
-            #break
+                folium.Marker(location=[latitude ,longitude],
+                    tiles='https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png',
+                    attr='国土地理院',
+                    popup=popup_data,
+                    icon = CustomIcon(
+                                icon_image = img,
+                                icon_size = (280, 100),
+                                icon_anchor = (30, 0),
+                                #shadow_image = shadow_img, # 影効果（今回は使用せず コメントアウト
+                                #shadow_size = (30, 30),
+                                shadow_anchor = (-4, -40),
+                                popup_anchor = (3, 3))).add_to(folium_map)
+                #break
+
+            except:
+                print(tenpo_name,'の緯度経度が取得できていません。')
+                pass
+            
         plugins.Fullscreen(
-                            position="topright",
-                            title="拡大する",
-                            title_cancel="元に戻す",
-                            force_separate_button=True,
-                        ).add_to(folium_map)
+                position="topright",
+                title="拡大する",
+                title_cancel="元に戻す",
+                force_separate_button=True,
+            ).add_to(folium_map)
         folium_map.get_root().width = "500px"
         folium_map.get_root().height = "500px"
         map_test_html = folium_map.get_root()._repr_html_()
@@ -699,9 +745,9 @@ def get_top():
     else:
         print('今日のデータは取得済み'+report_row_1+"と"+compare_date)
         post_line('今日のデータはマップ取得済み'+report_row_1+"と"+compare_date)
-        pass
-        # with open('templates/top_map.html', mode='r', encoding='utf-8') as f:
-        #     top_map_html = f.read()
+        #pass
+        with open('templates/top_map.html', mode='r', encoding='utf-8') as f:
+            top_map_html = f.read()
 
     display_report_df = all_kanto_display_df[['イベント日','都道府県','店舗名','媒体名','取材名']].sort_values(['イベント日','都道府県','店舗名','媒体名','取材名'],ascending=[True,False,True,True,False],inplace=False).reset_index(drop=True)
     print(display_report_df)
@@ -1204,7 +1250,7 @@ def tomorrow_recommend_area_syuzai_syuzainame(area_name,syuzai_name):
                 FROM schedule as schedule2
                 left join halldata as halldata2
                 on schedule2.店舗名 = halldata2.hall_name
-                WHERE イベント日 >= current_date
+                WHERE イベント日 >= current_date - 10
                     AND イベント日 < current_date + 7
                     AND 媒体名 != 'ホールナビ'
                     AND 取材名 = '{syuzai_name}'
@@ -1213,6 +1259,7 @@ def tomorrow_recommend_area_syuzai_syuzainame(area_name,syuzai_name):
     cols = [col.name for col in cursor.description]
     extract_syuzai_name_df = pd.DataFrame(cursor.fetchall(),columns=cols)
     extract_syuzai_name_df.drop_duplicates(keep='first',inplace=True)
+    extract_syuzai_name_df.sort_values(['イベント日','都道府県','媒体名'],ascending=[False,True,True],inplace=True)
     table_df = extract_syuzai_name_df[['イベント日','都道府県','店舗名','媒体名']]
     table_df['イベント日'] = table_df['イベント日'].map(convert_sql_date_to_jp_date_and_weekday)
     table_df.rename(columns={'イベント日':'日'},inplace=True)
@@ -1238,7 +1285,7 @@ def tomorrow_recommend_area_hall_hallname(area_name,hall_name):
             WHERE (店舗名 = '{hall_name}') or (hall_name = '{hall_name}')
                 AND 媒体名 != 'ホールナビ'
                 AND ({area_sql_text})
-                ORDER BY イベント日,都道府県,媒体名 desc;''')
+                ORDER BY イベント日,都道府県,媒体名 ASC;''')
     cols = [col.name for col in cursor.description]
     extract_hall_name_df = pd.DataFrame(cursor.fetchall(),columns=cols)
     for column_name in ['twitter_url','pworld_url','dmm_url','line_url']:
@@ -1247,7 +1294,8 @@ def tomorrow_recommend_area_hall_hallname(area_name,hall_name):
         except:
             data[column_name] = ''
     data['iframe'] = create_hall_map_iframe(extract_hall_name_df,zoom_size=10)
-    extract_hall_name_df = extract_hall_name_df[extract_hall_name_df['イベント日'] >= datetime.date.today()]
+    extract_hall_name_df = extract_hall_name_df[extract_hall_name_df['イベント日'] >= datetime.date.today() - datetime.timedelta(days=35)]
+    extract_hall_name_df.sort_values(['イベント日','都道府県','媒体名'],ascending=[False,True,True],inplace=True)
     table_df = extract_hall_name_df[['イベント日','都道府県','媒体名','取材名']]
     try:
         table_df['イベント日'] = table_df['イベント日'].map(convert_sql_date_to_jp_date_and_weekday)
@@ -1279,7 +1327,7 @@ def tomorrow_recommend_area_media_medianame(area_name,media_name):
                 FROM schedule as schedule2
                 left join halldata as halldata2
                 on schedule2.店舗名 = halldata2.hall_name
-                WHERE イベント日 >= current_date
+                WHERE イベント日 >= current_date - 1
                 AND イベント日 < current_date + 7
                 AND 媒体名 = '{media_name}'
                 AND ({area_sql_text})
@@ -1288,7 +1336,7 @@ def tomorrow_recommend_area_media_medianame(area_name,media_name):
     extract_media_name_df = pd.DataFrame(cursor.fetchall(),columns=cols)
     extract_media_name_df.drop_duplicates(keep='first',inplace=True)
     table_df = extract_media_name_df[['イベント日','都道府県','店舗名','取材名']]
-    table_df = table_df.sort_values(['イベント日','都道府県','店舗名','取材名'],ascending=[True,True,True,True],inplace=False).reset_index(drop=True)
+    table_df = table_df.sort_values(['イベント日','都道府県','店舗名','取材名'],ascending=[False,True,True,True],inplace=False).reset_index(drop=True)
     table_df['イベント日'] = table_df['イベント日'].map(convert_sql_date_to_jp_date_and_weekday)
     table_df.rename(columns={'イベント日':'日'},inplace=True)
     table_df.drop_duplicates(keep='first',inplace=True)
@@ -1573,7 +1621,7 @@ def post_prefecture_list(pref_name_en):
     post_list_df = pd.DataFrame(items)
     page = request.args.get(get_page_parameter(), type=int, default=1)
     #jsonから取得したデータをページネーションで表示する
-    items = items[(page-1)*8:page*8]
+    items = items[(page-1)*10:page*10]
     pagination = Pagination(page=page, total=len(items),  per_page=1, css_framework='bootstrap4')
     return render_template('post_prefecture_list.html',items=items,data=data,enumerate=enumerate,pagination=pagination)
 
