@@ -217,6 +217,33 @@ ul, ol a {
   padding: 0.5em;
 }
 
+.list_test-wrap {
+  list-style:  none;  /* デフォルトのアイコンを消す */
+  margin:  0;         /* デフォルト指定上書き */
+  padding: 0;         /* デフォルト指定上書き */
+}
+
+.list_test:before {
+  content:  "";     /* 空の要素作成 */
+  width: 20px;                /* 幅指定 */
+  height: 20px;               /* 高さ指定 */
+  display:  inline-block;     /* インラインブロックにする */
+  background-color: #0074bf;  /* 背景色指定 */
+  position:  relative;        /* 位置調整 */
+  top: 3px;                   /* 位置指定 */
+  border-radius:  50%;        /* 要素を丸くする */
+  margin-right: 5px;          /* 余白指定 */
+}
+
+.list_test {
+  padding:  10px;             /* 余白指定 */
+  background-color:  #65ace4; /* 背景色指定 */
+  border-radius:  10px;       /* 角丸指定 */
+  margin-bottom: 5px;         /* 要素と要素の間指定 */
+  color: #fff;                /* 文字色指定 */
+  font-size:  20px;           /* 文字サイズ指定 */
+}
+
 h1,h2{
   color: #6cb4e4;
   text-align: center;
@@ -1101,6 +1128,7 @@ text-align: center; /* 内容は中央配置 */
 .toc-002 ol ol {
     margin-top: 1px;
     padding-left: 1.1em;
+    margin-left: 3px;
 }
 
 .toc-002 li {
@@ -1516,10 +1544,10 @@ text-align: center; /* 内容は中央配置 */
   padding: .9em 1em;
   border: none;
   border-radius: 5px;
-  background-color: #2589d0;
+  background-color: #005eff;
   color: #fff;
   font-weight: 600;
-  font-size: 1em;
+  font-size: 1.5em !important;
   width: 100%;
 }
 
