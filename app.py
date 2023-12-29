@@ -1278,7 +1278,7 @@ def send():
 def tomorrow_recommend():
     return render_template('tomorrow_recommend.html')
 
-@app.route("/tomorrow_recommend/<area_name>/prefecture/<prefecture_name>") 
+@app.route("/tomorrow_recommend/<area_name>/prefecture/<prefecture_name>", methods=['GET','POST']) 
 def tomorrow_recommend_area_prefecture_prefecturename(area_name,prefecture_name):
     data = {}
     today = date.today()
@@ -1358,34 +1358,50 @@ def tomorrow_recommend_area_hall_hallname(area_name,hall_name):
     data['area_name_jp'] = area_name_and_str_jp_area_name_dict[area_name]
     area_sql_text = get_area_sql_text(area_name)
     cursor = get_driver()
-    cursor.execute(f'''SELECT *
+    cursor.execute(f'''SELECT  都道府県, イベント日, 曜日, 店舗名, 取材名, 媒体名, 取材ランク, 取得時間 , halldata2.id , hall_name, prefecture_name, hall_url, dmm_url, pworld_url, line_url, twitter_url,  address, longitude, latitude, anaslo_name
             FROM schedule as schedule2
             left join halldata as halldata2
             on schedule2.店舗名 = halldata2.hall_name
             WHERE (店舗名 = '{hall_name}') or (hall_name = '{hall_name}')
-                AND 媒体名 != 'ホールナビ'
-                AND ({area_sql_text})
-                ORDER BY イベント日,都道府県,媒体名 ASC;''')
+            AND イベント日 >= current_date - 31
+            AND イベント日 < current_date + 7
+            AND 媒体名 != 'ホールナビ'
+            ORDER BY イベント日,都道府県,媒体名 ASC;''')
     cols = [col.name for col in cursor.description]
     extract_hall_name_df = pd.DataFrame(cursor.fetchall(),columns=cols)
-    for column_name in ['twitter_url','pworld_url','dmm_url','line_url']:
+    print('extract_hall_name_df.columns',extract_hall_name_df.columns)
+
+    for column_name in ['twitter_url','pworld_url','dmm_url','line_url','id','address']:
         try:
             data[column_name] = extract_hall_name_df.iloc[0].T[column_name]
         except:
             data[column_name] = ''
     data['iframe'] = create_hall_map_iframe(extract_hall_name_df,zoom_size=10)
-    extract_hall_name_df = extract_hall_name_df[extract_hall_name_df['イベント日'] >= datetime.date.today() - datetime.timedelta(days=35)]
-    extract_hall_name_df.sort_values(['イベント日','都道府県','媒体名'],ascending=[False,True,True],inplace=True)
-    table_df = extract_hall_name_df[['イベント日','都道府県','媒体名','取材名']]
+    future_extract_hall_name_df = extract_hall_name_df[extract_hall_name_df['イベント日'] >= datetime.date.today() ]
+    past_extract_hall_name_df = extract_hall_name_df[extract_hall_name_df['イベント日'] < datetime.date.today() ]
+    data['iframe'] = create_hall_map_iframe(extract_hall_name_df,zoom_size=10)
+    future_extract_hall_name_df.sort_values(['イベント日','都道府県','媒体名'],ascending=[False,True,True],inplace=True)
+    past_extract_hall_name_df.sort_values(['イベント日','都道府県','媒体名'],ascending=[False,True,True],inplace=True)
+    future_extract_hall_name_df = future_extract_hall_name_df[['イベント日','都道府県','媒体名','取材名']]
+    past_extract_hall_name_df = past_extract_hall_name_df[['イベント日','都道府県','媒体名','取材名']]
     try:
-        table_df['イベント日'] = table_df['イベント日'].map(convert_sql_date_to_jp_date_and_weekday)
+        future_extract_hall_name_df['イベント日'] = future_extract_hall_name_df['イベント日'].map(convert_sql_date_to_jp_date_and_weekday)
     except:
         pass
-    table_df.rename(columns={'イベント日':'日'},inplace=True)
-    table_df.drop_duplicates(keep='first',inplace=True)
-    data['extract_hall_name_df'] = table_df
-    data['extract_hall_name_df_column_names'] = table_df.columns.values
-    data['extract_hall_name_df_row_data'] = list(table_df.values.tolist())
+    try:
+        past_extract_hall_name_df['イベント日'] = past_extract_hall_name_df['イベント日'].map(convert_sql_date_to_jp_date_and_weekday)
+    except:
+        pass
+    future_extract_hall_name_df.rename(columns={'イベント日':'日'},inplace=True)
+    future_extract_hall_name_df.drop_duplicates(keep='first',inplace=True)
+    past_extract_hall_name_df.rename(columns={'イベント日':'日'},inplace=True)
+    past_extract_hall_name_df.drop_duplicates(keep='first',inplace=True)
+    data['past_extract_hall_name_df'] = past_extract_hall_name_df
+    data['past_extract_hall_name_df_column_names'] = past_extract_hall_name_df.columns.values
+    data['past_extract_hall_name_df_row_data'] = list(past_extract_hall_name_df.values.tolist())
+    data['future_extract_hall_name_df'] = future_extract_hall_name_df
+    data['future_extract_hall_name_df_column_names'] = future_extract_hall_name_df.columns.values
+    data['future_extract_hall_name_df_row_data'] = list(future_extract_hall_name_df.values.tolist())
     return render_template('tomorrow_recommend_area_hall_hallname.html',data=data,zip=zip)
 
 
@@ -1407,7 +1423,7 @@ def tomorrow_recommend_area_media_medianame(area_name,media_name):
                 FROM schedule as schedule2
                 left join halldata as halldata2
                 on schedule2.店舗名 = halldata2.hall_name
-                WHERE イベント日 >= current_date - 1
+                WHERE イベント日 >= current_date - 31
                 AND イベント日 < current_date + 7
                 AND 媒体名 = '{media_name}'
                 AND ({area_sql_text})
@@ -1415,16 +1431,24 @@ def tomorrow_recommend_area_media_medianame(area_name,media_name):
     cols = [col.name for col in cursor.description]
     extract_media_name_df = pd.DataFrame(cursor.fetchall(),columns=cols)
     extract_media_name_df.drop_duplicates(keep='first',inplace=True)
-    table_df = extract_media_name_df[['イベント日','都道府県','店舗名','取材名']]
-    table_df = table_df.sort_values(['イベント日','都道府県','店舗名','取材名'],ascending=[False,True,True,True],inplace=False).reset_index(drop=True)
-    table_df['イベント日'] = table_df['イベント日'].map(convert_sql_date_to_jp_date_and_weekday)
-    table_df.rename(columns={'イベント日':'日'},inplace=True)
-    table_df.drop_duplicates(keep='first',inplace=True)
-    print(table_df)
-    data['iframe'] = create_media_map_iframe(extract_media_name_df,area_name)
-    data['extract_media_name_df'] = table_df
-    data['extract_media_name_df_column_names'] = table_df.columns.values
-    data['extract_media_name_df_row_data'] = list(table_df.values.tolist())
+    extract_media_name_df = extract_media_name_df.sort_values(['イベント日','都道府県','店舗名','取材名'],ascending=[False,True,True,True],inplace=False).reset_index(drop=True)
+    create_media_map_iframe_df = extract_media_name_df
+    extract_media_name_df = extract_media_name_df[['イベント日','都道府県','店舗名','取材名']]
+    future_extract_media_name_df = extract_media_name_df[extract_media_name_df['イベント日'] >= datetime.date.today() ]
+    past_extract_media_name_df = extract_media_name_df[extract_media_name_df['イベント日'] < datetime.date.today() ]
+    future_extract_media_name_df = future_extract_media_name_df[['イベント日','都道府県','店舗名','取材名']]
+    future_extract_media_name_df['イベント日'] = future_extract_media_name_df['イベント日'].map(convert_sql_date_to_jp_date_and_weekday)
+    past_extract_media_name_df['イベント日'] = past_extract_media_name_df['イベント日'].map(convert_sql_date_to_jp_date_and_weekday)
+    future_extract_media_name_df.rename(columns={'イベント日':'日'},inplace=True)
+    future_extract_media_name_df.drop_duplicates(keep='first',inplace=True)
+    print(future_extract_media_name_df)
+    data['iframe'] = create_media_map_iframe(create_media_map_iframe_df,area_name)
+    data['extract_media_name_df'] = future_extract_media_name_df
+    data['extract_media_name_df_column_names'] = future_extract_media_name_df.columns.values
+    data['extract_media_name_df_row_data'] = list(future_extract_media_name_df.values.tolist())
+    data['past_extract_media_name_df'] = past_extract_media_name_df
+    data['past_extract_media_name_df_column_names'] = past_extract_media_name_df.columns.values
+    data['past_extract_media_name_df_row_data'] = list(past_extract_media_name_df.values.tolist())
     return render_template('tomorrow_recommend_area_media_medianame.html',data=data,zip=zip)
 
 

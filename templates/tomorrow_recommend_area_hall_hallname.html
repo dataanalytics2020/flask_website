@@ -9,7 +9,7 @@
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                   <li class="breadcrumb-item"><a href="/">HOME</a></li>
-                  <li class="breadcrumb-item"><a href="/tomorrow-recommend/{{data.area_name}}">{{data.area_name_jp}}</a></li>
+                  <li class="breadcrumb-item"><a href="/tomorrow_recommend/{{data.area_name}}">{{data.area_name_jp}}</a></li>
                   <li class="breadcrumb-item active" aria-current="page"><a href="/tomorrow-recommend/{{data.area_name}}/hall/{{data.hall_name}}">{{data.hall_name}}</a></li>
                 </ol>
             </nav>
@@ -18,23 +18,45 @@
                 <div class="heading-008 my-2 ">{{data.hall_name}}</div>
             </div>
             <iframe class="embed-responsive-item" scrolling="no" height="450" width="100%" src={{ data.iframe|safe }}</iframe>
-            <ul class="snsButtons">
-                {% if data.twitter_url != '' %}
-                    <li class="snsButtons_twitter"><i class="fa fa-twitter"></i><span class="snsButtons_label"><a href="{{data.twitter_url}}" class="text-white" >店舗Twitter</a></span>
-                {% endif %} 
-                {% if data.pworld_url != '' %}
-                    <li class="snsButtons_pworld"><i class="fa-solid fa-p"></i><span class="snsButtons_label"><a href="{{data.pworld_url}}" class="text-white" >P-WORLD</a></span>
-                {% endif %} 
-                {% if data.line_url != '' %}
-                    <li class="snsButtons_line"><i class="fa-brands fa-line"></i><span class="snsButtons_label"><a href="{{data.line_url}}" class="text-white" >店舗LINE</a></span>
-                {% endif %} 
-            </ul>
+            <div class="card" style="width:100%;">
+                {% if data.address != ''%}
+                <div class="box-011 mt-5 m-2 mx-auto">
+                    <span>住所</span>
+                    <p>{{data.address}}</p>
+                </div>
+                {% endif %}
+                <a href="https://www.google.com/maps/search/?api=1&query={{data.hall_name}}&zoom=12" target="_blank" rel="noopener noreferrer" class="m-2 btn btn-primary btn-block text-white">Googleマップで表示する</a>
+                <div class="row no-gutters">
+                    <div class="col-6">
+                        <img onerror="this.remove()" class="card-img" src="http://pachislo7.com/wp-content/uploads/hall_image_{{data.id}}.png" alt="{{data.hall_name}}" loading="lazy">
+                    </div>
+                    <div class="col-6">
+                        <div class="card-body">
+                            <ul class="snsButtons">
+                            {% if data.twitter_url != ''%}
+                                <li class="snsButtons_twitter"><i class="fa fa-twitter"></i><span class="snsButtons_label"><a href="{{data.twitter_url}}" class="text-white" target="_blank" rel="noopener noreferrer">店舗X</a></span></li>
+                            {% endif %}
+                            {% if pworld_url != ''%}
+                                <li class="snsButtons_pworld"><i class="fa-solid fa-p"></i><span class="snsButtons_label"><a href="{{data.pworld_url}}" class="text-white" target="_blank" rel="noopener noreferrer">P-WORLD</a></span></li>
+                            {% endif %}
+                            {% if dmm_url != ''%}
+                                <li class="snsButtons_dmm"><i class="fa-solid fa-d"></i><span class="snsButtons_label"><a href="{{data.dmm_url}}" class="text-white" target="_blank" rel="noopener noreferrer">DMM</a></span></li>
+                            {% endif %}
+                            {% if line_url != ''%}
+                                <li class="snsButtons_line"><i class="fa-brands fa-line"></i><span class="snsButtons_label"><a href="{{dline_url}}" class="text-white" target="_blank" rel="noopener noreferrer">店舗LINE</a></span></li>
+                            {% endif %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <h4 class="my-2">取材予定(※直近一週間分表示中)</h4>
             <div class = 'heatmap .table-wrap'>
                 <div class="scroll_area" style="width:100%;max-width:2000px;overflow-x:scroll;">
                     <table id="hall_table" class="table table-striped">
                         <thead>
                             <tr>
-                                {% for col in data.extract_hall_name_df_column_names %}
+                                {% for col in data.future_extract_hall_name_df_column_names %}
                                 <th>
                                 {{col}}
                                 </th>
@@ -42,9 +64,42 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for row in data.extract_hall_name_df_row_data %}
+                            {% for row in data.future_extract_hall_name_df_row_data %}
                             <tr>
-                                {% for col, row_ in zip(data.extract_hall_name_df_column_names, row) %}
+                                {% for col, row_ in zip(data.future_extract_hall_name_df_column_names, row) %}
+                                    {% if col == '取材名' %}
+                                        <td><a href="/tomorrow_recommend/{{data.area_name}}/syuzai/{{ row_ }}" >{{ row_ }}</a></td>
+                                    {% elif col == '店舗名' %}
+                                        <td><a href="/tomorrow_recommend/{{data.area_name}}/hall/{{ row_ }}" >{{ row_ }}</a></td>
+                                    {% elif col == '媒体名' %}
+                                        <td><a href="/tomorrow_recommend/{{data.area_name}}/media/{{ row_ }}" >{{ row_ }}</a></td>
+                                    {% else %}
+                                        <td>{{row_}}</td>
+                                    {% endif %}
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <h4 class="my-2">過去取材(※過去一か月分表示中)</h4>
+            <div class = 'heatmap .table-wrap'>
+                <div class="scroll_area" style="width:100%;max-width:2000px;overflow-x:scroll;">
+                    <table id="past_hall_table" class="table table-striped">
+                        <thead>
+                            <tr>
+                                {% for col in data.past_extract_hall_name_df_column_names %}
+                                <th>
+                                {{col}}
+                                </th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in data.past_extract_hall_name_df_row_data %}
+                            <tr>
+                                {% for col, row_ in zip(data.past_extract_hall_name_df_column_names, row) %}
                                     {% if col == '取材名' %}
                                         <td><a href="/tomorrow_recommend/{{data.area_name}}/syuzai/{{ row_ }}" >{{ row_ }}</a></td>
                                     {% elif col == '店舗名' %}

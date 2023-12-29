@@ -19,6 +19,7 @@
                 <div class="heading-008 my-2 ">{{data.media_name}}</div>
             </div>
             <iframe class="embed-responsive-item" scrolling="no" height="450" width="100%" src={{ data.iframe|safe }}</iframe>
+            <h4 class="my-2">取材予定(※直近一週間分表示中)</h4>
             <div class = 'heatmap .table-wrap'>
                 <div class="scroll_area" style="width:100%;max-width:2000px;overflow-x:scroll;">
                     <table id="media_table" class="table table-striped">
@@ -35,6 +36,39 @@
                             {% for row in data.extract_media_name_df_row_data %}
                             <tr>
                                 {% for col, row_ in zip(data.extract_media_name_df_column_names, row) %}
+                                    {% if col == '取材名' %}
+                                        <td><a href="/tomorrow_recommend/{{data.area_name}}/syuzai/{{ row_ }}" >{{ row_ }}</a></td>
+                                    {% elif col == '店舗名' %}
+                                        <td><a href="/tomorrow_recommend/{{data.area_name}}/hall/{{ row_ }}" >{{ row_ }}</a></td>
+                                    {% elif col == '媒体名' %}
+                                        <td><a href="/tomorrow_recommend/{{data.area_name}}/media/{{ row_ }}" >{{ row_ }}</a></td>
+                                    {% else %}
+                                        <td>{{row_}}</td>
+                                    {% endif %}
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <h4 class="my-2">過去取材(※過去一か月分表示中)</h4>
+            <div class = 'heatmap .table-wrap'>
+                <div class="scroll_area" style="width:100%;max-width:2000px;overflow-x:scroll;">
+                    <table id="past_media_table" class="table table-striped">
+                        <thead>
+                            <tr>
+                                {% for col in data.past_extract_media_name_df_column_names %}
+                                <th>
+                                {{col}}
+                                </th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in data.past_extract_media_name_df_row_data %}
+                            <tr>
+                                {% for col, row_ in zip(data.past_extract_media_name_df_column_names, row) %}
                                     {% if col == '取材名' %}
                                         <td><a href="/tomorrow_recommend/{{data.area_name}}/syuzai/{{ row_ }}" >{{ row_ }}</a></td>
                                     {% elif col == '店舗名' %}

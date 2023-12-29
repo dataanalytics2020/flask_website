@@ -1765,3 +1765,29 @@ text-align: center; /* 内容は中央配置 */
   font-weight: 200;
   font-size: .8em;
 }
+
+.box-011 {
+  position: relative;
+  width: 95%;
+  margin: 1.9em auto 0;
+  padding: 2px;
+  border: 2px solid #2589d0;
+  border-radius: 3px;
+}
+
+.box-011 span {
+  position: absolute;
+  top: -1.9em;
+  left: -2px;
+  padding: .2em .8em;
+  border-radius: 5px 5px 0 0;
+  background-color: #2589d0;
+  color: #fff;
+}
+
+.box-011 p {
+  margin: 0;
+  color: #333;
+  padding: .2em .8em;
+  font-weight: bold;
+  font-size: 1.2em;}

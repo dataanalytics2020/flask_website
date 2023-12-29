@@ -153,6 +153,33 @@ $(document).ready(function(){
         // 初期表示の並び替えなし
         order: []
     });
+
+    $("#past_media_table").DataTable({
+        "language":{url:"https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json",},
+        // 件数切替機能 無効
+        lengthChange: true,
+        // 検索機能 無効
+        searching: true,
+        // ソート機能 無効
+        ordering: true,
+        // 情報表示 無効
+        info: true,
+        // ページング機能 無効
+        paging: true,
+        // ページングの件数切替機能 無効
+        pagingType: "full_numbers",
+        // ページングの件数切替機能 無効
+        lengthMenu: [ 5, 10, 30, 50,100 ],
+        // ページングの件数切替機能 無効
+        pageLength: 100,
+
+        //列の幅を調整する
+        autoWidth: true,
+        
+        // 初期表示の並び替えなし
+        order: []
+    });
+
     $("#hall_table").DataTable({
         "language":{url:"https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json",},
             // 件数切替機能 無効
@@ -171,6 +198,31 @@ $(document).ready(function(){
         lengthMenu: [ 5, 10, 30, 50,100 ],
         // ページングの件数切替機能 無効
         pageLength: 30,
+
+        //列の幅を調整する
+        autoWidth: true,
+        
+        // 初期表示の並び替えなし
+        order: []
+    });
+    $("#past_hall_table").DataTable({
+        "language":{url:"https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json",},
+            // 件数切替機能 無効
+        lengthChange: true,
+        // 検索機能 無効
+        searching: true,
+        // ソート機能 無効
+        ordering: true,
+        // 情報表示 無効
+        info: true,
+        // ページング機能 無効
+        paging: true,
+        // ページングの件数切替機能 無効
+        pagingType: "full_numbers",
+        // ページングの件数切替機能 無効
+        lengthMenu: [ 5, 10, 30, 50,100 ],
+        // ページングの件数切替機能 無効
+        pageLength: 100,
 
         //列の幅を調整する
         autoWidth: true,
