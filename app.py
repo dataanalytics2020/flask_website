@@ -1674,18 +1674,16 @@ def post_prefecture_list(pref_name_en):
     API_URL = f"{SITE_URL}/wp-json/wp/v2/"
     AUTH_USER = os.getenv('WORDPRESS_PACHISLO7_ID')
     AUTH_PASS = os.getenv('WORDPRESS_PACHISLO7_PW')
-    label = f'posts?_embed&tags={str(prefecture_tag_id)}+&status=draft'
+    page = request.args.get(get_page_parameter(), type=int, default=1)
+    label = f'posts?_embed&tags={str(prefecture_tag_id)}+&status=draft&page={page}'
     url = f"{API_URL}{label}"
     # すべてのアイテムを取得
     print(url)
-    items_list = requests.get(url, auth=(AUTH_USER, AUTH_PASS)).json()
-    print('len(items_list)',len(items_list))
-    page = request.args.get(get_page_parameter(), type=int, default=1)
+    items = requests.get(url, auth=(AUTH_USER, AUTH_PASS)).json()
     #jsonから取得したデータをページネーションで表示する
-    items = items_list[(page-1)*10:page*10]
     print('len(items)',len(items))
     print('page',page)
-    total_page = len(items_list)//10 + 1
+    total_page = 30//10 + 1
     pagination = Pagination(page=page, total=total_page,  per_page=1, css_framework='bootstrap4')
     return render_template('post_prefecture_list.html',items=items,data=data,enumerate=enumerate,pagination=pagination)
 
