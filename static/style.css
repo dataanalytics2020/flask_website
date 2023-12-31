@@ -1117,7 +1117,7 @@ text-align: center; /* 内容は中央配置 */
 .toc-002 ol {
     list-style-type: decimal;
     margin: 0;
-    overflow: hidden;
+    padding: 2px 25px;
 }
 
 .toc-002 > ul, ol a {
@@ -1129,11 +1129,12 @@ text-align: center; /* 内容は中央配置 */
     margin-top: 1px;
     padding-left: 1.1em;
     margin-left: 3px;
+    padding-left: 10px;
 }
 
 .toc-002 li {
     font-weight: 600;
-    line-height: 25px!important;
+    line-height: 19px!important;
 }
 
 .toc-002 ol ol li {
