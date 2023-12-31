@@ -7,14 +7,24 @@
     <div class="row">
         <div class="column col-lg-9">
             <dl class="info">
+                <dt><span>表示改善</span><time>2023.12.30</time></dt>
+                <dd>店舗ページにグーグルマップでも見れるようにしました</dd>
+                <dt><span>新機能追加</span><time>2023.12.25</time></dt>
+                <dd>都道府県別の過去差枚実績から明日のお勧め店舗記事を追加しました</dd>
                 <dt><span>新機能追加</span><time>2023.11.17</time></dt>
-                <dd><a href="news/news_2023-11-17-1">TOPページにお知らせ機能を追加しました</a></dd>
+                <dd>TOPページにお知らせ機能を追加しました</dd>
                 <dt><span>表示改善</span><time>2023.11.15</time></dt>
-                <dd>トップのマップから店舗ページに行けるように修正しました</dd>
+                <dd>マップのポップアップから店舗ページに行けるように修正しました</dd>
                 <dt><span>お知らせ</span><time>2023.7.28</time></dt>
-                <dd><a tabindex="-1">スロマップをオープンしました</a></dd>
+                <dd>スロマップをオープンしました</dd>
             </dl>
-            <a href="/serch-recommend-prefecture-day"><button class="button-014 my-3"><div><i class="fa-solid fa-building-circle-exclamation"></i> サイト初訪問者・スロット初心者にオススメ</div><span>➀過去差枚データから<br>お勧め店舗・機種を探す</span></button></a>
+            <a href="/serch-recommend-prefecture-day"><button class="button-014 my-4">
+                <div>
+                    <i class="fa-solid fa-building-circle-exclamation"></i> サイト初訪問者・スロット初心者にオススメ
+                </div>
+                
+                <span><img src="static/img/thumbnail/thumbnail_tokyo_2023-12-29-300x200.png" loading="lazy" width="90" height="60" alt="icon" class="mx-2">➀過去差枚実績から<br>お勧め店舗・機種を探す</span></button>
+            </a>
             <a href="/tomorrow-recommend"><button class="button-014 my-4"><div><i class="fa-solid fa-magnifying-glass-location"></i> 取材・公約をわかる中級者以上にオススメ</div><span>➁マップから<br>取材のある店舗を探す</span></button></a>
             <div class="heading-008 my-2 ">エリアから取材予定を地図で探す</div>
             <ul class="top-btn" style="list-style: none; padding: 0;  margin:0;">
@@ -47,7 +57,6 @@
                         <span class="area_btn area4" data-area="4">近畿</span>
                         <span class="area_btn area5" data-area="5">中国・四国</span>
                         <span class="area_btn area6" data-area="6">九州・沖縄</span>
-                        
                         <div class="area_overlay"></div>
                         <div class="pref_area">
                             <div class="pref_list" data-list="1">
@@ -60,7 +69,7 @@
                                 <div data-id="7">福島県</div>
                                 <div></div>
                             </div>
-                            
+
                             <div class="pref_list" data-list="2">
                                 <div data-id="8">茨城県</div>
                                 <div data-id="9">栃木県</div>
@@ -71,7 +80,7 @@
                                 <div data-id="14">神奈川県</div>
                                 <div></div>
                             </div>
-                            
+
                             <div class="pref_list" data-list="3">
                                 <div data-id="15">新潟県</div>
                                 <div data-id="16">富山県</div>
@@ -84,7 +93,7 @@
                                 <div data-id="23">愛知県</div>
                                 <div></div>
                             </div>
-                            
+
                             <div class="pref_list" data-list="4">
                                 <div data-id="24">三重県</div>
                                 <div data-id="25">滋賀県</div>
@@ -141,7 +150,7 @@
                 </div>
             </form>
 
-            <h4 data-text="※明日みんなが注目の取材のみマップに表示中">※明日{{data.tommorow_jp_str_day}} 東京都のお勧め店舗<br>過去差枚もマップに表示中</h4>
+            <h4 data-text="※明日みんなが注目の取材のみマップに表示中">※明日{{data.tommorow_jp_str_day}} 東京都の旧イベント日<br>過去差枚がわかる店舗をマップに表示中</h4>
             <iframe class="embed-responsive-item" loading="lazy" title="location_map" scrolling="no" height="450" width="100%" src= "{{url_for('show_iframe')}}" ></iframe>
 
             <h4 class="mt-3" >明日{{data.tommorow_jp_str_day}}の東京都日別差枚順記事</h4>
