@@ -8,12 +8,12 @@
         <div class="column col-lg-9">
             <dl class="info">
                 <dt><span>表示改善</span><time>2023.12.30</time></dt>
-                <dd>店舗ページにグーグルマップでも見れるようにしました</dd>
-                <dt><span>新機能追加</span><time>2023.12.25</time></dt>
+                <dd>店舗ページからグーグルマップでも見れるようにしました</dd>
+                <dt><span>新機能追加</span><time>2023.12.10</time></dt>
                 <dd>都道府県別の過去差枚実績から明日のお勧め店舗記事を追加しました</dd>
                 <dt><span>新機能追加</span><time>2023.11.17</time></dt>
                 <dd>TOPページにお知らせ機能を追加しました</dd>
-                <dt><span>表示改善</span><time>2023.11.15</time></dt>
+                <dt><span>表示改善</span><time>2023.10.15</time></dt>
                 <dd>マップのポップアップから店舗ページに行けるように修正しました</dd>
                 <dt><span>お知らせ</span><time>2023.7.28</time></dt>
                 <dd>スロマップをオープンしました</dd>
@@ -167,6 +167,10 @@
                                 <li class="list_test">{{ recommend_hall_name }}</li>
                             {% endfor %}
                             </ul>
+                            <div class="heading-011 mt-3" >明日{{data.tommorow_jp_str_day}}の東京都<br>日別お勧め店舗画像</div>
+                            <img class="card-img-top" src="https://pachislo7.com/wp-content/uploads/top10_recommend_hall_name_{{data.target_date_md }}.png" alt="明日{{data.tommorow_jp_str_day}}の東京都日別お勧め店舗画像" width="80%" height="80%" loading="lazy">
+                            <div class="heading-011 mt-3" >明日{{data.tommorow_jp_str_day}}の東京都<br>旧イベ日過去三回平均差枚画像</div>
+                            <img class="card-img-top" src="https://pachislo7.com/wp-content/uploads/old_event_day_hall_name_{{data.target_date_md }}.png" alt="明日{{data.tommorow_jp_str_day}}の東京都旧イベ日過去三回平均差枚画像" width="80%" height="80%" loading="lazy">
                         </div>
                     </a>
                 </div>

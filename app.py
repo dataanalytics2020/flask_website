@@ -777,6 +777,7 @@ def get_top():
     data['thumbnail_url'] = thumbnail_url
     parameter_id = res[0]['id']
     data['post_slug'] = post_slug
+    data['target_date_md'] = 'tokyo_' + post_slug.split('_')[1].split('-')[1] + post_slug.split('_')[1].split('-')[2]
     #print('parameter_id',parameter_id)
     write_html = res[0]['content']['rendered'].split('ここまで')[-1]
     content = res[0]['content']['rendered'].split('ここまで')[0]
