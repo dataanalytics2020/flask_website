@@ -169,9 +169,9 @@ for prefecture in prefecture_list[12:13]:
         #break
         count = 0
         error_count = 0
-        ichiran_all_tennpo_df = pd.DataFrame(columns=[],index=[])
         post_line_text(f'{prefecture} {len(tenpo_url_name_list)}店舗取得数',line_token)
-        for day_num in reversed(range(1,15)):
+        for day_num in reversed(range(1,25)):
+            ichiran_all_tennpo_df = pd.DataFrame(columns=[],index=[])
         #tenpo_ichiran_df['ホール名']
             try:
                 target_day = datetime.date.today() + datetime.timedelta(days=-day_num)
@@ -182,7 +182,6 @@ for prefecture in prefecture_list[12:13]:
                     continue
                 # if i> 2:
                 #     break
-                post_line_text(f'{prefecture} {target_day} diffcoinstable',line_token)
                 for i, tenpo_name in enumerate(tenpo_url_name_list):
                     try:
                         print(i,tenpo_name,target_day.strftime('%Y-%m-%d'))
@@ -238,17 +237,24 @@ for prefecture in prefecture_list[12:13]:
                                 #time.sleep(1)
                                 continue
                         #break
+                        
                     except Exception as e:
                         print(tenpo_name,e)
                         continue
                 #break
+                ichiran_all_tennpo_df = ichiran_all_tennpo_df.fillna('')
+                cursor = get_driver()
+                post_line_text(f'{prefecture} {target_day_str} insert開始',line_token)
+                insert_data_bulk(ichiran_all_tennpo_df ,conn)
+                post_line_text(f'{prefecture} {target_day_str}insert終了',line_token)
             except Exception as e:
                 print(tenpo_name,e)
                 continue
-        ichiran_all_tennpo_df = ichiran_all_tennpo_df.fillna('')
+        
         #print(ichiran_all_tennpo_df.iloc[:5])
         # SSH 接続 踏み台接続
         #break
+
     except Exception as e:
         print(e)
         break
@@ -258,16 +264,4 @@ for prefecture in prefecture_list[12:13]:
 
 #ichiran_all_tennpo_df.to_csv('csv/tokyo_psgr_insert_df.csv',index=False)
 
-users = os.getenv('HEROKU_PSGR_USER')    # DBにアクセスするユーザー名(適宜変更)
-dbnames = os.getenv('HEROKU_PSGR_DATABASE')   # 接続するデータベース名(適宜変更)
-passwords = os.getenv('HEROKU_PSGR_PASSWORD')  # DBにアクセスするユーザーのパスワード(適宜変更)
-host = os.getenv('HEROKU_PSGR_HOST')     # DBが稼働しているホスト名(適宜変更)
-port = 5432        # DBが稼働しているポート番号(適宜変更)
 
-# PostgreSQLへ接続
-conn = psycopg2.connect("user=" + users +" dbname=" + dbnames +" password=" + passwords, host=host, port=port)
-
-# PostgreSQLにデータ登録
-
-cursor = conn.cursor()
-insert_data_bulk(ichiran_all_tennpo_df ,conn)
