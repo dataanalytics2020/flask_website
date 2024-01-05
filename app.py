@@ -568,6 +568,7 @@ def get_top():
         jp_str_day_list.append(jp_str_day)
     data['jp_str_day_list'] = jp_str_day_list
     tomorrow:date = today + timedelta(days=1)
+    #today = datetime.datetime.utcnow().today()
     target_n_day_str = tomorrow.strftime('%Y-%m-%d')[-1]
     print('target_n_day_str',target_n_day_str)
     datetime64_tomorrow = np.datetime64(tomorrow)
@@ -1283,6 +1284,11 @@ def tomorrow_recommend():
 def tomorrow_recommend_area_prefecture_prefecturename(area_name,prefecture_name):
     data = {}
     today = date.today()
+    tomorrow:date = today + timedelta(days=1)
+    tomorrow_str = tomorrow.strftime('%Y-%m-%d')
+    tommorow_jp_str_day = tomorrow.strftime('%m').lstrip('0') + '月' + tomorrow.strftime('%d').lstrip('0') + '日' + w_list[tomorrow.weekday()]
+    print(tommorow_jp_str_day)
+    data['tommorow_jp_str_day'] =  tommorow_jp_str_day
     date_list = [today + timedelta(days=day) for day in range(0,6)]
     date_list = [date.strftime("%Y-%m-%d") for date in date_list]
     data['area_name_jp'] = area_name_and_str_jp_area_name_dict[area_name]
@@ -1316,6 +1322,50 @@ def tomorrow_recommend_area_prefecture_prefecturename(area_name,prefecture_name)
     data['extract_prefecture_name_df'] = table_df
     data['extract_prefecture_name_df_column_names'] = table_df.columns.values
     data['extract_prefecture_name_df_row_data'] = list(table_df.values.tolist())
+    prefecture_df = pd.read_csv('csv/pref_lat_lon.csv')
+    data['pref_name_jp'] = prefecture_name
+    data['pref_name_en'] = pref_name_en = prefecture_df[prefecture_df['pref_name'] == prefecture_name]['pref_name_en'].values[0]
+     
+    #print('data',data) 
+    # アクセス情報の設定
+    SITE_URL = os.getenv('WORDPRESS_PACHISLO7_URL')
+    API_URL = f"{SITE_URL}/wp-json/wp/v2/"
+    AUTH_USER = os.getenv('WORDPRESS_PACHISLO7_ID')
+    AUTH_PASS = os.getenv('WORDPRESS_PACHISLO7_PW')
+
+    #下書き状態の記事を取得
+    #画像は取得するがurl以外は取得しない
+    print('pref_name_en',pref_name_en) 
+    post_slug = f'{pref_name_en}_{tomorrow_str}'
+    label = f'posts?slug={post_slug}&status=draft&_embed'
+    url = f"{API_URL}{label}"
+    # すべてのアイテムを取得
+    print(data)
+    print('url',url)
+    
+    res = requests.get(url, auth=(AUTH_USER, AUTH_PASS)).json()
+    print('res',res)
+    thumbnail_url = res[0]['_embedded']['wp:featuredmedia'][0]['source_url']
+    #print('thumbnail_url',thumbnail_url)
+    data['thumbnail_url'] = thumbnail_url
+    parameter_id = res[0]['id']
+    data['post_slug'] = post_slug
+    print('pref_name_en',pref_name_en)
+    print('post_slug',post_slug)
+    data['target_date_md'] = pref_name_en + '_' + post_slug.split('_')[1].split('-')[1] + post_slug.split('_')[1].split('-')[2]
+    #print('parameter_id',parameter_id)
+    write_html = res[0]['content']['rendered'].split('ここまで')[-1]
+    content = res[0]['content']['rendered'].split('ここまで')[0]
+    data['title'] = res[0]['title']['rendered'].replace('TOP10','')
+    dfs = pd.read_html(content)
+    #print('dfs',dfs)
+    data['write_html'] = write_html
+    #data['tag_df'] = tag_df.to_html(justify='justify-all',classes='tb01')
+    dfs = pd.read_html(content)
+    groupby_date_kisyubetu_df = dfs[0]
+    location_name_df = dfs[1]
+    recommend_hall_name_list = list(location_name_df['店舗名'].unique())
+    data['recommend_hall_name_list'] = recommend_hall_name_list
     return render_template('tomorrow_recommend_area_prefecture_prefecturename.html',data=data,zip=zip)
 
 @app.route("/tomorrow_recommend/<area_name>/syuzai/<syuzai_name>")
