@@ -828,8 +828,14 @@ def post_top():
     data['area_name_jp'] = area_name_jp
     data['area_name'] = area_name
     print('dataは',data)
-    target_day = str(today.year) + '-' + user_data['target_day'].split('月')[0] + '-' + user_data['target_day'].split('月')[1].split('日')[0]
-    jpn_target_day = target_day.split('-')[1].lstrip('0') + '月' + target_day.split('-')[2].lstrip('0') + '日'
+    target_month =  int(f"{user_data['target_day'].split('月')[0]}")
+    print(target_month,type(target_month))
+    #target_monthを2桁にする
+    target_month =  f'{target_month:02}' 
+    target_day = int(user_data['target_day'].split('月')[1].split('日')[0])
+    target_day  = f'{target_day:02}' 
+    target_date = str(today.year) + '-' + target_month  + '-' + target_day
+    data['tommorow_jp_str_day'] = target_month.lstrip('0') + '月' + target_day.lstrip('0') + '日'
     #print(prefecture,target_day)
     #イベント日,店舗名,取材名,媒体名,アナスロ店舗名
     cursor = get_driver()
@@ -838,7 +844,7 @@ def post_top():
                 FROM schedule as schedule2
                 left join halldata as halldata2
                 on schedule2.店舗名 = halldata2.hall_name
-                WHERE イベント日 = '{target_day}'
+                WHERE イベント日 = '{target_date}'
                 AND 媒体名 != 'ホールナビ'
                 AND 都道府県 = '{prefecture}'
                 ORDER BY イベント日,都道府県 desc;''')
@@ -851,6 +857,38 @@ def post_top():
     table_df.rename(columns={'イベント日':'日'},inplace=True)
     table_df.drop_duplicates(keep='first',inplace=True)
     #print(table_df)
+    prefecture_df = pd.read_csv('csv/pref_lat_lon.csv')
+    data['pref_name_jp'] = prefecture_name
+    data['pref_name_en'] = pref_name_en = prefecture_df[prefecture_df['pref_name'] == prefecture]['pref_name_en'].values[0]
+    #print('data',data) 
+    # アクセス情報の設定
+    SITE_URL = os.getenv('WORDPRESS_PACHISLO7_URL')
+    API_URL = f"{SITE_URL}/wp-json/wp/v2/"
+    AUTH_USER = os.getenv('WORDPRESS_PACHISLO7_ID')
+    AUTH_PASS = os.getenv('WORDPRESS_PACHISLO7_PW')
+
+    #下書き状態の記事を取得
+    #画像は取得するがurl以外は取得しない
+    print('pref_name_en',pref_name_en) 
+    post_slug = f'{pref_name_en}_{target_date}'
+    label = f'posts?slug={post_slug}&status=draft&_embed'
+    url = f"{API_URL}{label}"
+    # すべてのアイテムを取得
+    print(data)
+    print('url',url)
+    
+    res = requests.get(url, auth=(AUTH_USER, AUTH_PASS)).json()
+    print('res',res)
+    thumbnail_url = res[0]['_embedded']['wp:featuredmedia'][0]['source_url']
+    #print('thumbnail_url',thumbnail_url)
+    data['thumbnail_url'] = thumbnail_url
+    parameter_id = res[0]['id']
+    data['post_slug'] = post_slug
+    print('pref_name_en',pref_name_en)
+    print('post_slug',post_slug)
+    data['target_date_md'] = post_slug
+    #print('parameter_id',parameter_id)
+    
     data['iframe'] = create_media_map_iframe(extract_prefecture_name_df,area_name='minamikantou')
     data['extract_prefecture_name_df'] = table_df
     data['extract_prefecture_name_df_column_names'] = table_df.columns.values
@@ -1352,7 +1390,7 @@ def tomorrow_recommend_area_prefecture_prefecturename(area_name,prefecture_name)
     data['post_slug'] = post_slug
     print('pref_name_en',pref_name_en)
     print('post_slug',post_slug)
-    data['target_date_md'] = pref_name_en + '_' + post_slug.split('_')[1].split('-')[1] + post_slug.split('_')[1].split('-')[2]
+    data['target_date_md'] = post_slug
     #print('parameter_id',parameter_id)
     write_html = res[0]['content']['rendered'].split('ここまで')[-1]
     content = res[0]['content']['rendered'].split('ここまで')[0]
