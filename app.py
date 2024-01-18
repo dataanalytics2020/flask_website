@@ -644,10 +644,10 @@ def get_top():
         for hall_name_text in list(report_df['店舗名'].unique()):
             sql_hall_name_text += f"'{hall_name_text}'" + ','
         sql_hall_name_text = sql_hall_name_text.rstrip(',')
-        sql_date_text = generate_past_data_n_day_sql_text(1,today)
+        sql_date_text = get_sql_target_day_list_str(int(target_n_day_str))
         cursor.execute(f"""SELECT date,hall_name,sum_diffcoins,ave_diffcoins,ave_game,win_rate
                FROM groupby_date_hall_diffcoins
-               WHERE date in ({sql_date_text})
+               WHERE date in {sql_date_text}
                AND hall_name in  ({sql_hall_name_text})""")
         print("sql_hall_name_text",sql_hall_name_text)
         cols = [col.name for col in cursor.description]
