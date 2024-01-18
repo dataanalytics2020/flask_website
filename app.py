@@ -75,6 +75,32 @@ def convert_sql_date_to_jp_date_and_weekday(sql_date:datetime.date) -> str:
     target_date = sql_date.strftime('%m').lstrip('0') + '/' + sql_date.strftime('%d').lstrip('0')  + w_list[sql_date.weekday()]
     return target_date
 
+def get_sql_target_day_list_str(target_number:int) -> str:
+    print('get_sql_target_day_list_str',target_number)
+    today = date.today()
+    target_day_list = []
+    number = 0
+    for i in range(3):
+        while True:
+            compare_day = today - timedelta(days=number)
+            #print(compare_day)
+            print(str(target_number),str(compare_day)[-1])
+            if str(target_number) == str(compare_day)[-1]:
+                target_day = today - timedelta(days=number)
+                print('取得日',target_day)
+                target_day_str = target_day.strftime('%Y-%m-%d')
+                target_day_list.append(target_day_str)
+                number += 1
+                break
+            else:
+                pass
+            number += 1
+            #break
+    target_day_list_str = str(tuple(target_day_list))
+    print('target_day_list_str',target_day_list_str)
+    # 引数が9なら → '("2024-01-09", "2023-12-29", "2023-12-19")'
+    return target_day_list_str
+
 
 def create_post_map_iframe(location_name_df,groupby_date_kisyubetu_df):
 
@@ -260,7 +286,7 @@ def create_syuzai_map_iframe(report_df:pd.DataFrame,area_name:str):
     folium_map.get_root().height = "500px"
     return folium_map.get_root()._repr_html_()
 
-def create_media_map_iframe(report_df:pd.DataFrame,area_name:str):
+def create_media_map_iframe(report_df:pd.DataFrame,area_name:str,past_diffcoins_df:pd.DataFrame=None):
     report_df = report_df.dropna(subset=['latitude'])
     report_df.drop_duplicates(keep='first',inplace=True)
     #(取材ランク = 'S' OR 取材ランク = 'A')のみ抽出
@@ -326,6 +352,11 @@ def create_media_map_iframe(report_df:pd.DataFrame,area_name:str):
         popup_df.drop_duplicates(keep='first',inplace=True)
         popup_df['イベント日'] = popup_df['イベント日'].apply(convert_sql_date_to_jp_date_and_weekday) 
         popup_df = popup_df.to_html(escape=False,index=False,justify='center',classes='display compact nowrap table table-striped table-hover table-sm')
+        if past_diffcoins_df is not None:
+            extract_past_diffcoins_df = past_diffcoins_df[past_diffcoins_df['店舗名'] == tenpo_name]
+            extract_past_diffcoins_df.drop_duplicates(keep='first',inplace=True)
+            popup_df += extract_past_diffcoins_df.to_html(escape=False,index=False,justify='center',classes='display compact nowrap table table-striped table-hover table-sm')
+
         popup_df +=f'<a href="/tomorrow_recommend/{area_name}/hall/{tenpo_name}"  target="_parent">{tenpo_name}※店舗詳細ページに飛びます </a>'
         popup_data = folium.Popup(popup_df,  max_width=1500,show=False,size=(700, 300))
 
@@ -833,7 +864,8 @@ def post_top():
     #target_monthを2桁にする
     target_month =  f'{target_month:02}' 
     target_day = int(user_data['target_day'].split('月')[1].split('日')[0])
-    target_day  = f'{target_day:02}' 
+    target_day_str = str(target_day)[-1]
+    target_day  = f'{target_day:02}'
     target_date = str(today.year) + '-' + target_month  + '-' + target_day
     data['tommorow_jp_str_day'] = target_month.lstrip('0') + '月' + target_day.lstrip('0') + '日'
     #print(prefecture,target_day)
@@ -851,6 +883,32 @@ def post_top():
     cols = [col.name for col in cursor.description]
     extract_prefecture_name_df = pd.DataFrame(cursor.fetchall(),columns=cols)
     extract_prefecture_name_df.drop_duplicates(keep='first',inplace=True)
+    #差枚テーブルの取得
+    sql_hall_name_text = ''
+    for hall_name_text in list(extract_prefecture_name_df['店舗名'].unique()):
+        sql_hall_name_text += f"'{hall_name_text}'" + ','
+    sql_hall_name_text = sql_hall_name_text.rstrip(',')
+    #sql_date_text = generate_past_data_n_day_sql_text(1,today)
+    target_number:int = int(target_day_str)
+    diffcoins_sql_date_str = get_sql_target_day_list_str(target_number)
+    print('diffcoins_sql_date_str',diffcoins_sql_date_str)
+    print()
+    sql=f"""SELECT date,hall_name,sum_diffcoins,ave_diffcoins,ave_game,win_rate
+            FROM groupby_date_hall_diffcoins
+            WHERE date in {diffcoins_sql_date_str}
+            AND hall_name in  ({sql_hall_name_text})
+            ORDER BY date DESC"""
+    print(sql)
+    cursor.execute(sql)
+    print("sql_hall_name_text",sql_hall_name_text)
+    cols = [col.name for col in cursor.description]
+    past_diffconis_df = pd.DataFrame(cursor.fetchall(),columns=cols)
+    past_diffconis_df['date'] = past_diffconis_df['date'].apply(convert_sql_date_to_jp_date_and_weekday)
+    past_diffconis_df.rename(columns={'date':'日付','hall_name':'店舗名','sum_diffcoins':'総差枚','ave_diffcoins':'平均差枚','ave_game':'平均G数','win_rate':'勝率'},inplace=True)
+    past_diffconis_df['平均差枚'] = past_diffconis_df['平均差枚'].astype(str) + '枚'
+    past_diffconis_df['総差枚'] = past_diffconis_df['総差枚'].map(lambda x: round(x,-2)).astype(str) + '枚'
+    past_diffconis_df['平均G数'] = past_diffconis_df['平均G数'].astype(str) + 'G'
+    print('past_diffconis_df',past_diffconis_df)
     table_df = extract_prefecture_name_df[['イベント日','店舗名','媒体名','取材名']]
     table_df['イベント日'] = table_df['イベント日'].map(convert_sql_date_to_jp_date_and_weekday)
     table_df = table_df.sort_values(['イベント日','店舗名','媒体名','取材名'],ascending=[True,True,True,True],inplace=False).reset_index(drop=True)
@@ -878,7 +936,7 @@ def post_top():
     print('url',url)
     
     res = requests.get(url, auth=(AUTH_USER, AUTH_PASS)).json()
-    print('res',res)
+    #print('res',res)
     thumbnail_url = res[0]['_embedded']['wp:featuredmedia'][0]['source_url']
     #print('thumbnail_url',thumbnail_url)
     data['thumbnail_url'] = thumbnail_url
@@ -889,7 +947,7 @@ def post_top():
     data['target_date_md'] = post_slug
     #print('parameter_id',parameter_id)
     
-    data['iframe'] = create_media_map_iframe(extract_prefecture_name_df,area_name='minamikantou')
+    data['iframe'] = create_media_map_iframe(extract_prefecture_name_df,area_name='minamikantou',past_diffcoins_df=past_diffconis_df)
     data['extract_prefecture_name_df'] = table_df
     data['extract_prefecture_name_df_column_names'] = table_df.columns.values
     data['extract_prefecture_name_df_row_data'] = list(table_df.values.tolist())
