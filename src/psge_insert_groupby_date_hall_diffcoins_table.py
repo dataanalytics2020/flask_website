@@ -118,33 +118,8 @@ line_token = os.getenv('LINE_TOKEN')
 
 prefecture_list = list(prefecture_df['pref_name'])
 print(prefecture_list)
-for prefecture in prefecture_list[12:13]:
-    print('prefecture',prefecture)
-    prefecture_url = urllib.parse.quote(prefecture)
-    url = f'https://{os.getenv("SCRAPING_DOMAIN")}/%e3%83%9b%e3%83%bc%e3%83%ab%e3%83%87%e3%83%bc%e3%82%bf/{prefecture_url}'
-    res = requests.get(url)#class="hall-list-table"
-    soup = BeautifulSoup(res.text, 'lxml')
-    table_elem = soup.find('div',class_='hall-list-table')
-    time.sleep(1)
-    tenpo_url_name_list = []
-    tenpo_url_name_dict = {}
-    for table_row in table_elem.find_all('div',class_='table-row'):
-        try:
-            hall_name = table_row.find('div',class_='table-data-cell').a.text
-            url = table_row.find('div',class_='table-data-cell').a.get("href")
-            print(hall_name,url)
-            tenpo_url_name = urllib.parse.unquote(url).split('/')[-2].replace('-データ一覧','')
-            tenpo_url_name_list.append(tenpo_url_name)
-            tenpo_url_name_dict[tenpo_url_name] = hall_name
-        except:
-            pass
-    i = 0
-    #break
-    ichiran_all_tennpo_df = pd.DataFrame(columns=[],index=[])
-    #post_line_text(f'{len(tenpo_url_name_list)}店舗取得数',line_area_token[prefecture])
 
-
-for prefecture in prefecture_list[12:13]:
+for prefecture in prefecture_list:
     try:
         prefecture_url = urllib.parse.quote(prefecture)
         url = f'https://{os.getenv("SCRAPING_DOMAIN")}/%e3%83%9b%e3%83%bc%e3%83%ab%e3%83%87%e3%83%bc%e3%82%bf/{prefecture_url}'
@@ -170,7 +145,7 @@ for prefecture in prefecture_list[12:13]:
         count = 0
         error_count = 0
         post_line_text(f'{prefecture} {len(tenpo_url_name_list)}店舗取得数',line_token)
-        for day_num in reversed(range(1,25)):
+        for day_num in reversed(range(1,10)):
             ichiran_all_tennpo_df = pd.DataFrame(columns=[],index=[])
         #tenpo_ichiran_df['ホール名']
             try:
@@ -237,16 +212,15 @@ for prefecture in prefecture_list[12:13]:
                                 #time.sleep(1)
                                 continue
                         #break
-                        
                     except Exception as e:
                         print(tenpo_name,e)
                         continue
                 #break
                 ichiran_all_tennpo_df = ichiran_all_tennpo_df.fillna('')
                 cursor = get_driver()
-                post_line_text(f'{prefecture} {target_day_str} insert開始',line_token)
+                post_line_text(f'{prefecture} {target_day_str} HEROKU_PSGR insert開始',line_token)
                 insert_data_bulk(ichiran_all_tennpo_df ,conn)
-                post_line_text(f'{prefecture} {target_day_str}insert終了',line_token)
+                post_line_text(f'{prefecture} {target_day_str} HEROKU_PSGR insert終了',line_token)
             except Exception as e:
                 print(tenpo_name,e)
                 continue
@@ -257,8 +231,8 @@ for prefecture in prefecture_list[12:13]:
 
     except Exception as e:
         print(e)
+        post_line_text(f'{prefecture}HEROKU_PSGR追加処理でエラーが発生しました',line_token)
         break
-        #post_line_text(f'{prefecture}MYSQL追加処理でエラーが発生しました',line_token)
         #continue
 
 
