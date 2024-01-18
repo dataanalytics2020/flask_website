@@ -231,9 +231,9 @@ for prefecture in prefecture_list:
 
     except Exception as e:
         print(e)
-        post_line_text(f'{prefecture}HEROKU_PSGR追加処理でエラーが発生しました',line_token)
-        break
-        #continue
+        post_line_text(f'{prefecture} HEROKU_PSGR追加処理でエラーが発生しました',line_token)
+        #break
+        continue
 
 
 #ichiran_all_tennpo_df.to_csv('csv/tokyo_psgr_insert_df.csv',index=False)

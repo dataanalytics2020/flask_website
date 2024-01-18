@@ -70,25 +70,16 @@ line_token = os.getenv('LINE_TOKEN')
 #print(line_token)
 for prefecture in prefecture_list:
     try:
-        from selenium.webdriver.chrome.service import Service
-        from selenium import webdriver
-        from chromedriver_py import binary_path # this will get you the path variable
-        svc = Service(executable_path=binary_path)
-        options = Options()
-        options.add_argument('--headless')
-        options.add_argument('--disable-gpu')
-        options.add_argument('--no-sandbox')
-        options.add_argument('--disable-dev-shm-usage')
-        browser = webdriver.Chrome(service=svc, options=options)
         #post_line_text(f'{prefecture}XサーバーへのMYSQL追加処理を開始します',line_token)
         cols = ['店舗名','URL']
+        parlar_name_parlar_url_dict = {}
+        concat_df = pd.DataFrame(index=[], columns=[])
         yesterday = datetime.date.today() + datetime.timedelta(days=-1)
         url = f'https://{os.getenv("SCRAPING_DOMAIN")}/%E3%83%9B%E3%83%BC%E3%83%AB%E3%83%87%E3%83%BC%E3%82%BF/{prefecture}/'
-        browser.get(url)
-        concat_df = pd.DataFrame(index=[], columns=[])
-        parlar_name_parlar_url_dict = {}
-        html = browser.page_source.encode('utf-8')
-        soup = BeautifulSoup(html, 'lxml')
+        res = requests.get(url)
+        soup = BeautifulSoup(res.text, 'html.parser')
+        table = soup.find_all('table')
+        tenpo_ichiran_df =pd.read_html(str(table))[-1]
         for element in soup.find(class_="hall-list-table").find_all("a"):
             #print(element.string,element['href'])
             parlar_name = element.string
@@ -187,7 +178,7 @@ for prefecture in prefecture_list:
             cnx.close()
             
         #break
-        browser.quit()
+        #browser.quit()
         #break
     except Exception as e:
         print(e)
