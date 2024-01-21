@@ -628,7 +628,7 @@ def get_top():
                 left join halldata as halldata2
                 on schedule2.店舗名 = halldata2.hall_name
                 WHERE イベント日 > current_date
-                AND イベント日 <= current_date + 2
+                AND イベント日 <= current_date + 1
                 AND 媒体名 != 'ホールナビ'
                 AND 取材名 LIKE '%{target_n_day_str}のつく日%'
                 AND 都道府県 = '東京都'
@@ -645,10 +645,13 @@ def get_top():
             sql_hall_name_text += f"'{hall_name_text}'" + ','
         sql_hall_name_text = sql_hall_name_text.rstrip(',')
         sql_date_text = get_sql_target_day_list_str(int(target_n_day_str))
-        cursor.execute(f"""SELECT date,hall_name,sum_diffcoins,ave_diffcoins,ave_game,win_rate
+        print('sql_date_text',sql_date_text)
+        sql = f"""SELECT date,hall_name,sum_diffcoins,ave_diffcoins,ave_game,win_rate
                FROM groupby_date_hall_diffcoins
                WHERE date in {sql_date_text}
-               AND hall_name in  ({sql_hall_name_text})""")
+               AND hall_name in  ({sql_hall_name_text})"""
+        print('sql',sql)
+        cursor.execute(sql)
         print("sql_hall_name_text",sql_hall_name_text)
         cols = [col.name for col in cursor.description]
         past_diffconis_df = pd.DataFrame(cursor.fetchall(),columns=cols)
@@ -662,7 +665,7 @@ def get_top():
         past_diffconis_df.to_csv('csv/tokyo_past_diffconis_df.csv',index=False)
 
     all_kanto_display_df = report_df = report_df.drop_duplicates(keep='first')
-    if report_row_1 != compare_date:
+    if str(report_row_1) != str(compare_date):
         post_line('今日のデータはマップ未取得'+report_row_1+"と"+compare_date)
         report_df['イベント日'] = pd.to_datetime(report_df['イベント日'])
         latitude_isnull_df = report_df[report_df['latitude'].isnull()]
