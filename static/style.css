@@ -1771,28 +1771,66 @@ text-align: center; /* 内容は中央配置 */
   font-size: .8em;
 }
 
-.box-011 {
-  position: relative;
-  width: 95%;
-  margin: 1.9em auto 0;
-  padding: 2px;
+.heading-28 {
+  color: #333333;
+  font-weight: 400;
+  font-size: 1rem;
+  letter-spacing: .04em;
+  text-align: center;
+}
+
+.heading-28::before {
+  display: block;
+  font-weight: 700;
+  font-size: 2rem;
+  line-height: 1.5;
+  letter-spacing: .02em;
+  content: attr(data-label);
+}
+
+.box-013 {
+  max-width: 400px;
+  margin: 0 auto;
   border: 2px solid #2589d0;
   border-radius: 3px;
 }
 
-.box-011 span {
-  position: absolute;
-  top: -1.9em;
-  left: -2px;
-  padding: .2em .8em;
-  border-radius: 5px 5px 0 0;
+.box-013 span {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: .5em 0;
   background-color: #2589d0;
   color: #fff;
+  font-weight: 600;
 }
 
-.box-011 p {
+.box-013 p {
   margin: 0;
+  padding: 1em 1.5em;
   color: #333;
-  padding: .2em .8em;
-  font-weight: bold;
-  font-size: 1.2em;}
+}
+
+.box-004 {
+  display: flex;
+  grid-gap: 0 .7em;
+  margin: 0 auto;
+  padding: 1em;
+  border-radius: 5px;
+  background-color: #ffe9ad;
+  color: #000000;
+  font-size: 13px;
+}
+
+.box-004::before {
+  width: 24px;
+  height: 24px;
+  content: '';
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12.8659 3.00017L22.3922 19.5002C22.6684 19.9785 22.5045 20.5901 22.0262 20.8662C21.8742 20.954 21.7017 21.0002 21.5262 21.0002H2.47363C1.92135 21.0002 1.47363 20.5525 1.47363 20.0002C1.47363 19.8246 1.51984 19.6522 1.60761 19.5002L11.1339 3.00017C11.41 2.52187 12.0216 2.358 12.4999 2.63414C12.6519 2.72191 12.7782 2.84815 12.8659 3.00017ZM10.9999 16.0002V18.0002H12.9999V16.0002H10.9999ZM10.9999 9.00017V14.0002H12.9999V9.00017H10.9999Z' fill='%23f48225'%3E%3C/path%3E%3C/svg%3E");
+}
+
+.box-004 p {
+  margin: 0;
+  padding: 0 0 0 .7em;
+  border-left: 1px solid #f48225;
+}

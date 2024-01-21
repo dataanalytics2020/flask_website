@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block head %}
-<title>{{data.syuzai_name}} マップで見えるパチンコ・スロット取材予定</title>
+<title>{{data.syuzai_name}} 公約 マップで見えるパチンコ・スロット取材予定</title>
 {% endblock %}
 {% block content %}
 <div class="container">
@@ -13,8 +13,23 @@
                   <li class="breadcrumb-item active" aria-current="page"><a href="/tomorrow-recommend/{{data.area_name}}/syuzai/{{data.syuzai_name}}">{{data.syuzai_name}}</a></li>
                 </ol>
             </nav>
-            <div class="mx-auto" style="width: 200px;">
-                <div class="heading-008 my-2 ">{{data.syuzai_name}}</div>
+            <div class="mx-auto">
+                <h1 class="fw-light">{{data.syuzai_name}} </h1>
+                <h2 class="heading-28">{{data.media_name}}</h2>
+                {% if data.pledge_text == '未調査' %}
+                <div class="box-013 my-2">
+                    <span>公約不明</span>
+                    <p>公約未調査になります。<br>もしご存じの方いましたら<a href="https://twitter.com/slo_map">XのDM</a>もしくは<a href="/form">お問い合わせ</a>からご報告いただけますと新機能の開発がその分早く進みますのでご協力よろしくお願いします。</p>
+                </div>
+                {% else %}
+                <div class="box-013 my-2">
+                    <span>公約</span>
+                    <p>{{data.pledge_text}}</p>
+                </div>
+                <div class="box-004">
+                    <p>公約内容が違う場合、薄い場合等は<a href="https://twitter.com/slo_map">XのDM</a>もしくは<a href="/form">お問い合わせ</a>からご報告いただけますと新機能の開発がその分早く進みますのでご協力よろしくお願いします。</p>
+                </div>
+                {% endif %}
             </div>
             <iframe class="embed-responsive-item" scrolling="no" height="450" width="100%" src={{ data.iframe|safe }}</iframe>
             <div class = 'heatmap .table-wrap'>

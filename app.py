@@ -1476,19 +1476,28 @@ def tomorrow_recommend_area_syuzai_syuzainame(area_name,syuzai_name):
     area_sql_text = get_area_sql_text(area_name)
     cursor = get_driver()
     #首都圏のイベントの媒体別の予約数を集計
-    cursor.execute(f'''SELECT *
-                FROM schedule as schedule2
-                left join halldata as halldata2
-                on schedule2.店舗名 = halldata2.hall_name
-                WHERE イベント日 >= current_date - 10
-                    AND イベント日 < current_date + 7
-                    AND 媒体名 != 'ホールナビ'
-                    AND 取材名 = '{syuzai_name}'
-                    AND ({area_sql_text})
-                    ORDER BY イベント日,都道府県,媒体名 desc;''')
+    cursor.execute(f'''SELECT 都道府県, イベント日,店舗名, 取材名,媒体名,取材ランク,longitude, latitude, pledge_text
+            FROM schedule as schedule2
+            left join halldata as halldata2
+            on schedule2.店舗名 = halldata2.hall_name
+            left join pledge as pledge
+            on schedule2.取材名 = pledge.syuzai_name
+            WHERE イベント日 >= current_date - 10
+            AND イベント日 < current_date + 7
+            AND 媒体名 != 'ホールナビ'
+            AND 取材名 = '{syuzai_name}'
+            AND ({area_sql_text})
+            ORDER BY イベント日,都道府県,媒体名 desc;''')
     cols = [col.name for col in cursor.description]
     extract_syuzai_name_df = pd.DataFrame(cursor.fetchall(),columns=cols)
     extract_syuzai_name_df.drop_duplicates(keep='first',inplace=True)
+    pledge_text = extract_syuzai_name_df.iloc[0]['pledge_text']
+    media_name = extract_syuzai_name_df.iloc[0]['媒体名']
+    data['media_name'] = media_name
+    if (pledge_text == '') or (pledge_text == None):
+        pledge_text = '未調査'
+        post_line(f'未調査の取材名があります。{area_name} {syuzai_name}')
+    data['pledge_text'] = pledge_text
     extract_syuzai_name_df.sort_values(['イベント日','都道府県','媒体名'],ascending=[False,True,True],inplace=True)
     table_df = extract_syuzai_name_df[['イベント日','都道府県','店舗名','媒体名']]
     table_df['イベント日'] = table_df['イベント日'].map(convert_sql_date_to_jp_date_and_weekday)
@@ -1553,7 +1562,6 @@ def tomorrow_recommend_area_hall_hallname(area_name,hall_name):
     data['future_extract_hall_name_df_column_names'] = future_extract_hall_name_df.columns.values
     data['future_extract_hall_name_df_row_data'] = list(future_extract_hall_name_df.values.tolist())
     return render_template('tomorrow_recommend_area_hall_hallname.html',data=data,zip=zip)
-
 
 @app.route("/tomorrow_recommend/<area_name>/media/<media_name>")
 def tomorrow_recommend_area_media_medianame(area_name,media_name):
