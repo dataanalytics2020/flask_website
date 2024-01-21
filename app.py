@@ -175,7 +175,7 @@ def create_post_map_iframe(location_name_df,groupby_date_kisyubetu_df):
                 icon = CustomIcon(
                             icon_image = img,
                             icon_size = (280, 100),
-                            icon_anchor = (30, 0),
+                            icon_anchor = (0, 0),
                             #shadow_image = shadow_img, # 影効果（今回は使用せず コメントアウト
                             #shadow_size = (30, 30),
                             shadow_anchor = (-4, -4),
@@ -257,8 +257,18 @@ def create_syuzai_map_iframe(report_df:pd.DataFrame,area_name:str):
         im.save('syuzai_image.png', quality=95)
         img = 'syuzai_image.png'
         popup_df = extract_syuzai_df_1[['イベント日','店舗名','取材名','媒体名']].sort_values('店舗名')
-        popup_df['イベント日'] = popup_df['イベント日'].apply(convert_sql_date_to_jp_date_and_weekday) 
-        popup_df = popup_df.to_html(escape=False,index=False,justify='center',classes='display compact nowrap table table-striped table-hover table-sm')
+        furture_popup_df = popup_df[popup_df['イベント日'] > datetime.date.today()]
+        past_popup_df = popup_df[popup_df['イベント日'] <= datetime.date.today()]
+        furture_popup_df['イベント日'] = furture_popup_df['イベント日'].apply(convert_sql_date_to_jp_date_and_weekday) 
+        past_popup_df['イベント日'] = past_popup_df['イベント日'].apply(convert_sql_date_to_jp_date_and_weekday) 
+        #popup_df['イベント日'] = popup_df['イベント日'].apply(convert_sql_date_to_jp_date_and_weekday) 
+        popup_df = ''
+        if len(furture_popup_df) != 0:
+            popup_df += '<h4 class="my-2">◆取材予定(※直近一週間分表示中)</h4>\n'
+            popup_df += furture_popup_df.to_html(escape=False,index=False,justify='center',classes='display compact nowrap table table-striped table-hover table-sm')
+        if len(past_popup_df) != 0:
+            popup_df += '<h4 class="my-2">◆過去取材</h4>\n'
+            popup_df += past_popup_df.to_html(escape=False,index=False,justify='center',classes='display compact nowrap table table-striped table-hover table-sm')
         popup_df +=f'<a href="/tomorrow_recommend/{area_name}/hall/{tenpo_name}"  target="_parent">{tenpo_name}※店舗詳細ページに飛びます </a>'
         popup_data = folium.Popup(popup_df,  max_width=1500,show=False,size=(700, 300))
         folium.Marker(location=[latitude ,longitude],
@@ -268,7 +278,7 @@ def create_syuzai_map_iframe(report_df:pd.DataFrame,area_name:str):
             icon = CustomIcon(
                         icon_image = img,
                         icon_size = (280, 100),
-                        icon_anchor = (30, 0),
+                        icon_anchor = (0, 0),
                         #shadow_image = shadow_img, # 影効果（今回は使用せず コメントアウト
                         #shadow_size = (30, 30),
                         shadow_anchor = (-4, -40),
@@ -421,7 +431,7 @@ def create_hall_map_iframe(extract_hall_name_df,zoom_size=10):
         icon = CustomIcon(
                     icon_image = img,
                     icon_size = (280, 100),
-                    icon_anchor = (-50, 70),
+                    icon_anchor = (0, 0),
                     #shadow_image = shadow_img, # 影効果（今回は使用せず コメントアウト
                     #shadow_size = (30, 30),
                     shadow_anchor = (-4, -40),
@@ -615,7 +625,7 @@ def get_top():
     except:
         report_row_1 = 'NONE'
     compare_date:str = tomorrow.strftime('%Y-%m-%d')#-%d
-    if report_row_1 == compare_date:
+    if str(report_row_1) == str(compare_date):
         print('今日のデータは取得済み'+report_row_1+"と"+compare_date)
         post_line('今日のデータは取得済み'+report_row_1+"と"+compare_date)
         post_line('report_df' + str(report_row_1))
@@ -646,6 +656,9 @@ def get_top():
         sql_hall_name_text = sql_hall_name_text.rstrip(',')
         sql_date_text = get_sql_target_day_list_str(int(target_n_day_str))
         print('sql_date_text',sql_date_text)
+        if report_df.empty:
+            post_line('empty error'+report_row_1+"と"+compare_date)
+            sql_hall_name_text = "'マルハン池袋店'"
         sql = f"""SELECT date,hall_name,sum_diffcoins,ave_diffcoins,ave_game,win_rate
                FROM groupby_date_hall_diffcoins
                WHERE date in {sql_date_text}
@@ -755,7 +768,7 @@ def get_top():
                     icon = CustomIcon(
                                 icon_image = img,
                                 icon_size = (280, 100),
-                                icon_anchor = (30, 0),
+                                icon_anchor = (0, 0),
                                 #shadow_image = shadow_img, # 影効果（今回は使用せず コメントアウト
                                 #shadow_size = (30, 30),
                                 shadow_anchor = (-4, -40),
@@ -1350,7 +1363,11 @@ def form():
         password = os.getenv('GMAIL_PASSWORD')
         second_password = os.getenv('GMAIL_SECOND_PASSWORD')
         name =  request.form.get('name')
+        if name == '':
+            name = '名無し'
         from_email = request.form.get('email')
+        if from_email == '':
+            from_email = accoun_mail
         category = request.form.get('category')
         about = request.form.get('about')
         subject = category + ':'+ name  + 'お問い合わせ'
@@ -1482,7 +1499,7 @@ def tomorrow_recommend_area_syuzai_syuzainame(area_name,syuzai_name):
             on schedule2.店舗名 = halldata2.hall_name
             left join pledge as pledge
             on schedule2.取材名 = pledge.syuzai_name
-            WHERE イベント日 >= current_date - 10
+            WHERE イベント日 >= current_date - 31
             AND イベント日 < current_date + 7
             AND 媒体名 != 'ホールナビ'
             AND 取材名 = '{syuzai_name}'
@@ -1491,6 +1508,8 @@ def tomorrow_recommend_area_syuzai_syuzainame(area_name,syuzai_name):
     cols = [col.name for col in cursor.description]
     extract_syuzai_name_df = pd.DataFrame(cursor.fetchall(),columns=cols)
     extract_syuzai_name_df.drop_duplicates(keep='first',inplace=True)
+    future_extract_syuzai_name_df = extract_syuzai_name_df[extract_syuzai_name_df['イベント日'] >= datetime.date.today() ]
+    past_extract_syuzai_name_df = extract_syuzai_name_df[extract_syuzai_name_df['イベント日'] < datetime.date.today() ]
     pledge_text = extract_syuzai_name_df.iloc[0]['pledge_text']
     media_name = extract_syuzai_name_df.iloc[0]['媒体名']
     data['media_name'] = media_name
@@ -1498,6 +1517,28 @@ def tomorrow_recommend_area_syuzai_syuzainame(area_name,syuzai_name):
         pledge_text = '未調査'
         post_line(f'未調査の取材名があります。{area_name} {syuzai_name}')
     data['pledge_text'] = pledge_text
+    future_extract_syuzai_name_df.sort_values(['イベント日','都道府県','媒体名'],ascending=[False,True,True],inplace=True)
+    past_extract_syuzai_name_df.sort_values(['イベント日','都道府県','媒体名'],ascending=[False,True,True],inplace=True)
+    future_extract_syuzai_name_df = future_extract_syuzai_name_df[['イベント日','都道府県','店舗名','媒体名']]
+    past_extract_syuzai_name_df = past_extract_syuzai_name_df[['イベント日','都道府県','店舗名','媒体名']]
+    try:
+        future_extract_syuzai_name_df['イベント日'] = future_extract_syuzai_name_df['イベント日'].map(convert_sql_date_to_jp_date_and_weekday)
+    except:
+        pass
+    try:
+        past_extract_syuzai_name_df['イベント日'] = past_extract_syuzai_name_df['イベント日'].map(convert_sql_date_to_jp_date_and_weekday)
+    except:
+        pass
+    future_extract_syuzai_name_df.rename(columns={'イベント日':'日'},inplace=True)
+    future_extract_syuzai_name_df.drop_duplicates(keep='first',inplace=True)
+    past_extract_syuzai_name_df.rename(columns={'イベント日':'日'},inplace=True)
+    past_extract_syuzai_name_df.drop_duplicates(keep='first',inplace=True)
+    data['past_extract_syuzai_name_df'] = past_extract_syuzai_name_df
+    data['past_extract_syuzai_name_df_column_names'] = past_extract_syuzai_name_df.columns.values
+    data['past_extract_syuzai_name_df_row_data'] = list(past_extract_syuzai_name_df.values.tolist())
+    data['future_extract_syuzai_name_df'] = future_extract_syuzai_name_df
+    data['future_extract_syuzai_name_df_column_names'] = future_extract_syuzai_name_df.columns.values
+    data['future_extract_syuzai_name_df_row_data'] = list(future_extract_syuzai_name_df.values.tolist())
     extract_syuzai_name_df.sort_values(['イベント日','都道府県','媒体名'],ascending=[False,True,True],inplace=True)
     table_df = extract_syuzai_name_df[['イベント日','都道府県','店舗名','媒体名']]
     table_df['イベント日'] = table_df['イベント日'].map(convert_sql_date_to_jp_date_and_weekday)
