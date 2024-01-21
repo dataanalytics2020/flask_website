@@ -58,7 +58,7 @@ def post_line_text_and_image(message,image_path,token):
 def login_scraping_site(area_name):
     from selenium import webdriver
     options = Options()
-    options.add_argument('--headless')
+    #options.add_argument('--headless')
     options.add_argument("--no-sandbox")
 
     import chromedriver_binary
