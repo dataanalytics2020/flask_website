@@ -541,6 +541,7 @@ def get_area_sql_text(target_area_name='minamikantou'):
     return area_sql_text
 
 def get_driver():
+    global conn
     users = os.getenv('HEROKU_PSGR_USER')    # DBにアクセスするユーザー名(適宜変更)
     dbnames = os.getenv('HEROKU_PSGR_DATABASE')   # 接続するデータベース名(適宜変更)
     passwords = os.getenv('HEROKU_PSGR_PASSWORD')  # DBにアクセスするユーザーのパスワード(適宜変更)
@@ -1493,7 +1494,7 @@ def tomorrow_recommend_area_syuzai_syuzainame(area_name,syuzai_name):
     area_sql_text = get_area_sql_text(area_name)
     cursor = get_driver()
     #首都圏のイベントの媒体別の予約数を集計
-    cursor.execute(f'''SELECT 都道府県, イベント日,店舗名, 取材名,媒体名,取材ランク,longitude, latitude, pledge_text
+    cursor.execute(f'''SELECT 都道府県, イベント日,店舗名, 取材名,媒体名,取材ランク,longitude, latitude, pledge_text,no_pledge_visit_count 
             FROM schedule as schedule2
             left join halldata as halldata2
             on schedule2.店舗名 = halldata2.hall_name
@@ -1508,14 +1509,20 @@ def tomorrow_recommend_area_syuzai_syuzainame(area_name,syuzai_name):
     cols = [col.name for col in cursor.description]
     extract_syuzai_name_df = pd.DataFrame(cursor.fetchall(),columns=cols)
     extract_syuzai_name_df.drop_duplicates(keep='first',inplace=True)
+
     future_extract_syuzai_name_df = extract_syuzai_name_df[extract_syuzai_name_df['イベント日'] >= datetime.date.today() ]
     past_extract_syuzai_name_df = extract_syuzai_name_df[extract_syuzai_name_df['イベント日'] < datetime.date.today() ]
     pledge_text = extract_syuzai_name_df.iloc[0]['pledge_text']
     media_name = extract_syuzai_name_df.iloc[0]['媒体名']
+    no_pledge_visit_count = int(extract_syuzai_name_df.iloc[0]['no_pledge_visit_count'])
     data['media_name'] = media_name
     if (pledge_text == '') or (pledge_text == None):
         pledge_text = '未調査'
-        post_line(f'未調査の取材名があります。{area_name} {syuzai_name}')
+        no_pledge_visit_count += 1
+        post_line(f'未調査の取材名があります。{area_name} {media_name} {syuzai_name} {no_pledge_visit_count}回')
+        sql = f'''UPDATE pledge SET  no_pledge_visit_count = {no_pledge_visit_count} WHERE syuzai_name = '{syuzai_name}';'''
+        cursor.execute(sql)
+        conn.commit()
     data['pledge_text'] = pledge_text
     future_extract_syuzai_name_df.sort_values(['イベント日','都道府県','媒体名'],ascending=[False,True,True],inplace=True)
     past_extract_syuzai_name_df.sort_values(['イベント日','都道府県','媒体名'],ascending=[False,True,True],inplace=True)
