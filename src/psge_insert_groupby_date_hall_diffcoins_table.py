@@ -94,7 +94,7 @@ def insert_data_bulk(ichiran_all_tennpo_df,conn):
     conn.commit()
 
 
-prefecture_df = pd.read_csv(r'csv\pref_lat_lon.csv')
+
 
 
 cursor = get_driver()
@@ -115,7 +115,7 @@ print(date_prefecture_list)
 
 line_token = os.getenv('LINE_TOKEN')
 
-
+prefecture_df = pd.read_csv(r'csv\pref_lat_lon.csv')
 prefecture_list = list(prefecture_df['pref_name'])
 print(prefecture_list)
 
@@ -145,7 +145,7 @@ for prefecture in prefecture_list:
         count = 0
         error_count = 0
         post_line_text(f'{prefecture} {len(tenpo_url_name_list)}店舗取得数',line_token)
-        for day_num in reversed(range(1,10)):
+        for day_num in reversed(range(2,33)):
             ichiran_all_tennpo_df = pd.DataFrame(columns=[],index=[])
         #tenpo_ichiran_df['ホール名']
             try:
