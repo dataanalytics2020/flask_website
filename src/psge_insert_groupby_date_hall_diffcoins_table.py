@@ -14,7 +14,7 @@ import pymysql as db
 
 import sshtunnel
 import psycopg2
-
+import traceback
 from dotenv import load_dotenv
 load_dotenv(".env")
 
@@ -86,16 +86,12 @@ def delete_data(cnx,day):
     cnx.commit()
 
 def insert_data_bulk(ichiran_all_tennpo_df,conn):
-    insert_sql = f"""INSERT INTO groupby_date_hall_diffcoins (date, prefecture, hall_name, url_hall_name, sum_diffcoins, ave_diffcoins, ave_game, win_rate) values (%s,%s,%s,%s,%s,%s,%s,%s)"""
+    insert_sql = f"""INSERT INTO groupby_date_hall_diffcoins (date, prefecture, hall_name, url_hall_name, sum_diffcoins, ave_diffcoins, ave_game, win_rate,created_at) values (%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
     print(ichiran_all_tennpo_df.values.tolist())
     cur = conn.cursor()
     cur.executemany(insert_sql, ichiran_all_tennpo_df.values.tolist())
     print("Insert bulk data")
     conn.commit()
-
-
-
-
 
 cursor = get_driver()
 sql = f'''SELECT date,prefecture
@@ -112,130 +108,119 @@ report_df_1["date_prefecture"] = report_df_1["イベント日"] + "_" +report_df
 date_prefecture_list = list(report_df_1['date_prefecture'])
 print(date_prefecture_list)
 
-
-line_token = os.getenv('LINE_TOKEN')
+line_token = os.getenv('WORK_LINE_TOKEN')
 
 prefecture_df = pd.read_csv(r'csv\pref_lat_lon.csv')
 prefecture_list = list(prefecture_df['pref_name'])
 print(prefecture_list)
 
-for prefecture in prefecture_list:
-    try:
-        prefecture_url = urllib.parse.quote(prefecture)
-        url = f'https://{os.getenv("SCRAPING_DOMAIN")}/%e3%83%9b%e3%83%bc%e3%83%ab%e3%83%87%e3%83%bc%e3%82%bf/{prefecture_url}'
-        res = requests.get(url)#class="hall-list-table"
-        soup = BeautifulSoup(res.text, 'lxml')
-
-        table_elem = soup.find('div',class_='hall-list-table')
-        time.sleep(1)
-        tenpo_url_name_list = []
-        tenpo_url_name_dict = {}
-        for table_row in table_elem.find_all('div',class_='table-row'):
-            try:
-                hall_name = table_row.find('div',class_='table-data-cell').a.text
-                url = table_row.find('div',class_='table-data-cell').a.get("href")
-                #print(hall_name,url)
-                tenpo_url_name = urllib.parse.unquote(url).split('/')[-2].replace('-データ一覧','')
-                tenpo_url_name_list.append(tenpo_url_name)
-                tenpo_url_name_dict[tenpo_url_name] = hall_name
-            except:
-                pass
-        i = 0
-        #break
-        count = 0
-        error_count = 0
-        post_line_text(f'{prefecture} {len(tenpo_url_name_list)}店舗取得数',line_token)
-        for day_num in reversed(range(2,33)):
-            ichiran_all_tennpo_df = pd.DataFrame(columns=[],index=[])
-        #tenpo_ichiran_df['ホール名']
-            try:
-                target_day = datetime.date.today() + datetime.timedelta(days=-day_num)
-                target_day_str = target_day.strftime('%Y-%m-%d')
-                target_date_prefecture_str = target_day_str + '_' + prefecture
-                target_date_prefecture_str
-                if target_date_prefecture_str in date_prefecture_list:
-                    continue
-                # if i> 2:
-                #     break
-                for i, tenpo_name in enumerate(tenpo_url_name_list):
-                    try:
-                        print(i,tenpo_name,target_day.strftime('%Y-%m-%d'))
-                        url = f'https://{os.getenv("SCRAPING_DOMAIN")}/{target_day.strftime("%Y-%m-%d")}-{tenpo_name}'
-                        res = requests.get(url)
-                        soup = BeautifulSoup(res.text, 'html.parser')
-                        try:
-                            hall_name = soup.title.text.split(' ')[1]
-                        except:
-                            hall_name = soup.title.text
-                        table = soup.find(id = "all_data_table")
-                        dfs =pd.read_html(str(table))
-                        #display(tenpo_df)
-                        #time.sleep(1)
-                        for df in  dfs:
-                            try:
-                                if '機種名' in list(df.columns):
-                                    df['date'] = target_day.strftime('%Y-%m-%d')
-                                    df['hall_name'] = hall_name
-                                    #print(tenpo_name)
-
-                                    df['prefecture'] = prefecture
-                                    gruopby_diff_coins_df = df.groupby(['hall_name','date']).sum().reset_index()
-                                    gruopby_diff_coins_df = gruopby_diff_coins_df
-                                    gruopby_diff_coins_df['hall_name'] = hall_name
-                                    gruopby_diff_coins_df['prefecture'] = prefecture
-                                    gruopby_diff_coins_df['url_hall_name'] = tenpo_name
-                                    gruopby_diff_coins_df['勝利台数'] = len(df[df['差枚'] > 0])
-                                    gruopby_diff_coins_df['勝利台数'] = gruopby_diff_coins_df['勝利台数'].astype(str)
-                                    gruopby_diff_coins_df['総台数'] = df.groupby(['hall_name','date']).size().reset_index()[0]
-                                    gruopby_diff_coins_df['平均差枚'] = gruopby_diff_coins_df['差枚'] / gruopby_diff_coins_df['総台数']
-                                    gruopby_diff_coins_df['平均G数'] = gruopby_diff_coins_df['G数'] / gruopby_diff_coins_df['総台数']
-                                    gruopby_diff_coins_df['総台数'] = gruopby_diff_coins_df['総台数'].astype(str)
-                                    gruopby_diff_coins_df['勝率'] = gruopby_diff_coins_df['勝利台数'] + '/' + gruopby_diff_coins_df['総台数']
-                                    gruopby_diff_coins_df['勝率'] = gruopby_diff_coins_df['勝率'].map(lambda x : '(' + x + '台)' + str(round(int(x.split('/')[0])/int(x.split('/')[1])*100,1))  + '%')
-                                    gruopby_diff_coins_df = gruopby_diff_coins_df.fillna(0)
-                                    gruopby_diff_coins_df = gruopby_diff_coins_df.astype({'平均差枚':int,'平均G数':int})
-                                    gruopby_diff_coins_df = gruopby_diff_coins_df.sort_values('date',ascending=False)
-                                    gruopby_diff_coins_df = gruopby_diff_coins_df.reset_index(drop=True)
-                                    gruopby_diff_coins_df = gruopby_diff_coins_df[['date','prefecture','hall_name','url_hall_name','差枚','平均差枚','平均G数','勝率']]
-                                    gruopby_diff_coins_df.columns = ['date','prefecture','hall_name','url_hall_name','sum_diffcoins','ave_diffcoins','ave_game','win_rate']
-                                    ichiran_all_tennpo_df =  pd.concat([ichiran_all_tennpo_df, gruopby_diff_coins_df])
-                                    print('成功',i,tenpo_name)
-                                    #display(ichiran_all_tennpo_df)
-                                    break
-                                else:
-                                    print('見つかりませんでした',i,tenpo_name)
-                                count += 1
-                                time.sleep(1)
-                            except Exception as e:
-                                print(tenpo_name,e)
-                                error_count += 1
-                                #time.sleep(1)
-                                continue
-                        #break
-                    except Exception as e:
-                        print(tenpo_name,e)
-                        continue
-                #break
-                ichiran_all_tennpo_df = ichiran_all_tennpo_df.fillna('')
-                cursor = get_driver()
-                post_line_text(f'{prefecture} {target_day_str} HEROKU_PSGR insert開始',line_token)
-                insert_data_bulk(ichiran_all_tennpo_df ,conn)
-                post_line_text(f'{prefecture} {target_day_str} HEROKU_PSGR insert終了',line_token)
-            except Exception as e:
-                print(tenpo_name,e)
+for day_num in (range(1,34)):
+    print(day_num)
+    for prefecture in prefecture_list:
+        try:
+            target_day = datetime.date.today() + datetime.timedelta(days=-day_num)
+            target_day_str = target_day.strftime('%Y-%m-%d')
+            target_date_prefecture_str = target_day_str + '_' + prefecture
+            target_date_prefecture_str
+            if target_date_prefecture_str in date_prefecture_list:
+                print('すでに取得済み',target_date_prefecture_str)
                 continue
-        
-        #print(ichiran_all_tennpo_df.iloc[:5])
-        # SSH 接続 踏み台接続
-        #break
+            # if i> 2:
+            print(f'{prefecture} {target_day_str} スクレイピング開始します')
+            #continue
+            post_line_text(f'{prefecture} {target_day_str} スクレイピング開始します',line_token)
+            prefecture_url = urllib.parse.quote(prefecture)
+            url = f'https://{os.getenv("SCRAPING_DOMAIN")}/%e3%83%9b%e3%83%bc%e3%83%ab%e3%83%87%e3%83%bc%e3%82%bf/{prefecture_url}'
+            res = requests.get(url)#class="hall-list-table"
+            soup = BeautifulSoup(res.text, 'lxml')
 
-    except Exception as e:
-        print(e)
-        post_line_text(f'{prefecture} HEROKU_PSGR追加処理でエラーが発生しました',line_token)
-        #break
-        continue
-
-
-#ichiran_all_tennpo_df.to_csv('csv/tokyo_psgr_insert_df.csv',index=False)
-
+            table_elem = soup.find('div',class_='hall-list-table')
+            time.sleep(1)
+            tenpo_url_name_list = []
+            tenpo_url_name_dict = {}
+            for table_row in table_elem.find_all('div',class_='table-row'):
+                try:
+                    hall_name = table_row.find('div',class_='table-data-cell').a.text
+                    url = table_row.find('div',class_='table-data-cell').a.get("href")
+                    #print(hall_name,url)
+                    tenpo_url_name = urllib.parse.unquote(url).split('/')[-2].replace('-データ一覧','')
+                    tenpo_url_name_list.append(tenpo_url_name)
+                    tenpo_url_name_dict[tenpo_url_name] = hall_name
+                except:
+                    pass
+            i = 0
+            count = 0
+            error_count = 0
+            ichiran_all_tennpo_df = pd.DataFrame(columns=[],index=[])
+            #tenpo_ichiran_df['ホール名']
+            for i, tenpo_name in enumerate(tenpo_url_name_list):
+                try:
+                    print(i,tenpo_name,target_day.strftime('%Y-%m-%d'))
+                    url = f'https://{os.getenv("SCRAPING_DOMAIN")}/{target_day.strftime("%Y-%m-%d")}-{tenpo_name}'
+                    res = requests.get(url)
+                    soup = BeautifulSoup(res.text, 'html.parser')
+                    try:
+                        hall_name = soup.title.text.split(' ')[1]
+                    except:
+                        hall_name = soup.title.text
+                    table = soup.find(id = "all_data_table")
+                    dfs =pd.read_html(str(table))
+                    created_at = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                    #display(tenpo_df)
+                    #time.sleep(1)
+                    for df in  dfs:
+                        try:
+                            if '機種名' in list(df.columns):
+                                df['date'] = target_day.strftime('%Y-%m-%d')
+                                df['hall_name'] = hall_name
+                                #print(tenpo_name)
+                                df['prefecture'] = prefecture
+                                gruopby_diff_coins_df = df.groupby(['hall_name','date']).sum().reset_index()
+                                gruopby_diff_coins_df = gruopby_diff_coins_df
+                                gruopby_diff_coins_df['hall_name'] = hall_name
+                                gruopby_diff_coins_df['prefecture'] = prefecture
+                                gruopby_diff_coins_df['url_hall_name'] = tenpo_name
+                                gruopby_diff_coins_df['勝利台数'] = len(df[df['差枚'] > 0])
+                                gruopby_diff_coins_df['勝利台数'] = gruopby_diff_coins_df['勝利台数'].astype(str)
+                                gruopby_diff_coins_df['総台数'] = df.groupby(['hall_name','date']).size().reset_index()[0]
+                                gruopby_diff_coins_df['平均差枚'] = gruopby_diff_coins_df['差枚'] / gruopby_diff_coins_df['総台数']
+                                gruopby_diff_coins_df['平均G数'] = gruopby_diff_coins_df['G数'] / gruopby_diff_coins_df['総台数']
+                                gruopby_diff_coins_df['総台数'] = gruopby_diff_coins_df['総台数'].astype(str)
+                                gruopby_diff_coins_df['勝率'] = gruopby_diff_coins_df['勝利台数'] + '/' + gruopby_diff_coins_df['総台数']
+                                gruopby_diff_coins_df['勝率'] = gruopby_diff_coins_df['勝率'].map(lambda x : '(' + x + '台)' + str(round(int(x.split('/')[0])/int(x.split('/')[1])*100,1))  + '%')
+                                gruopby_diff_coins_df['created_at'] = created_at    
+                                gruopby_diff_coins_df = gruopby_diff_coins_df.fillna(0)
+                                gruopby_diff_coins_df = gruopby_diff_coins_df.astype({'平均差枚':int,'平均G数':int})
+                                gruopby_diff_coins_df = gruopby_diff_coins_df.sort_values('date',ascending=False)
+                                gruopby_diff_coins_df = gruopby_diff_coins_df.reset_index(drop=True)
+                                gruopby_diff_coins_df = gruopby_diff_coins_df[['date','prefecture','hall_name','url_hall_name','差枚','平均差枚','平均G数','勝率','created_at']]
+                                gruopby_diff_coins_df.columns = ['date','prefecture','hall_name','url_hall_name','sum_diffcoins','ave_diffcoins','ave_game','win_rate','created_at']
+                                ichiran_all_tennpo_df =  pd.concat([ichiran_all_tennpo_df, gruopby_diff_coins_df])
+                                print('成功',i,tenpo_name)
+                                #display(ichiran_all_tennpo_df)
+                                break
+                            else:
+                                print('見つかりませんでした',i,tenpo_name)
+                            count += 1
+                            time.sleep(1)
+                        except Exception as e:
+                            print(tenpo_name,e)
+                            error_count += 1
+                            #time.sleep(1)
+                            continue
+                    #break
+                except Exception as e:
+                    print(tenpo_name,e)
+                    continue
+            #break
+            ichiran_all_tennpo_df = ichiran_all_tennpo_df.fillna('')
+            cursor = get_driver()
+            post_line_text(f'{prefecture} {target_day_str} HEROKU_PSGR insert開始',line_token)
+            insert_data_bulk(ichiran_all_tennpo_df ,conn)
+            post_line_text(f'{prefecture} {target_day_str} HEROKU_PSGR insert終了',line_token)
+        except Exception as e:
+            print(tenpo_name,e)
+            error_text = traceback.format_exc()
+            post_line_text(f'{prefecture} {target_day_str} HEROKU_PSGR追加処理でエラーが発生しました \n{error_text}',line_token)
+            continue
 
