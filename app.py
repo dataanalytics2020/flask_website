@@ -1519,7 +1519,7 @@ def tomorrow_recommend_area_syuzai_syuzainame(area_name,syuzai_name):
     if (pledge_text == '') or (pledge_text == None):
         pledge_text = '未調査'
         no_pledge_visit_count += 1
-        post_line(f'未調査の取材名があります。{area_name} {media_name} {syuzai_name} {no_pledge_visit_count}回')
+        #post_line(f'未調査の取材名があります。{area_name} {media_name} {syuzai_name} {no_pledge_visit_count}回')
         sql = f'''UPDATE pledge SET  no_pledge_visit_count = {no_pledge_visit_count} WHERE syuzai_name = '{syuzai_name}';'''
         cursor.execute(sql)
         conn.commit()
