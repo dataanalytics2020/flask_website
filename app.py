@@ -1459,7 +1459,10 @@ def tomorrow_recommend_area_prefecture_prefecturename(area_name,prefecture_name)
     # すべてのアイテムを取得
     print(data)
     print('url',url)
-    
+
+    #記事がどれくらい見られてるかリアルタイムで把握するためのライン通知
+    post_line(f'明日の{post_slug}の記事が見られました。')
+
     res = requests.get(url, auth=(AUTH_USER, AUTH_PASS)).json()
     print('res',res)
     thumbnail_url = res[0]['_embedded']['wp:featuredmedia'][0]['source_url']
@@ -1889,7 +1892,7 @@ def post_prefecture_list(pref_name_en):
     #jsonから取得したデータをページネーションで表示する
     print('len(items)',len(items))
     print('page',page)
-    total_page = 30//10 + 1
+    total_page = 50//10 + 1
     pagination = Pagination(page=page, total=total_page,  per_page=1, css_framework='bootstrap4')
     return render_template('post_prefecture_list.html',items=items,data=data,enumerate=enumerate,pagination=pagination)
 
@@ -1914,6 +1917,10 @@ def post_prefecture(post_slug):
         url = f"{API_URL}{label}"
         # すべてのアイテムを取得
         print(url)
+
+        #都道府県別日別の記事がどれくらい見られてるかLINEで通知する
+        post_line(f'{post_slug}の記事が都道府県別一覧経由で見られています。')
+
         res = requests.get(url, auth=(AUTH_USER, AUTH_PASS)).json()
         #print(res)
         thumbnail_url = res[0]['_embedded']['wp:featuredmedia'][0]['source_url']
