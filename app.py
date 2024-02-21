@@ -1461,7 +1461,7 @@ def tomorrow_recommend_area_prefecture_prefecturename(area_name,prefecture_name)
     print('url',url)
 
     #記事がどれくらい見られてるかリアルタイムで把握するためのライン通知
-    post_line(f'明日の{post_slug}の記事が見られました。')
+    #post_line(f'明日の{post_slug}の記事が見られました。')
 
     res = requests.get(url, auth=(AUTH_USER, AUTH_PASS)).json()
     print('res',res)
@@ -1923,7 +1923,7 @@ def post_prefecture(post_slug):
         print(url)
 
         #都道府県別日別の記事がどれくらい見られてるかLINEで通知する
-        post_line(f'{post_slug}の記事が都道府県別一覧経由で見られています。')
+        #post_line(f'{post_slug}の記事が都道府県別一覧経由で見られています。')
 
         res = requests.get(url, auth=(AUTH_USER, AUTH_PASS)).json()
         #print(res)
