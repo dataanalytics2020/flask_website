@@ -1892,7 +1892,11 @@ def post_prefecture_list(pref_name_en):
     #jsonから取得したデータをページネーションで表示する
     print('len(items)',len(items))
     print('page',page)
-    total_page = 50//10 + 1
+    target_day = datetime.date(2023, 11, 29)
+    today = datetime.date.today()
+    diff = today - target_day
+    print(diff.days,type(diff.days))
+    total_page = diff.days//10 + 1
     pagination = Pagination(page=page, total=total_page,  per_page=1, css_framework='bootstrap4')
     return render_template('post_prefecture_list.html',items=items,data=data,enumerate=enumerate,pagination=pagination)
 
