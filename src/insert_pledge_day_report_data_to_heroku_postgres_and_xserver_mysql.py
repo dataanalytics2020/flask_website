@@ -101,7 +101,7 @@ furture_syuzai_list_df = pd.DataFrame(index=[], columns=['都道府県','イベ�
 for area_name in ['hokkaido','tohoku','kanto','chubu','kansai','chugoku','sikoku','kyusyu']:
     browser = login_scraping_site(area_name)
     elements = browser.find_elements(By.CLASS_NAME,"mgn_serch_list_bottom")
-    post_line_text(f'{area_name}の取材予定追加開始',os.getenv('LINE_TOKEN'))
+    post_line_text(f'{area_name}の取材予定追加開始',os.getenv('WORK_LINE_TOKEN'))
     i = 0
     while True:
         browser.find_element(By.CLASS_NAME,"head_change_main").click()
@@ -257,11 +257,11 @@ try:
     insert_data_bulk(concat_df ,cnx)
     cnx.commit()
     server.stop()
-    post_line_text(f'{len(concat_df)}件のxサーバーへの全国の取材予定追加おわり',os.getenv('LINE_TOKEN'))
+    post_line_text(f'{len(concat_df)}件のxサーバーへの全国の取材予定追加おわり',os.getenv('WORK_LINE_TOKEN'))
     print(f'{len(concat_df)}件の全国の取材予定追加おわり')
 
     ## Postgresへのデータ登録
-    post_line_text(f'{len(concat_df)}件のpostgresへの全国の取材予定追加します。',os.getenv('LINE_TOKEN'))
+    post_line_text(f'{len(concat_df)}件のpostgresへの全国の取材予定追加します。',os.getenv('WORK_LINE_TOKEN'))
 
     def insert_data_bulk(df,cnx):
         insert_sql = """INSERT INTO schedule (id,都道府県, イベント日, 曜日, 店舗名, 取材名, 媒体名, 取材ランク,取得時間) values (%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
@@ -304,13 +304,13 @@ try:
     concat_df.to_csv('csv/heroku_schedule_latest.csv',index=False)
     insert_data_bulk(concat_df ,conn)
     conn.commit()
-    post_line_text(f'{len(concat_df)}件のpostgresへの全国の取材予定追加おわり',os.getenv('LINE_TOKEN'))
+    post_line_text(f'{len(concat_df)}件のpostgresへの全国の取材予定追加おわり',os.getenv('WORK_LINE_TOKEN'))
     print(f'{len(concat_df)}件の全国の取材予定追加おわり')
 
 except Exception as e:
     print('エラー理由',e)
-    post_line_text(f'エラー{e}',os.getenv('LINE_TOKEN'))
+    post_line_text(f'エラー{e}',os.getenv('WORK_LINE_TOKEN'))
     
-post_line_text(f'全ての処理が終わりました。',os.getenv('LINE_TOKEN'))
+post_line_text(f'全ての処理が終わりました。',os.getenv('WORK_LINE_TOKEN'))
     #break
 browser.quit()
