@@ -63,10 +63,19 @@ $(function(){
     
     //都道府県をクリック
     $('.pref_list [data-id]').click(function(){
+        console.log(location.href)
         if($(this).data('id')){
             var id = $(this).data('id');
-            $('[name="pref_id"]').val(id);
+            if (  location.href.match(/recommend/) ) {
+            console.log('recommend');
+            $('[name="prefecture_name_en"]').val(id);
             prefReset();
+            }
+            else {
+                console.log('else');
+                window.location.href = location.href + 'prefecture/' + id;
+                prefReset();
+            }
         }
     });
     

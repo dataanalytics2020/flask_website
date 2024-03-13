@@ -154,7 +154,7 @@ body {
 }
 
 /* 地域毎の都道府県リスト */
-.japan_map .pref_list{
+.japan_map .pref_list {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -1861,4 +1861,66 @@ text-align: center; /* 内容は中央配置 */
   margin: 0;
   padding: 1em 1.5em;
   color: #333;
+}
+
+.heading-17 {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+  position: relative;
+  padding: .5em .7em;
+  overflow: hidden;
+  border: 1px solid #000000;
+  border-radius: 5px;
+  color: #333333;
+  font-size: 16px;
+}
+
+.heading-17:before {
+  position: absolute;
+  top: -34%;
+  left: -66px;
+  z-index: -1;
+  transform: rotate(25deg);
+  width: 100px;
+  height: 200%;
+  background-color: #00aaff;
+  content: '';
+}
+
+.heading-17 span {
+  margin-right: 1.1em;
+  color: #fff;
+  font-size: 1.1em
+}
+
+.button-37 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  width: 350px;
+  margin: 0 auto;
+  padding: .9em 1.5em;
+  border: 1px solid #000;
+  border-radius: 5px;
+  background-color: #00aaff;
+  color: #fff;
+  font-size: 1.1em;
+  font-weight: bold;
+}
+
+.button-37:focus {
+  color: transparent;
+}
+
+.button-37:focus::before {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: url('data:image/svg+xml;charset=utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%20width%3D%2248%22%20height%3D%2248%22%20fill%3D%22%232589d0%22%3E%20%3Cpath%20d%3D%22M14%200%20H18%20V8%20H14%20z%22%20transform%3D%22rotate(0%2016%2016)%22%20opacity%3D%22.1%22%3E%20%3Canimate%20attributeName%3D%22opacity%22%20from%3D%221%22%20to%3D%22.1%22%20begin%3D%220%22%20dur%3D%221s%22%20repeatCount%3D%22indefinite%22%2F%3E%20%3C%2Fpath%3E%20%3Cpath%20d%3D%22M14%200%20H18%20V8%20H14%20z%22%20transform%3D%22rotate(45%2016%2016)%22%20opacity%3D%22.1%22%3E%20%3Canimate%20attributeName%3D%22opacity%22%20from%3D%221%22%20to%3D%22.1%22%20begin%3D%220.125s%22%20dur%3D%221s%22%20repeatCount%3D%22indefinite%22%2F%3E%20%3C%2Fpath%3E%20%3Cpath%20d%3D%22M14%200%20H18%20V8%20H14%20z%22%20transform%3D%22rotate(90%2016%2016)%22%20opacity%3D%22.1%22%3E%20%3Canimate%20attributeName%3D%22opacity%22%20from%3D%221%22%20to%3D%22.1%22%20begin%3D%220.25s%22%20dur%3D%221s%22%20repeatCount%3D%22indefinite%22%2F%3E%20%3C%2Fpath%3E%20%3Cpath%20d%3D%22M14%200%20H18%20V8%20H14%20z%22%20transform%3D%22rotate(135%2016%2016)%22%20opacity%3D%22.1%22%3E%20%3Canimate%20attributeName%3D%22opacity%22%20from%3D%221%22%20to%3D%22.1%22%20begin%3D%220.375s%22%20dur%3D%221s%22%20repeatCount%3D%22indefinite%22%2F%3E%20%3C%2Fpath%3E%20%3Cpath%20d%3D%22M14%200%20H18%20V8%20H14%20z%22%20transform%3D%22rotate(180%2016%2016)%22%20opacity%3D%22.1%22%3E%20%3Canimate%20attributeName%3D%22opacity%22%20from%3D%221%22%20to%3D%22.1%22%20begin%3D%220.5s%22%20dur%3D%221s%22%20repeatCount%3D%22indefinite%22%2F%3E%20%3C%2Fpath%3E%20%3Cpath%20d%3D%22M14%200%20H18%20V8%20H14%20z%22%20transform%3D%22rotate(225%2016%2016)%22%20opacity%3D%22.1%22%3E%20%3Canimate%20attributeName%3D%22opacity%22%20from%3D%221%22%20to%3D%22.1%22%20begin%3D%220.625s%22%20dur%3D%221s%22%20repeatCount%3D%22indefinite%22%2F%3E%20%3C%2Fpath%3E%20%3Cpath%20d%3D%22M14%200%20H18%20V8%20H14%20z%22%20transform%3D%22rotate(270%2016%2016)%22%20opacity%3D%22.1%22%3E%20%3Canimate%20attributeName%3D%22opacity%22%20from%3D%221%22%20to%3D%22.1%22%20begin%3D%220.75s%22%20dur%3D%221s%22%20repeatCount%3D%22indefinite%22%2F%3E%20%3C%2Fpath%3E%20%3Cpath%20d%3D%22M14%200%20H18%20V8%20H14%20z%22%20transform%3D%22rotate(315%2016%2016)%22%20opacity%3D%22.1%22%3E%20%3Canimate%20attributeName%3D%22opacity%22%20from%3D%221%22%20to%3D%22.1%22%20begin%3D%220.875s%22%20dur%3D%221s%22%20repeatCount%3D%22indefinite%22%2F%3E%20%3C%2Fpath%3E%3C%2Fsvg%3E') no-repeat center / 1.7em;
+  content: '';
 }

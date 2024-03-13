@@ -16,7 +16,7 @@
                 </ol>
             </nav>
             <a href="/post_prefecture_list/{{data.pref_name_en}}"><button class="button-060">{{data.prefecture_name}}のほかの日を探す</button></a>
-            <h4 class="mt-3" >{{data.tommorow_jp_str_day}}の{{data.prefecture_name}}日別差枚順お勧め店舗紹介記事<br>※詳細は画像をタップ</h4>
+            <h4 class="mt-3" >{{data.target_jp_str_day}}の{{data.prefecture_name}}日別差枚順お勧め店舗紹介記事<br>※詳細は画像をタップ</h4>
             <div class="card-group">
                 <div class="card border-dark mb-1">
                     <a href="/post_prefecture/{{ data.post_slug }}" class="card-body text-dark">
@@ -30,10 +30,10 @@
                                 <li class="list_test">{{ recommend_hall_name }}</li>
                             {% endfor %}
                             </ul>
-                            <div class="heading-011 mt-3" >{{data.tommorow_jp_str_day}}の{{data.prefecture_name}}<br>日別お勧め店舗画像</div>
-                            <img class="card-img-top" src="https://pachislo7.com/wp-content/uploads/top10_recommend_hall_name_{{data.target_date_md }}.png" alt="明日{{data.tommorow_jp_str_day}}の{{data.prefecture_name}}日別お勧め店舗画像" width="80%" height="80%" loading="lazy">
-                            <div class="heading-011 mt-3" >{{data.tommorow_jp_str_day}}の{{data.prefecture_name}}<br>旧イベ日過去三回平均差枚画像</div>
-                            <img class="card-img-top" src="https://pachislo7.com/wp-content/uploads/old_event_day_hall_name_{{data.target_date_md }}.png" alt="明日{{data.tommorow_jp_str_day}}の{{data.prefecture_name}}旧イベ日過去三回平均差枚画像" width="80%" height="80%" loading="lazy">
+                            <div class="heading-011 mt-3" >{{data.target_jp_str_day}}の{{data.prefecture_name}}<br>日別お勧め店舗画像</div>
+                            <img class="card-img-top" src="https://pachislo7.com/wp-content/uploads/top10_recommend_hall_name_{{data.target_date_md }}.png" alt="明日{{data.target_jp_str_day}}の{{data.prefecture_name}}日別お勧め店舗画像" width="80%" height="80%" loading="lazy">
+                            <div class="heading-011 mt-3" >{{data.target_jp_str_day}}の{{data.prefecture_name}}<br>旧イベ日過去三回平均差枚画像</div>
+                            <img class="card-img-top" src="https://pachislo7.com/wp-content/uploads/old_event_day_hall_name_{{data.target_date_md }}.png" alt="明日{{data.target_jp_str_day}}の{{data.prefecture_name}}旧イベ日過去三回平均差枚画像" width="80%" height="80%" loading="lazy">
                         </div>
                     </a>
                 </div>

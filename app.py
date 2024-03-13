@@ -1399,33 +1399,71 @@ def tomorrow_recommend():
 
 @app.route("/tomorrow_recommend/<area_name>/prefecture/<prefecture_name>", methods=['GET','POST']) 
 def tomorrow_recommend_area_prefecture_prefecturename(area_name,prefecture_name):
-    data = {}
+    pref_name_df = pd.read_csv('csv/pref_lat_lon.csv')
     today = date.today()
-    tomorrow:date = today + timedelta(days=1)
-    tomorrow_str = tomorrow.strftime('%Y-%m-%d')
-    tommorow_jp_str_day = tomorrow.strftime('%m').lstrip('0') + '月' + tomorrow.strftime('%d').lstrip('0') + '日' + w_list[tomorrow.weekday()]
-    print(tommorow_jp_str_day)
-    data['tommorow_jp_str_day'] =  tommorow_jp_str_day
+    try:
+        req = request.args
+        target_date = req.get("target_date")
+    except:
+        target_date = None
+        
+    if target_date == None:
+        #?user_id=1
+        print('target_date',target_date)
+        data = {}
+        target_date:date = today + timedelta(days=1)
+        target_date_str = target_date.strftime('%Y-%m-%d')
+        target_date_jp_str_day = target_date.strftime('%m').lstrip('0') + '月' + target_date.strftime('%d').lstrip('0') + '日' + w_list[target_date.weekday()]
+        print(target_date_jp_str_day)
+            #data['area_name_jp'] = area_name_and_str_jp_area_name_dict[area_name]
+        cursor = get_driver()
+        #area_sql_text = get_area_sql_text(area_name)
+        #首都圏のイベントの媒体別の予約数を集計
+        print('prefecture_name',prefecture_name)
+        cursor.execute(f'''SELECT *
+                        FROM schedule as schedule2
+                        left join halldata as halldata2
+                        on schedule2.店舗名 = halldata2.hall_name
+                        WHERE イベント日 >= current_date
+                        AND イベント日 < current_date + 7
+                        AND 媒体名 != 'ホールナビ'
+                        AND 都道府県 = '{prefecture_name}'
+                        ORDER BY イベント日,都道府県,媒体名 desc;''')
+
+    else:
+        data = {}
+        target_date_str = target_date
+        target_date = datetime.datetime.strptime(target_date, '%Y-%m-%d')
+        target_date_jp_str_day = target_date.strftime('%m').lstrip('0') + '月' + target_date.strftime('%d').lstrip('0') + '日' + w_list[target_date.weekday()]
+        print(target_date_jp_str_day)
+            #data['area_name_jp'] = area_name_and_str_jp_area_name_dict[area_name]
+        cursor = get_driver()
+        #area_sql_text = get_area_sql_text(area_name)
+        #首都圏のイベントの媒体別の予約数を集計
+        print('prefecture_name',prefecture_name)
+        cursor.execute(f'''SELECT *
+                        FROM schedule as schedule2
+                        left join halldata as halldata2
+                        on schedule2.店舗名 = halldata2.hall_name
+                        WHERE イベント日 >= current_date
+                        AND イベント日 < current_date + 7
+                        AND 媒体名 != 'ホールナビ'
+                        AND 都道府県 = '{prefecture_name}'
+                        AND イベント日 = '{target_date_str}'
+                        ORDER BY イベント日,都道府県,媒体名 desc;''')
+        
+    data['pref_name_en'] = pref_name_en = pref_name_df[pref_name_df['pref_name'] == prefecture_name]['pref_name_en'].values[0]
+
+    data['target_date_str'] = target_date_str
+    data['target_jp_str_day'] =  target_date_jp_str_day
     date_list = [today + timedelta(days=day) for day in range(0,6)]
     date_list = [date.strftime("%Y-%m-%d") for date in date_list]
     data['area_name_jp'] = area_name_and_str_jp_area_name_dict[area_name]
     data['date_list'] = date_list
     data['area_name'] = area_name
     data['prefecture_name'] = prefecture_name
-    #data['area_name_jp'] = area_name_and_str_jp_area_name_dict[area_name]
-    cursor = get_driver()
-    #area_sql_text = get_area_sql_text(area_name)
-    #首都圏のイベントの媒体別の予約数を集計
-    print('prefecture_name',prefecture_name)
-    cursor.execute(f'''SELECT *
-                FROM schedule as schedule2
-                left join halldata as halldata2
-                on schedule2.店舗名 = halldata2.hall_name
-                WHERE イベント日 >= current_date
-                AND イベント日 < current_date + 7
-                AND 媒体名 != 'ホールナビ'
-                AND 都道府県 = '{prefecture_name}'
-                ORDER BY イベント日,都道府県,媒体名 desc;''')
+    data['pref_name_jp'] = prefecture_name
+
     cols = [col.name for col in cursor.description]
     extract_prefecture_name_df = pd.DataFrame(cursor.fetchall(),columns=cols)
     extract_prefecture_name_df.drop_duplicates(keep='first',inplace=True)
@@ -1440,8 +1478,7 @@ def tomorrow_recommend_area_prefecture_prefecturename(area_name,prefecture_name)
     data['extract_prefecture_name_df_column_names'] = table_df.columns.values
     data['extract_prefecture_name_df_row_data'] = list(table_df.values.tolist())
     prefecture_df = pd.read_csv('csv/pref_lat_lon.csv')
-    data['pref_name_jp'] = prefecture_name
-    data['pref_name_en'] = pref_name_en = prefecture_df[prefecture_df['pref_name'] == prefecture_name]['pref_name_en'].values[0]
+    
      
     #print('data',data) 
     # アクセス情報の設定
@@ -1453,7 +1490,7 @@ def tomorrow_recommend_area_prefecture_prefecturename(area_name,prefecture_name)
     #下書き状態の記事を取得
     #画像は取得するがurl以外は取得しない
     print('pref_name_en',pref_name_en) 
-    post_slug = f'{pref_name_en}_{tomorrow_str}'
+    post_slug = f'{pref_name_en}_{target_date_str}'
     label = f'posts?slug={post_slug}&status=draft&_embed'
     url = f"{API_URL}{label}"
     # すべてのアイテムを取得
@@ -1464,7 +1501,7 @@ def tomorrow_recommend_area_prefecture_prefecturename(area_name,prefecture_name)
     #post_line(f'明日の{post_slug}の記事が見られました。')
 
     res = requests.get(url, auth=(AUTH_USER, AUTH_PASS)).json()
-    print('res',res)
+    #print('res',res)
     thumbnail_url = res[0]['_embedded']['wp:featuredmedia'][0]['source_url']
     #print('thumbnail_url',thumbnail_url)
     data['thumbnail_url'] = thumbnail_url
@@ -1725,10 +1762,16 @@ def tomorrow_recommend_area(area_name):
 class DateForm(FlaskForm):
     inputdate = DateField('', format='%Y/%m/%d')
     submit = SubmitField('検索')
-@app.route("/tomorrow-recommend/<area_name>/", methods=['POST'])
-def tomorrow_recommend_area_post(area_name):
+@app.route("/tomorrow-recommend/<pref_name_en>/", methods=['POST'])
+def tomorrow_recommend_area_post(pref_name_en):
     form = DateForm()
-    area_sql_text = get_area_sql_text(area_name)
+    prefecture_df = pd.read_csv('csv/pref_lat_lon.csv')
+    data = {}
+    data['pref_id'] = prefecture_id  = prefecture_df[prefecture_df['pref_name'] == '沖縄県'].index[0]
+    data['pref_name_en'] = pref_name_en = prefecture_df.iloc[int(data['pref_id'])-1]['pref_name_en']
+    data['pref_name_jp'] = pref_name_jp = prefecture_df.iloc[int(data['pref_id'])-1]['pref_name']
+    data['area_name_jp'] = prefecture_df.iloc[int(data['pref_id'])-1]['area_name_jp']
+    data['area_name_en'] = prefecture_df.iloc[int(data['pref_id'])-1]['area_name_en']
     data = request.form
     print('dataは',data)
     print('form.inputdate.data',form.inputdate.data)
@@ -1781,17 +1824,15 @@ def tomorrow_recommend_area_date(area_name,date):
     return render_template('tomorrow_recommend_area_date.html',data=data)
 
 @app.route("/serch-recommend-prefecture-day", methods=['GET','POST'])
-@cache.cached(timeout=300)
 def serch_recommend_prefecture_day():
     if request.method == 'GET':
+        prefecture_df = pd.read_csv('csv/pref_lat_lon.csv')
+        
         data = {}
         date_list = []
         day_str_list = []
-        prefecture_id_and_name_dict = {}
-        for i, prefecture_name in enumerate(prefecture_list):
-            i = i + 1
-            prefecture_id_and_name_dict[i] = prefecture_name
-        data['prefecture_id_and_name_dict'] = prefecture_id_and_name_dict
+        prefecture_name_en_and_name_dict = dict(zip(prefecture_df['pref_name_en'],prefecture_df['pref_name']))
+        data['prefecture_name_en_and_name_dict'] = prefecture_name_en_and_name_dict
         today = datetime.date.today()
         prefecture_name = '東京都'
         prefecture_name_en = 'tokyo'
@@ -1817,6 +1858,97 @@ def serch_recommend_prefecture_day():
     else:
         pass
     
+@app.route("/prefecture/<pref_name_en>", methods=['GET','POST'])
+def select_page_prefecture(pref_name_en):
+    prefecture_df = pd.read_csv('csv/pref_lat_lon.csv')
+    #index番号で取り出す
+    data = {}
+    data['pref_name_en'] = pref_name_en
+    data['pref_name_jp'] = pref_name_jp = prefecture_df[prefecture_df['pref_name_en'] == pref_name_en]['pref_name'].values[0]
+    data['area_name_jp'] = prefecture_df[prefecture_df['pref_name_en'] == pref_name_en]['area_name_jp'].values[0]
+    data['area_name_en'] = prefecture_df[prefecture_df['pref_name_en'] == pref_name_en]['area_name_en'].values[0]
+    print('pref_name_en',pref_name_en,pref_name_jp)  
+    print('data',data) 
+
+    date_list = []
+    day_str_list = []
+    today = datetime.date.today()
+    #target_day =  today + datetime.timedelta(days=target_day_number)
+    target_day_str = today.strftime('%Y-%m-%d')
+    #曜日のリスト
+    print(target_day_str[-1])
+    #Nの付く日
+    display_date_list_dict = {}
+    tag_dict = {}
+    for i in range(0,7):
+        #print(i)
+        target_day = today + datetime.timedelta(days=i)
+        belong_day_str = target_day.strftime('%Y-%m-%d')
+        target_day_str_jp = target_day.strftime('%m/').lstrip('0')  +target_day.strftime('%d').lstrip('0') +  w_list[target_day.weekday()]
+        target_day_str_number:str = belong_day_str[-1] + 'の付く日'
+        display_date_list_dict[target_day_str_jp] = target_day_str_number
+        display_list_str = target_day_str_jp + ' ' + target_day_str_number
+        tag_dict[display_list_str] = belong_day_str
+    print(tag_dict)
+    
+    data['tag_dict'] = tag_dict
+    sql = f'''SELECT COUNT(媒体名), 媒体名
+    FROM schedule
+    WHERE イベント日 >= current_date
+    AND イベント日 <= current_date + 7
+    AND 媒体名 != 'ホールナビ'
+    AND 都道府県 = '{pref_name_jp}'
+    GROUP BY 媒体名
+    ORDER BY COUNT(媒体名) desc;'''
+
+    today = date.today()
+    date_list = [today + timedelta(days=day) for day in range(0,9)]
+    date_list = [date.strftime("%Y-%m-%d") for date in date_list]
+    data['date_list'] = date_list
+
+
+    cursor = get_driver()
+    #首都圏のイベントの媒体別の予約数を集計
+    print('sql1',sql)
+    cursor.execute(sql)
+    cols = [col.name for col in cursor.description]
+    groupby_media_name_count_df = pd.DataFrame(cursor.fetchall(),columns=cols)
+    #重複行を削除する
+    groupby_media_name_count_df.drop_duplicates(keep='first',inplace=True)
+    print('groupby_media_name_count_df:',groupby_media_name_count_df)
+    groupby_media_name_count_df.rename(columns={'count': '取材数'},inplace=True)
+    data['groupby_media_name_count_df'] = groupby_media_name_count_df
+    data['groupby_media_name_count_df_column_names'] = groupby_media_name_count_df.columns.values
+    data['groupby_media_name_count_df_row_data'] = list(groupby_media_name_count_df.values.tolist())
+    print('data',data)
+    #cursor = get_driver()
+    sql2 = f'''SELECT COUNT(店舗名),都道府県, 店舗名
+            FROM schedule as schedule2
+            left join halldata as halldata2
+            on schedule2.店舗名 = halldata2.hall_name
+            WHERE イベント日 >= current_date
+            AND イベント日 <= current_date + 7
+            AND 媒体名 != 'ホールナビ'
+            AND 都道府県 = '{pref_name_jp}'
+            GROUP BY 店舗名,都道府県
+            ORDER BY COUNT(店舗名) desc;'''
+    print('sql2',sql2)
+    cursor.execute(sql2)
+    cols = [col.name for col in cursor.description]
+    groupby_hall_name_count_df = pd.DataFrame(cursor.fetchall(),columns=cols)
+    #重複行を削除する
+    print(groupby_hall_name_count_df)
+    groupby_hall_name_count_df.drop_duplicates(keep='first',inplace=True)
+    print('groupby_hall_name_count_df:',groupby_hall_name_count_df)
+    groupby_hall_name_count_df.rename(columns={'count': '取材数'},inplace=True)
+    data['groupby_hall_name_count_df'] = groupby_hall_name_count_df[['取材数','店舗名']]
+    groupby_hall_name_count_df = groupby_hall_name_count_df[['取材数','店舗名']]
+    data['groupby_hall_name_count_df_column_names'] = groupby_hall_name_count_df.columns.values
+    data['groupby_hall_name_count_df_row_data'] = list(groupby_hall_name_count_df.values.tolist())
+    return render_template('select_page_prefecture.html',data=data,enumerate=enumerate,zip=zip)
+
+
+
 @app.route("/prefecture_post_detail", methods=['GET','POST'])
 def prefecture_post_detail():
     if request.method == 'POST':
@@ -1826,9 +1958,11 @@ def prefecture_post_detail():
         #北海道が選択された場合 wordpressのタグのidは72
         data = {}
         data['target_day'] = target_day = request.form.get('target_day')
-        data['pref_id'] = request.form.get('pref_id')
-        data['pref_name_en'] = pref_name_en = prefecture_df.iloc[int(data['pref_id'])-1]['pref_name_en']
-        data['pref_name_jp'] = prefecture_df.iloc[int(data['pref_id'])-1]['pref_name']
+        data['pref_name_en'] = pref_name_en = request.form.get('prefecture_name_en')
+        data['pref_name_jp'] = pref_name_jp = prefecture_df[prefecture_df['pref_name_en'] == pref_name_en]['pref_name'].values[0]
+        data['area_name_jp'] = prefecture_df[prefecture_df['pref_name_en'] == pref_name_en]['area_name_jp'].values[0]
+        data['area_name_en'] = prefecture_df[prefecture_df['pref_name_en'] == pref_name_en]['area_name_en'].values[0]
+        print('pref_name_en',pref_name_en,pref_name_jp)  
         print('pref_name_en',pref_name_en)  
         print('data',data) 
         # アクセス情報の設定
@@ -1864,7 +1998,7 @@ def prefecture_post_detail():
         data['iframe'] = create_post_map_iframe(location_name_df,groupby_date_kisyubetu_df)
         return render_template('prefecture_post_detail.html',data=data,enumerate=enumerate)
     else:
-        redirect(url_for('test3'))
+        pass
 
 #post_prefecture_list.html
 @app.route("/post_prefecture_list/<pref_name_en>", methods=['GET'])
