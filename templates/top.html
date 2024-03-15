@@ -7,6 +7,8 @@
     <div class="row">
         <div class="column col-lg-9">
             <dl class="info">
+                <dt><span>表示改善</span><time>2024.03.14</time></dt>
+                <dd>表示のベースをエリア別から都道府県別に見やすいようにUIを修正しました</dd>
                 <dt><span>表示改善</span><time>2024.01.21</time></dt>
                 <dd>取材名ページに公約が表示される機能を追加しました</dd>
                 <dt><span>表示改善</span><time>2023.12.30</time></dt>
@@ -20,138 +22,103 @@
                 <dt><span>お知らせ</span><time>2023.7.28</time></dt>
                 <dd>スロマップをオープンしました</dd>
             </dl>
+            <h2 class="heading-17 my-2 ">
+                <span>01</span>
+                都道府県から色々を探す
+            </h2>
+            <div class='col-12 my-1'>
+                <div class="japan_map">
+                    <img src="../static/img/japanmap.png" height="100%" width="100%" alt="日本地図">
+                    <span class="area_btn area1" data-area="1">北海道・東北</span>
+                    <span class="area_btn area2" data-area="2">関東</span>
+                    <span class="area_btn area3" data-area="3">中部</span>
+                    <span class="area_btn area4" data-area="4">近畿</span>
+                    <span class="area_btn area5" data-area="5">中国・四国</span>
+                    <span class="area_btn area6" data-area="6">九州・沖縄</span>
+                    <div class="area_overlay"></div>
+                    <div class="pref_area">
+                        <div class="pref_list" data-list="1">
+                            <div data-id="hokkaido">北海道</div>
+                            <div data-id="aomori">青森県</div>
+                            <div data-id="iwate">岩手県</div>
+                            <div data-id="miyagi">宮城県</div>
+                            <div data-id="akita">秋田県</div>
+                            <div data-id="yamagata">山形県</div>
+                            <div data-id="fukushima">福島県</div>
+                            <div></div>
+                        </div>
+
+                        <div class="pref_list" data-list="2">
+                            <div data-id="ibaraki">茨城県</div>
+                            <div data-id="tochigi">栃木県</div>
+                            <div data-id="gunma">群馬県</div>
+                            <div data-id="saitama">埼玉県</div>
+                            <div data-id="chiba">千葉県</div>
+                            <div data-id="tokyo">東京都</div>
+                            <div data-id="kanagawa">神奈川県</div>
+                            <div></div>
+                        </div>
+
+                        <div class="pref_list" data-list="3">
+                            <div data-id="">新潟県</div>
+                            <div data-id="">富山県</div>
+                            <div data-id="">石川県</div>
+                            <div data-id="fukui">福井県</div>
+                            <div data-id="yamanashi">山梨県</div>
+                            <div data-id="nagano">長野県</div>
+                            <div data-id="gifu">岐阜県</div>
+                            <div data-id="shizuoka">静岡県</div>
+                            <div data-id="aichi">愛知県</div>
+                            <div></div>
+                        </div>
+
+                        <div class="pref_list" data-list="4">
+                            <div data-id="mie">三重県</div>
+                            <div data-id="shiga">滋賀県</div>
+                            <div data-id="kyoto">京都府</div>
+                            <div data-id="osaka">大阪府</div>
+                            <div data-id="hyogo">兵庫県</div>
+                            <div data-id="nara">奈良県</div>
+                            <div data-id="wakayama">和歌山県</div>
+                            <div></div>
+                        </div>
+                        
+                        <div class="pref_list" data-list="5">
+                            <div data-id="tottori">鳥取県</div>
+                            <div data-id="shimane">島根県</div>
+                            <div data-id="okayama">岡山県</div>
+                            <div data-id="hiroshima">広島県</div>
+                            <div data-id="yamaguchi">山口県</div>
+                            <div data-id="tokushima">徳島県</div>
+                            <div data-id="kagawa">香川県</div>
+                            <div data-id="ehime">愛媛県</div>
+                            <div data-id="kochi">高知県</div>
+                            <div></div>
+                        </div>
+                        
+                        <div class="pref_list" data-list="6">
+                            <div data-id="fukuoka">福岡県</div>
+                            <div data-id="saga">佐賀県</div>
+                            <div data-id="nagasaki">長崎県</div>
+                            <div data-id="kumamoto">熊本県</div>
+                            <div data-id="oita">大分県</div>
+                            <div data-id="miyazaki">宮崎県</div>
+                            <div data-id="kagoshima">鹿児島県</div>
+                            <div data-id="okinawa">沖縄県</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <h2 class="heading-17">
+                <span>02</span>
+                スロマップお勧め機能から探す
+            </h2>
             <a href="/serch-recommend-prefecture-day"><button class="button-014 my-4">
                 <div>
                     <i class="fa-solid fa-building-circle-exclamation"></i> サイト初訪問者・スロット初心者にオススメ
                 </div>
-                
-                <span><img src="static/img/thumbnail/thumbnail_tokyo_2023-12-29-300x200.png" loading="lazy" width="90" height="60" alt="icon" class="mx-2">➀過去差枚実績から<br>お勧め店舗・機種を探す</span></button>
+                <span><img src="static/img/thumbnail/thumbnail_tokyo_2023-12-29-300x200.png" loading="lazy" width="80" height="50" alt="thumbnail" class="mx-1">➀過去差枚実績から<br>お勧め店舗を探す<img src="static/img/content_image/191.jpg" loading="lazy" width="80" height="50" alt="北斗の拳" class="mx-1"></span></button>
             </a>
-            <a href="/tomorrow-recommend"><button class="button-014 my-4"><div><i class="fa-solid fa-magnifying-glass-location"></i> 取材・公約をわかる中級者以上にオススメ</div><span>➁マップから<br>取材のある店舗を探す</span></button></a>
-            <div class="heading-008 my-2 ">エリアから取材予定を地図で探す</div>
-            <ul class="top-btn" style="list-style: none; padding: 0;  margin:0;">
-                <li><a class="link-btn colorname1" href="{{ url_for('tomorrow_recommend_area', area_name='hokkaidoutouhoku')}}">北海道・東北</a></li>
-                <li><a class="link-btn colorname1" href="{{ url_for('tomorrow_recommend_area', area_name='kitakantou')}}">北関東</a></li>
-                <li><a class="link-btn colorname1" href="{{ url_for('tomorrow_recommend_area', area_name='minamikantou')}}">南関東</a></li>
-            </ul>
-
-            <ul class="top-btn" style="list-style: none; padding: 0;  margin:0;">
-                <li><a class="link-btn colorname1" href="{{ url_for('tomorrow_recommend_area', area_name='hokurikukoushinetsu')}}">北陸・甲信越</a></li>
-                <li><a class="link-btn colorname1" href="{{ url_for('tomorrow_recommend_area', area_name='toukai')}}">東海</a></li>
-                <li><a class="link-btn colorname1" href="{{ url_for('tomorrow_recommend_area', area_name='kansai')}}">関西</a></li>
-            </ul>
-
-
-            <ul class="top-btn" style="list-style: none; padding: 0;  margin:0;">
-                <li><a class="link-btn colorname1" href="{{ url_for('tomorrow_recommend_area', area_name='chugokushikoku')}}">中国・四国</a></li>
-                <li><a class="link-btn colorname1" href="{{ url_for('tomorrow_recommend_area', area_name='kyushu')}}">九州・山口</a></li>
-            </ul>
-
-
-            <div class="heading-008 my-2 ">日付と都道府県から取材予定を探す</div>
-            <form action="{{ url_for('post_top') }}" method="post">
-                <div class='col-12'>
-                    <div class="japan_map">
-                        <img src="../static/img/japanmap.png" height="100%" width="100%" alt="日本地図">
-                        <span class="area_btn area1" data-area="1">北海道・東北</span>
-                        <span class="area_btn area2" data-area="2">関東</span>
-                        <span class="area_btn area3" data-area="3">中部</span>
-                        <span class="area_btn area4" data-area="4">近畿</span>
-                        <span class="area_btn area5" data-area="5">中国・四国</span>
-                        <span class="area_btn area6" data-area="6">九州・沖縄</span>
-                        <div class="area_overlay"></div>
-                        <div class="pref_area">
-                            <div class="pref_list" data-list="1">
-                                <div data-id="1">北海道</div>
-                                <div data-id="2">青森県</div>
-                                <div data-id="3">岩手県</div>
-                                <div data-id="4">宮城県</div>
-                                <div data-id="5">秋田県</div>
-                                <div data-id="6">山形県</div>
-                                <div data-id="7">福島県</div>
-                                <div></div>
-                            </div>
-
-                            <div class="pref_list" data-list="2">
-                                <div data-id="8">茨城県</div>
-                                <div data-id="9">栃木県</div>
-                                <div data-id="10">群馬県</div>
-                                <div data-id="11">埼玉県</div>
-                                <div data-id="12">千葉県</div>
-                                <div data-id="13">東京都</div>
-                                <div data-id="14">神奈川県</div>
-                                <div></div>
-                            </div>
-
-                            <div class="pref_list" data-list="3">
-                                <div data-id="15">新潟県</div>
-                                <div data-id="16">富山県</div>
-                                <div data-id="17">石川県</div>
-                                <div data-id="18">福井県</div>
-                                <div data-id="19">山梨県</div>
-                                <div data-id="20">長野県</div>
-                                <div data-id="21">岐阜県</div>
-                                <div data-id="22">静岡県</div>
-                                <div data-id="23">愛知県</div>
-                                <div></div>
-                            </div>
-
-                            <div class="pref_list" data-list="4">
-                                <div data-id="24">三重県</div>
-                                <div data-id="25">滋賀県</div>
-                                <div data-id="26">京都府</div>
-                                <div data-id="27">大阪府</div>
-                                <div data-id="28">兵庫県</div>
-                                <div data-id="29">奈良県</div>
-                                <div data-id="30">和歌山県</div>
-                                <div></div>
-                            </div>
-                            
-                            <div class="pref_list" data-list="5">
-                                <div data-id="31">鳥取県</div>
-                                <div data-id="32">島根県</div>
-                                <div data-id="33">岡山県</div>
-                                <div data-id="34">広島県</div>
-                                <div data-id="35">山口県</div>
-                                <div data-id="36">徳島県</div>
-                                <div data-id="37">香川県</div>
-                                <div data-id="38">愛媛県</div>
-                                <div data-id="39">高知県</div>
-                                <div></div>
-                            </div>
-                            
-                            <div class="pref_list" data-list="6">
-                                <div data-id="40">福岡県</div>
-                                <div data-id="41">佐賀県</div>
-                                <div data-id="42">長崎県</div>
-                                <div data-id="43">熊本県</div>
-                                <div data-id="44">大分県</div>
-                                <div data-id="45">宮崎県</div>
-                                <div data-id="46">鹿児島県</div>
-                                <div data-id="47">沖縄県</div>
-                            </div>
-                        </div>
-                    </div>
-                    <select name="pref_id" class="form-select form-select-lg my-3" >
-                        <option selected>マップから選択</option>
-                        {% for prefecture,pref_id in data.prefecture_id_and_name_dict.items() %}
-                            <option  value="{{ pref_id }}">{{ prefecture }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <p>調べたい日付を選択：</p>
-                <select class="form-select form-select-lg mb-2" name="target_day">
-                {% for target_day in data.jp_str_day_list %}
-                    <option value="{{ target_day }}">{{ target_day }}</option>
-                {% endfor %}
-                </select>
-
-                <div class="d-grid gap-2 col-6 mx-auto pb-3 pt-3">
-                    <button class="btn btn-primary" type="submit" value="送信">検索</button>
-                </div>
-            </form>
-
             <h4 data-text="※明日みんなが注目の取材のみマップに表示中">※明日{{data.tommorow_jp_str_day}} 東京都の旧イベント日<br>過去差枚がわかる店舗をマップに表示中</h4>
             <iframe class="embed-responsive-item" loading="lazy" title="location_map" scrolling="no" height="450" width="100%" src= "{{url_for('show_iframe')}}" ></iframe>
 

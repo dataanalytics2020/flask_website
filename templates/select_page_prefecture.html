@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>{{data.pref_name_jp}} マップで見えるパチンコ・スロット取材予定</title>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class='row justify-content-center'>
+        <div class='col-lg-8 text-center'>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                  <li class="breadcrumb-item"><a href="/">HOME</a></li>
+                  <li class="breadcrumb-item active" aria-current="page"><a href="/tomorrow-recommend/{{data.area_name}}">{{data.pref_name_jp}}</a></li>
+                </ol>
+            </nav>
+            <h1>{{data.pref_name_jp}}のパチンコ・スロット取材予定</h1>
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-lg-8 text-center">
+            <h2 class="heading-17">
+                <span>01</span>
+                行きたい日付からお勧め店舗を探す
+            </h2>
+            <details class="qa-001 my-2">
+                <summary>お勧め店舗の選出条件は何ですか？</summary>
+                <p>各都道府県で取得できる店舗のデータを使って〇の付く日の過去3回の平均差枚が多い順TOP10になります。特定日でなくても純粋に出しているパチンコ店舗になります。そのためほかの人の知らない思わぬ穴場店舗が見つかる可能性があります。</p>
+            </details>
+            {% for i , (date_text,date) in enumerate(data.tag_dict.items()) %}
+                <button class="my-1 button-37" onclick="location.href='/tomorrow_recommend/{{data.area_name_en}}/prefecture/{{data.pref_name_en}}?target_date={{date}}'"> {{ date_text }}</button>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-lg-8 text-center">
+            <h2 class="mt-4 heading-17">
+                <span>02</span>
+                行きたい媒体名から探す
+            </h2>
+            <div class = 'heatmap .table-wrap'>
+                <div class="scroll_area" style="width:100%;max-width:2000px;overflow-x:scroll;">
+                    <table id="media_table" class="table table-striped">
+                        <thead>
+                            <tr>
+                                {% for col in data.groupby_media_name_count_df_column_names %}
+                                <th>
+                                {{col}}
+                                </th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in data.groupby_media_name_count_df_row_data %}
+                            <tr>
+                                {% for col, row_ in zip(data.groupby_media_name_count_df_column_names, row) %}
+                                    {% if col == '媒体名' %}
+                                        <td><a href="/tomorrow_recommend/{{data.pref_name_en}}/media/{{ row_ }}" >{{ row_ }}</a></td>
+                                    {% else %}
+                                        <td>{{row_}}</td>
+                                    {% endif %}
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-lg-8 text-center">
+            <h2 class="mt-4 heading-17">
+                <span>03</span>
+                行きたい店舗名から探す
+            </h2>
+            <div class = 'heatmap .table-wrap'>
+                <div class="scroll_area" style="width:100%;max-width:2000px;overflow-x:scroll;">
+                    <table id="hall_table" class="table table-striped">
+                        <thead>
+                            <tr>
+                                {% for col in data.groupby_hall_name_count_df_column_names %}
+                                <th>
+                                {{col}}
+                                </th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in data.groupby_hall_name_count_df_row_data %}
+                            <tr>
+                                {% for col, row_ in zip(data.groupby_hall_name_count_df_column_names, row) %}
+                                    {% if col == '店舗名' %}
+                                        <td><a href="/tomorrow_recommend/{{data.pref_name_en}}/hall/{{ row_ }}" >{{ row_ }}</a></td>
+                                    {% else %}
+                                        <td>{{row_}}</td>
+                                    {% endif %}
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1/i18n/jquery.ui.datepicker-ja.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/themes/cupertino/jquery-ui.min.css">  <!-- テーマcupertinoを選択 -->\
+<script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+
+{% endblock %}

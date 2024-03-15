@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block head %}
-<title>{{data.hall_name}} マップで見えるパチンコ・スロット取材予定</title>
+<title>{{data.hall_name}} 店舗詳細ページ</title>
 {% endblock %}
 {% block content %}
 <div class="container">
@@ -9,14 +9,18 @@
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                   <li class="breadcrumb-item"><a href="/">HOME</a></li>
-                  <li class="breadcrumb-item"><a href="/tomorrow-recommend/{{data.area_name}}">{{data.area_name_jp}}</a></li>
-                  <li class="breadcrumb-item active" aria-current="page"><a href="/tomorrow_recommend/{{data.area_name}}/hall/{{data.hall_name}}">{{data.hall_name}}</a></li>
+                  <li class="breadcrumb-item"><a href="/prefecture/{{data.pref_name_en}}">{{data.pref_name_jp}}</a></li>
+                  <li class="breadcrumb-item active" aria-current="page"><a href="/tomorrow_recommend/{{data.pref_name_en}}/hall/{{data.hall_name}}">{{data.hall_name}}</a></li>
                 </ol>
             </nav>
-
-            <div class="mx-auto" style="width: 350px;">
-                <div class="heading-008 my-2 ">{{data.hall_name}}</div>
-            </div>
+            <h2 class="heading-17 my-2">
+                <span>01</span>
+                {{data.hall_name}} 店舗詳細ページ
+            </h2>
+            <details class="qa-001 my-2">
+                <summary>このページは何ですか？</summary>
+                <p>店舗詳細ページです。<br>グーグルマップで家からの経路を調べる機能もありますのでご活用ください。</p>
+            </details>
             <iframe class="embed-responsive-item" scrolling="no" height="450" width="100%" src={{ data.iframe|safe }}</iframe>
             <div class="card" style="width:100%;">
                 {% if data.address != ''%}
@@ -50,7 +54,10 @@
                     </div>
                 </div>
             </div>
-            <h4 class="my-2">取材予定(※直近一週間分表示中)</h4>
+            <h2 class="heading-17 my-2">
+                <span>02</span>
+                取材予定(※直近一週間分表示中)
+            </h2>
             <div class = 'heatmap .table-wrap'>
                 <div class="scroll_area" style="width:100%;max-width:2000px;overflow-x:scroll;">
                     <table id="hall_table" class="table table-striped">
@@ -68,11 +75,11 @@
                             <tr>
                                 {% for col, row_ in zip(data.future_extract_hall_name_df_column_names, row) %}
                                     {% if col == '取材名' %}
-                                        <td><a href="/tomorrow_recommend/{{data.area_name}}/syuzai/{{ row_ }}" >{{ row_ }}</a></td>
+                                        <td><a href="/tomorrow_recommend/{{data.pref_name_en}}/syuzai/{{ row_ }}" >{{ row_ }}</a></td>
                                     {% elif col == '店舗名' %}
-                                        <td><a href="/tomorrow_recommend/{{data.area_name}}/hall/{{ row_ }}" >{{ row_ }}</a></td>
+                                        <td><a href="/tomorrow_recommend/{{data.pref_name_en}}/hall/{{ row_ }}" >{{ row_ }}</a></td>
                                     {% elif col == '媒体名' %}
-                                        <td><a href="/tomorrow_recommend/{{data.area_name}}/media/{{ row_ }}" >{{ row_ }}</a></td>
+                                        <td><a href="/tomorrow_recommend/{{data.pref_name_en}}/media/{{ row_ }}" >{{ row_ }}</a></td>
                                     {% else %}
                                         <td>{{row_}}</td>
                                     {% endif %}
@@ -83,7 +90,10 @@
                     </table>
                 </div>
             </div>
-            <h4 class="my-2">過去取材(※過去一か月分表示中)</h4>
+            <h2 class="heading-17 my-2">
+                <span>03</span>
+                過去取材(※過去分表示中)
+            </h2>
             <div class = 'heatmap .table-wrap'>
                 <div class="scroll_area" style="width:100%;max-width:2000px;overflow-x:scroll;">
                     <table id="past_hall_table" class="table table-striped">
@@ -101,11 +111,11 @@
                             <tr>
                                 {% for col, row_ in zip(data.past_extract_hall_name_df_column_names, row) %}
                                     {% if col == '取材名' %}
-                                        <td><a href="/tomorrow_recommend/{{data.area_name}}/syuzai/{{ row_ }}" >{{ row_ }}</a></td>
+                                        <td><a href="/tomorrow_recommend/{{data.pref_name_en}}/syuzai/{{ row_ }}" >{{ row_ }}</a></td>
                                     {% elif col == '店舗名' %}
-                                        <td><a href="/tomorrow_recommend/{{data.area_name}}/hall/{{ row_ }}" >{{ row_ }}</a></td>
+                                        <td><a href="/tomorrow_recommend/{{data.pref_name_en}}/hall/{{ row_ }}" >{{ row_ }}</a></td>
                                     {% elif col == '媒体名' %}
-                                        <td><a href="/tomorrow_recommend/{{data.area_name}}/media/{{ row_ }}" >{{ row_ }}</a></td>
+                                        <td><a href="/tomorrow_recommend/{{data.pref_name_en}}/media/{{ row_ }}" >{{ row_ }}</a></td>
                                     {% else %}
                                         <td>{{row_}}</td>
                                     {% endif %}

@@ -63,10 +63,22 @@ $(function(){
     
     //都道府県をクリック
     $('.pref_list [data-id]').click(function(){
+        console.log(location.href)
+        var url = location.href.toString();
+        var url = url.replace('tomorrow-recommend/','')
+        console.log('url',url)
         if($(this).data('id')){
             var id = $(this).data('id');
-            $('[name="pref_id"]').val(id);
+            if (  location.href.match(/serch-recommend-prefecture-day/) ) {
+            console.log('recommend');
+            $('[name="pref_name_en"]').val(id);
             prefReset();
+            }
+            else {
+                console.log('else');
+                window.location.href = url + 'prefecture/' + id;
+                prefReset();
+            }
         }
     });
     
