@@ -117,10 +117,10 @@
                             </div>
                         </div>
                     </div>
-                    <select name="prefecture_name_en" class="form-select form-select-lg my-3" aria-label="prefecture select" >
+                    <select name="pref_name_en" class="form-select form-select-lg my-3" aria-label="prefecture select" >
                         <option selected>マップから選択可</option>
-                        {% for prefecture_name_en , prefecture in data.prefecture_name_en_and_name_dict.items() %}
-                            <option  value="{{ prefecture_name_en }}">{{ prefecture }}</option>
+                        {% for pref_name_en , prefecture in data.prefecture_name_en_and_name_dict.items() %}
+                            <option  value="{{ pref_name_en }}">{{ prefecture }}</option>
                         {% endfor %}
                     </select>
                 </div>
