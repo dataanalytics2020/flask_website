@@ -61,7 +61,7 @@ def login_scraping_site(area_name):
     from selenium import webdriver
     from selenium.webdriver.chrome.service import Service as ChromeService
     options = Options()
-    options.add_argument('--headless')
+    #options.add_argument('--headless')
     options.add_argument('--disable-gpu')
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
@@ -109,6 +109,10 @@ try:
             browser.find_element(By.CLASS_NAME,"head_change_main").click()
             browser.implicitly_wait(10)
             if 'プレミアム会員登録' == browser.find_element(By.CLASS_NAME,"menu_child").text:
+                try:
+                    browser.quit()
+                except:
+                    pass
                 browser = login_scraping_site(area_name)
             else:
                 pass
