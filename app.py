@@ -766,7 +766,7 @@ def get_top():
                 if len(extract_hall_df) == 0:
                     continue
                 popup_df_html += extract_hall_df.to_html(escape=False,index=False,table_id="mystyle",justify='center',classes='table table-striped table-hover table-sm')
-                popup_df_html +=f'<a href="/tomorrow_recommend/minamikantou/hall/{tenpo_name}"  target="_parent">{tenpo_name}※店舗詳細ページに飛びます </a>'
+                popup_df_html +=f'<a href="/tomorrow_recommend/tokyo/hall/{tenpo_name}"  target="_parent">{tenpo_name}※店舗詳細ページに飛びます </a>'
                 popup_data = folium.Popup(popup_df_html,  max_width=1500,show=False,size=(700, 300))
 
                 folium.Marker(location=[latitude ,longitude],
