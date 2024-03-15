@@ -11,15 +11,19 @@
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                   <li class="breadcrumb-item"><a href="/">HOME</a></li>
-                  <li class="breadcrumb-item"><a href="/tomorrow-recommend/{{data.area_name}}">{{data.area_name_jp}}</a></li>
-                  <li class="breadcrumb-item active" aria-current="page"><a href="/tomorrow_recommend/{{data.area_name}}/media/{{data.media_name}}">{{data.media_name}}</a></li>
+                  <li class="breadcrumb-item"><a href="/prefecture/{{data.pref_name_en}}">{{data.pref_name_jp}}</a></li>
+                  <li class="breadcrumb-item active" aria-current="page"><a href="/tomorrow_recommend/{{data.pref_name_en}}/media/{{data.media_name}}">{{data.media_name}}</a></li>
                 </ol>
             </nav>
-            <div class="mx-auto" style="width: 200px;">
-                <div class="heading-008 my-2 ">{{data.media_name}}</div>
-            </div>
+            <h2 class="heading-17 my-2">
+                <span>01</span>
+                {{data.pref_name_jp}} {{data.media_name}} 取材予定マップ(※直近一週間分表示中)
+            </h2>
             <iframe class="embed-responsive-item" scrolling="no" height="450" width="100%" src={{ data.iframe|safe }}</iframe>
-            <h4 class="my-2">取材予定(※直近一週間分表示中)</h4>
+            <h2 class="heading-17 my-2">
+                <span>02</span>
+                {{data.pref_name_jp}} {{data.media_name}} 取材予定テーブル(※直近一週間分表示中)
+            </h2>
             <div class = 'heatmap .table-wrap'>
                 <div class="scroll_area" style="width:100%;max-width:2000px;overflow-x:scroll;">
                     <table id="media_table" class="table table-striped">
@@ -37,11 +41,11 @@
                             <tr>
                                 {% for col, row_ in zip(data.extract_media_name_df_column_names, row) %}
                                     {% if col == '取材名' %}
-                                        <td><a href="/tomorrow_recommend/{{data.area_name}}/syuzai/{{ row_ }}" >{{ row_ }}</a></td>
+                                        <td><a href="/tomorrow_recommend/{{data.pref_name_en}}/syuzai/{{ row_ }}" >{{ row_ }}</a></td>
                                     {% elif col == '店舗名' %}
-                                        <td><a href="/tomorrow_recommend/{{data.area_name}}/hall/{{ row_ }}" >{{ row_ }}</a></td>
+                                        <td><a href="/tomorrow_recommend/{{data.pref_name_en}}/hall/{{ row_ }}" >{{ row_ }}</a></td>
                                     {% elif col == '媒体名' %}
-                                        <td><a href="/tomorrow_recommend/{{data.area_name}}/media/{{ row_ }}" >{{ row_ }}</a></td>
+                                        <td><a href="/tomorrow_recommend/{{data.pref_name_en}}/media/{{ row_ }}" >{{ row_ }}</a></td>
                                     {% else %}
                                         <td>{{row_}}</td>
                                     {% endif %}
@@ -52,7 +56,10 @@
                     </table>
                 </div>
             </div>
-            <h4 class="my-2">過去取材(※過去一か月分表示中)</h4>
+            <h2 class="heading-17 my-2">
+                <span>03</span>
+                {{data.pref_name_jp}} {{data.media_name}} 過去取材(※過去一か月分表示中)
+            </h2>
             <div class = 'heatmap .table-wrap'>
                 <div class="scroll_area" style="width:100%;max-width:2000px;overflow-x:scroll;">
                     <table id="past_media_table" class="table table-striped">
@@ -70,11 +77,11 @@
                             <tr>
                                 {% for col, row_ in zip(data.past_extract_media_name_df_column_names, row) %}
                                     {% if col == '取材名' %}
-                                        <td><a href="/tomorrow_recommend/{{data.area_name}}/syuzai/{{ row_ }}" >{{ row_ }}</a></td>
+                                        <td><a href="/tomorrow_recommend/{{data.pref_name_en}}/syuzai/{{ row_ }}" >{{ row_ }}</a></td>
                                     {% elif col == '店舗名' %}
-                                        <td><a href="/tomorrow_recommend/{{data.area_name}}/hall/{{ row_ }}" >{{ row_ }}</a></td>
+                                        <td><a href="/tomorrow_recommend/{{data.pref_name_en}}/hall/{{ row_ }}" >{{ row_ }}</a></td>
                                     {% elif col == '媒体名' %}
-                                        <td><a href="/tomorrow_recommend/{{data.area_name}}/media/{{ row_ }}" >{{ row_ }}</a></td>
+                                        <td><a href="/tomorrow_recommend/{{data.pref_name_en}}/media/{{ row_ }}" >{{ row_ }}</a></td>
                                     {% else %}
                                         <td>{{row_}}</td>
                                     {% endif %}

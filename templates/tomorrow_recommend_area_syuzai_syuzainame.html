@@ -9,20 +9,10 @@
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                   <li class="breadcrumb-item"><a href="/">HOME</a></li>
-                  <li class="breadcrumb-item"><a href="/tomorrow-recommend/{{data.area_name}}">{{data.area_name_jp}}</a></li>
-                  <li class="breadcrumb-item active" aria-current="page"><a href="/tomorrow_recommend/{{data.area_name}}/syuzai/{{data.syuzai_name}}">{{data.syuzai_name}}</a></li>
+                  <li class="breadcrumb-item"><a href="/prefecture/{{data.pref_name_en}}">{{data.pref_name_jp}}</a></li>
+                  <li class="breadcrumb-item active" aria-current="page"><a href="/tomorrow_recommend/{{data.pref_name_en}}/syuzai/{{data.syuzai_name}}">{{data.syuzai_name}}</a></li>
                 </ol>
             </nav>
-            <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7061697582316562" crossorigin="anonymous"></script>
-            <ins class="adsbygoogle"
-                style="display:block; text-align:center;"
-                data-ad-layout="in-article"
-                data-ad-format="fluid"
-                data-ad-client="ca-pub-7061697582316562"
-                data-ad-slot="6299027261"></ins>
-            <script>
-                (adsbygoogle = window.adsbygoogle || []).push({});
-            </script>
             <div class="mx-auto">
                 <h1 class="fw-light">{{data.syuzai_name}} </h1>
                 <h2 class="heading-28">{{data.media_name}}</h2>
@@ -60,11 +50,11 @@
                             <tr>
                                 {% for col, row_ in zip(data.future_extract_syuzai_name_df_column_names, row) %}
                                     {% if col == '取材名' %}
-                                        <td><a href="/tomorrow_recommend/{{data.area_name}}/syuzai/{{ row_ }}" >{{ row_ }}</a></td>
+                                        <td><a href="/tomorrow_recommend/{{data.pref_name_en}}/syuzai/{{ row_ }}" >{{ row_ }}</a></td>
                                     {% elif col == '店舗名' %}
-                                        <td><a href="/tomorrow_recommend/{{data.area_name}}/hall/{{ row_ }}" >{{ row_ }}</a></td>
+                                        <td><a href="/tomorrow_recommend/{{data.pref_name_en}}/hall/{{ row_ }}" >{{ row_ }}</a></td>
                                     {% elif col == '媒体名' %}
-                                        <td><a href="/tomorrow_recommend/{{data.area_name}}/media/{{ row_ }}" >{{ row_ }}</a></td>
+                                        <td><a href="/tomorrow_recommend/{{data.pref_name_en}}/media/{{ row_ }}" >{{ row_ }}</a></td>
                                     {% else %}
                                         <td>{{row_}}</td>
                                     {% endif %}
@@ -93,11 +83,11 @@
                             <tr>
                                 {% for col, row_ in zip(data.past_extract_syuzai_name_df_column_names, row) %}
                                     {% if col == '取材名' %}
-                                        <td><a href="/tomorrow_recommend/{{data.area_name}}/syuzai/{{ row_ }}" >{{ row_ }}</a></td>
+                                        <td><a href="/tomorrow_recommend/{{data.pref_name_en}}/syuzai/{{ row_ }}" >{{ row_ }}</a></td>
                                     {% elif col == '店舗名' %}
-                                        <td><a href="/tomorrow_recommend/{{data.area_name}}/hall/{{ row_ }}" >{{ row_ }}</a></td>
+                                        <td><a href="/tomorrow_recommend/{{data.pref_name_en}}/hall/{{ row_ }}" >{{ row_ }}</a></td>
                                     {% elif col == '媒体名' %}
-                                        <td><a href="/tomorrow_recommend/{{data.area_name}}/media/{{ row_ }}" >{{ row_ }}</a></td>
+                                        <td><a href="/tomorrow_recommend/{{data.pref_name_en}}/media/{{ row_ }}" >{{ row_ }}</a></td>
                                     {% else %}
                                         <td>{{row_}}</td>
                                     {% endif %}
