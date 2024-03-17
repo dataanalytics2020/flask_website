@@ -1716,6 +1716,7 @@ def tomorrow_recommend_area_media_medianame(pref_name_en,media_name):
                     ORDER BY イベント日,都道府県,媒体名 desc;''')
     else:
         data['pref_name_en'] = pref_name_en
+        data['pref_name_jp'] = pref_name_jp = prefecture_df[prefecture_df['pref_name_en'] == pref_name_en]['pref_name'].values[0]
         data['area_name_jp'] = prefecture_df[prefecture_df['pref_name_en'] == pref_name_en]['area_name_jp'].values[0]
         data['area_name_en'] = prefecture_df[prefecture_df['pref_name_en'] == pref_name_en]['area_name_en'].values[0]
         today = date.today()
@@ -1726,6 +1727,7 @@ def tomorrow_recommend_area_media_medianame(pref_name_en,media_name):
         cursor = get_driver()
         #首都圏のイベントの媒体別の予約数を集計
         print('media_name',media_name)
+        print('pref_name_en',pref_name_en)
         cursor.execute(f'''SELECT *
                     FROM schedule as schedule2
                     left join halldata as halldata2
@@ -1956,7 +1958,7 @@ def select_page_prefecture(pref_name_en):
     data['tag_dict'] = tag_dict
     sql = f'''SELECT COUNT(媒体名), 媒体名
     FROM schedule
-    WHERE イベント日 >= current_date
+    WHERE イベント日 >= current_date 
     AND イベント日 <= current_date + 7
     AND 媒体名 != 'ホールナビ'
     AND 都道府県 = '{pref_name_jp}'
@@ -1988,7 +1990,7 @@ def select_page_prefecture(pref_name_en):
             FROM schedule as schedule2
             left join halldata as halldata2
             on schedule2.店舗名 = halldata2.hall_name
-            WHERE イベント日 >= current_date
+            WHERE イベント日 >= current_date - 4
             AND イベント日 <= current_date + 7
             AND 媒体名 != 'ホールナビ'
             AND 都道府県 = '{pref_name_jp}'
