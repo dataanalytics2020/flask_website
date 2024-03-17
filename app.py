@@ -1948,6 +1948,16 @@ def select_page_prefecture(pref_name_en):
     prefecture_df = pd.read_csv('csv/pref_lat_lon.csv')
     #index番号で取り出す
     data = {}
+    if pref_name_en in area_str_list:
+        data['area_name_en'] = pref_name_en
+        data['area_name_jp'] = prefecture_df[prefecture_df['area_name_en'] == pref_name_en]['area_name_jp'].values[0]
+        data['pref_name_en_list'] = pref_name_en_list = list(prefecture_df[prefecture_df['area_name_en'] == pref_name_en]['pref_name_en'])
+        data['pref_name_jp_list'] =pref_name_jp_list = list(prefecture_df[prefecture_df['area_name_en'] == pref_name_en]['pref_name'])
+        #pref_name_jp_listとpref_name_en_listを辞書型に変換
+        data['pref_name_jp_and_en_dict'] = dict(zip(pref_name_jp_list,pref_name_en_list))
+        return render_template('select_page_area_to_prefecture.html',data=data,zip=zip,enumerate=enumerate)
+
+
     data['pref_name_en'] = pref_name_en
     data['pref_name_jp'] = pref_name_jp = prefecture_df[prefecture_df['pref_name_en'] == pref_name_en]['pref_name'].values[0]
     data['area_name_jp'] = prefecture_df[prefecture_df['pref_name_en'] == pref_name_en]['area_name_jp'].values[0]
