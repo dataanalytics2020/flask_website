@@ -198,6 +198,10 @@ def create_post_map_iframe(location_name_df,groupby_date_kisyubetu_df):
 def create_syuzai_map_iframe(report_df:pd.DataFrame,pref_name_en:str):
     report_df = report_df.drop_duplicates(keep='first')
     report_df = report_df.dropna(subset=['latitude'])
+    
+    #今日より前の日付のデータを削除
+    furture_exist_hall_name_list  = list(report_df[report_df['イベント日'] >= datetime.date.today()]['店舗名'].unique())
+    print('furture_exist_hall_name_list',furture_exist_hall_name_list)
     #(取材ランク = 'S' OR 取材ランク = 'A')のみ抽出
     map_report_df = report_df[['店舗名','取材名','媒体名']].drop_duplicates(keep='first')
     map_report_df = map_report_df.sort_values(['店舗名','媒体名']).reset_index(drop=True)
@@ -225,27 +229,23 @@ def create_syuzai_map_iframe(report_df:pd.DataFrame,pref_name_en:str):
         longitude = extract_syuzai_df_1.iloc[0]['longitude']
         latitude = extract_syuzai_df_1.iloc[0]['latitude']
         #print('latitude,longitude',latitude,longitude)
-        # グレースケールの画像データを作成
-        im= Image.new("L", (280, 100),color=(0))
-        im.putalpha(0)
-        im2= Image.new("L", (260, 50),color=(50))
-        im2.putalpha(128)
-        im3 = Image.open('icon.png')
-        draw = ImageDraw.Draw(im)
-        font = ImageFont.truetype('font/LightNovelPOPv2.otf',19)
         if len(extract_syuzai_df_1)==1:
             syuzai_name_text = '◆' + tenpo_name + f'\n {extract_syuzai_df_1["取材名"].values[0]}'
         else:
             syuzai_name_text = '◆' + tenpo_name + f'\n {extract_syuzai_df_1["取材名"].values[0]}、他{len(extract_syuzai_df_1)-1}件'
         #print(syuzai_name_text)
+        # グレースケールの画像データを作成
+        im= Image.new('RGBA', (260, 100),color=(0))
+        im.putalpha(0)
+        im2= Image.new('RGBA', (230, 35),color=(0))
+        im2.putalpha(128)
+        im.paste(im2, (15,48))
+        #print(syuzai_name_text)
         draw = ImageDraw.Draw(im)
-        font = ImageFont.truetype('font/LightNovelPOPv2.otf',19)
-
-        # 画像を表示
-        im.paste(im3, (-15,-14))
-        im.paste(im2, (25,48))
+        font = ImageFont.truetype('font/LightNovelPOPv2.otf',13)
+        draw = ImageDraw.Draw(im)
         draw.multiline_text(
-            (150, 50),
+            (130, 50),
             f'{syuzai_name_text}',
             font=font,
             fill='white',
@@ -254,11 +254,21 @@ def create_syuzai_map_iframe(report_df:pd.DataFrame,pref_name_en:str):
             anchor='ma'
         )
 
-        im.save('syuzai_image.png', quality=95)
+        #背景と同サイズの透明な画像を生成
+        img_clear = Image.new("RGBA", im.size, (255, 255, 255, 0))
+        if tenpo_name in furture_exist_hall_name_list:
+            im3 = Image.open('icon.png')
+        else:
+            im3 = Image.open('icon_gray.png')
+        #透明画像の上にペースト
+        img_clear.paste(im3, (-10, -10))
+        #重ね合わせる
+        bg = Image.alpha_composite(im, img_clear)
+        bg.save('syuzai_image.png')
         img = 'syuzai_image.png'
         popup_df = extract_syuzai_df_1[['イベント日','店舗名','取材名','媒体名']].sort_values('店舗名')
-        furture_popup_df = popup_df[popup_df['イベント日'] > datetime.date.today()]
-        past_popup_df = popup_df[popup_df['イベント日'] <= datetime.date.today()]
+        furture_popup_df = popup_df[popup_df['イベント日'] >= datetime.date.today()]
+        past_popup_df = popup_df[popup_df['イベント日'] < datetime.date.today()]
         furture_popup_df['イベント日'] = furture_popup_df['イベント日'].apply(convert_sql_date_to_jp_date_and_weekday) 
         past_popup_df['イベント日'] = past_popup_df['イベント日'].apply(convert_sql_date_to_jp_date_and_weekday) 
         #popup_df['イベント日'] = popup_df['イベント日'].apply(convert_sql_date_to_jp_date_and_weekday) 
@@ -302,8 +312,12 @@ def create_media_map_iframe(report_df:pd.DataFrame,pref_name_jp:str,past_diffcoi
         pref_name_en = prefecture_df[prefecture_df['pref_name'] == pref_name_jp]['pref_name_en'].values[0]
     except:
         pref_name_en = prefecture_df[prefecture_df['area_name_jp'] == pref_name_jp]['area_name_en'].values[0]
+        
+    furture_exist_hall_name_list  = list(report_df[report_df['イベント日'] >= datetime.date.today()]['店舗名'].unique())
+    print('furture_exist_hall_name_list',furture_exist_hall_name_list)
     report_df = report_df.dropna(subset=['latitude'])
     report_df.drop_duplicates(keep='first',inplace=True)
+    print('report_df',report_df)
     #(取材ランク = 'S' OR 取材ランク = 'A')のみ抽出
     print('report_df',report_df)
     map_report_df = report_df[['店舗名','取材名','媒体名']]
@@ -333,26 +347,23 @@ def create_media_map_iframe(report_df:pd.DataFrame,pref_name_jp:str,past_diffcoi
         latitude = extract_syuzai_df_1.iloc[0]['latitude']
         #print('latitude,longitude',latitude,longitude)
         # グレースケールの画像データを作成
-        im= Image.new("L", (280, 100),color=(0))
-        im.putalpha(0)
-        im2= Image.new("L", (260, 50),color=(50))
-        im2.putalpha(128)
-        im3 = Image.open('icon.png')
-        draw = ImageDraw.Draw(im)
-        font = ImageFont.truetype('font/LightNovelPOPv2.otf',19)
         if len(extract_syuzai_df_1)==1:
             syuzai_name_text = '◆' + tenpo_name + f'\n {extract_syuzai_df_1["取材名"].values[0]}'
         else:
             syuzai_name_text = '◆' + tenpo_name + f'\n {extract_syuzai_df_1["取材名"].values[0]}、他{len(extract_syuzai_df_1)-1}件'
+
+        # グレースケールの画像データを作成
+        im= Image.new('RGBA', (260, 100),color=(0))
+        im.putalpha(0)
+        im2= Image.new('RGBA', (230, 35),color=(0))
+        im2.putalpha(128)
+        im.paste(im2, (15,48))
         #print(syuzai_name_text)
         draw = ImageDraw.Draw(im)
-        font = ImageFont.truetype('font/LightNovelPOPv2.otf',19)
-
-        # 画像を表示
-        im.paste(im3, (-15,-14))
-        im.paste(im2, (25,48))
+        font = ImageFont.truetype('font/LightNovelPOPv2.otf',13)
+        draw = ImageDraw.Draw(im)
         draw.multiline_text(
-            (150, 50),
+            (130, 50),
             f'{syuzai_name_text}',
             font=font,
             fill='white',
@@ -361,7 +372,17 @@ def create_media_map_iframe(report_df:pd.DataFrame,pref_name_jp:str,past_diffcoi
             anchor='ma'
         )
 
-        im.save('syuzai_image.png', quality=95)
+        #背景と同サイズの透明な画像を生成
+        img_clear = Image.new("RGBA", im.size, (255, 255, 255, 0))
+        if tenpo_name in furture_exist_hall_name_list:
+            im3 = Image.open('icon.png')
+        else:
+            im3 = Image.open('icon_gray.png')
+        #透明画像の上にペースト
+        img_clear.paste(im3, (-10, -10))
+        #重ね合わせる
+        bg = Image.alpha_composite(im, img_clear)
+        bg.save('syuzai_image.png')
         img = 'syuzai_image.png'
         popup_df = extract_syuzai_df_1[['イベント日','店舗名','取材名','媒体名']].sort_values('店舗名')#.reset_index(drop=True).T
         popup_df.drop_duplicates(keep='first',inplace=True)
