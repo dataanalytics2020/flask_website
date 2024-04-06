@@ -1711,8 +1711,8 @@ def tomorrow_recommend_area_syuzai_syuzainame(pref_name_en,syuzai_name):
     extract_syuzai_name_df = pd.DataFrame(cursor.fetchall(),columns=cols)
     print('extract_syuzai_name_df',extract_syuzai_name_df,extract_syuzai_name_df.shape)
     extract_syuzai_name_df.drop_duplicates(keep='first',inplace=True)
-    future_extract_syuzai_name_df = extract_syuzai_name_df[extract_syuzai_name_df['イベント日'] >= today ]
-    past_extract_syuzai_name_df = extract_syuzai_name_df[extract_syuzai_name_df['イベント日'] < today ]
+    future_extract_syuzai_name_df = extract_syuzai_name_df[extract_syuzai_name_df['イベント日'] >= datetime.date.today() ]
+    past_extract_syuzai_name_df = extract_syuzai_name_df[extract_syuzai_name_df['イベント日'] < datetime.date.today()  ]
     pledge_text = extract_syuzai_name_df.iloc[0]['pledge_text']
     media_name = extract_syuzai_name_df.iloc[0]['媒体名']
     # no_pledge_visit_count = int(extract_syuzai_name_df.iloc[0]['no_pledge_visit_count'])
