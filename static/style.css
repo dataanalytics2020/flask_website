@@ -561,11 +561,8 @@ font-weight: bold;
 vertical-align: top;
 background: #000;
 color: #fff;
-
-
-  background-image: linear-gradient(to top,
-		#cae6fa 0%,
-		#1f48ea 100%);
+text-align: center;
+background-image: linear-gradient(to top,#cae6fa 0%,#1f48ea 100%);
 }
 
 table td {
@@ -962,7 +959,7 @@ h4:before {
 .snsButtons_label {
   min-width: 80px;
   display: inline-block;
-  padding: 0px 8px 0px 0px;
+  padding: 0px 8px 0px 8px;
   text-align: center;
   font-size: 12pt;
 }
@@ -1163,14 +1160,6 @@ text-align: center; /* 内容は中央配置 */
     font-size: 16px;
   }
 
-.heading-011:before {
-    font-family: "Font Awesome 5 Free";
-    content: "\f14a";
-    font-weight: 900;
-    position: absolute;
-    left : 0.5em; /*左端からのアイコンまでの距離*/
-  }
-
 .kisyu_001 {
     position: relative;
     color: rgb(255, 255, 255);
@@ -1360,7 +1349,7 @@ text-align: center; /* 内容は中央配置 */
     align-items: center;
     justify-content: center;
     padding: 13px 0;
-    line-height: 1.5;
+    line-height: 1;
     background: #F5F5F5;
     color: #999999;
 }
@@ -1384,7 +1373,7 @@ text-align: center; /* 内容は中央配置 */
 @media screen and (max-width: 767px) {
 .progressbar .item {
     font-size: 11px;
-    line-height: 1.4;
+    line-height: 1.1;
     padding: 10px 0;
 }
 .progressbar .item:not(:last-child)::before,
@@ -1928,3 +1917,223 @@ text-align: center; /* 内容は中央配置 */
   text-decoration: none!important;
   background: transparent!important;
 }
+
+
+
+/*==================================================
+スライダーのためのcss
+===================================*/
+.slider {/*横幅94%で左右に余白を持たせて中央寄せ*/
+  width:94%;
+   margin:0 auto;
+}
+
+
+.slick-slider {
+  display: grid!important;
+}
+
+.slider , .slick-initialized .slick-slider .slick-dotted  > ul {
+  padding-left: 0!important;
+}
+
+
+.slider img {
+   width: 175px!important;/*スライダー内の画像を横幅100%に*/
+   height:75px;
+   margin: 2px;
+}
+
+/*slickのJSで書かれるタグ内、スライド左右の余白調整*/
+
+.slider .slick-slide {
+   margin:0 10px;
+}
+
+/*矢印の設定*/
+
+/*戻る、次へ矢印の位置*/
+.slick-prev, 
+.slick-next {
+   position: absolute;/*絶対配置にする*/
+   top: 28%;
+   cursor: pointer;/*マウスカーソルを指マークに*/
+   outline: none;/*クリックをしたら出てくる枠線を消す*/
+   border-top: 6px solid #00aaff;/*矢印の色*/
+   border-right: 6px solid #00aaff;/*矢印の色*/
+   height: 15px;
+   width: 15px;
+}
+
+.slick-prev {/*戻る矢印の位置と形状*/
+   left: -1.5%;
+   transform: rotate(-135deg);
+}
+
+.slick-next {/*次へ矢印の位置と形状*/
+   right: -1.5%;
+   transform: rotate(45deg);
+}
+
+/*ドットナビゲーションの設定*/
+
+.slick-dots {
+   text-align:center;
+ margin:10px 15px 0 0!important;
+}
+
+.slick-dots li {
+   display:inline-block;
+ margin:0 5px;
+}
+
+.slick-dots button {
+   color: transparent;
+   outline: none;
+   width:8px;/*ドットボタンのサイズ*/
+   height:16px;/*ドットボタンのサイズ*/
+   display:block;
+   border-radius:50%;
+   background:#ccc;/*ドットボタンの色*/
+}
+
+.slick-dots .slick-active button{
+   background:#333;/*ドットボタンの現在地表示の色*/
+}
+
+
+
+
+.table_image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  user-select: none;
+  -ms-user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  }
+  
+  /* ボタンに挟まれた真ん中の数値 */
+
+
+  .spinner-ave {
+    color: hsl(210, 100%, 60%);
+    font-size: 20px;
+    width: 80px;
+    padding: 0;
+    text-align: center;
+    border: 1px solid #B9B9B9;
+    border-radius: 5px;
+    background: none;
+    outline: none;
+    pointer-events: none;
+    margin: 0 10px;　　/* ボタンとの余白 */
+    }
+    
+  
+  .spinner {
+  color: #3399ff;
+  font-size: 20px;
+  width: 80px;
+  padding: 0;
+  text-align: center;
+  border: 1px solid #B9B9B9;
+  border-radius: 5px;
+  background: none;
+  outline: none;
+  pointer-events: none;
+  margin: 0 10px;　　/* ボタンとの余白 */
+  }
+  
+  .spinner::-webkit-inner-spin-button,
+  .spinner::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  }
+  
+  /* ベースになる円 */
+  .spinner-ave-diffcoins-add,
+  .spinner-ave-diffcoins-sub,
+  .spinner-sub,
+  .spinner-add {
+  position: relative;
+  background: #3399ff;
+  display: block;
+  width: 42px;
+  height: 42px;
+  text-align: center;
+  border-radius: 50%;
+  cursor: pointer;
+  line-height: 35px;
+  font-size: 2em;
+  }
+  
+  /* + -はテキスト */
+  
+  .spinner-p {
+  display: block;
+  position: absolute;
+  margin-top: -3px;/* 円の真ん中に設置するように調整 */
+  margin-left:  12px;/* 円の真ん中に設置するように調整 */
+  font-size: 42px;
+  font-weight: 600;
+  color: #FFFFFF;
+  }
+
+  .spinner-p1 {
+    color: #FFFFFF;
+    }
+  
+
+.table-half {
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  #sns {
+    display: inline-block;
+    float: none;
+    margin: 0 auto;
+    padding: 0;
+}
+#sns li {
+    float: left;
+    width: 120px;
+    height: 30px;
+    line-height:30px;
+    margin: 0 0px 5px 0;
+    padding: 0;
+    font-size: 18px;
+    list-style-type: none;
+    text-align: center;
+    border-radius: 4px;
+}
+#sns li a { 
+    display: block;
+    font-size: 16px;
+    font-weight: bold;
+    color:#fff;
+}
+#sns .facebook { border-bottom: 2px solid #2d4373; background: #315096; }
+#sns .dmm { border-bottom: 2px solid #1f1f1f; background: #000000; }
+#sns .twitter { border-bottom: 2px solid #2795e9; background: #55acee; }
+#sns .line { border-bottom: 2px solid #219900; background: #00c300; }
+#sns .feedly { border-bottom: 2px solid #54803a; background: #75ad43; }
+#sns .rss { border-bottom: 2px solid #da7a04; background: #ff8c00; }
+#sns .google { border-bottom: 2px solid #8d2d1d; background: #dd4b39; }
+#sns .pocket { border-bottom: 2px solid #d10018; background: #c7001a; }
+#sns li:hover { margin: 0 8px 10px 0; }
+.clearfix:after {
+	display: block;
+	visibility: hidden;
+	clear: both;
+	height: 0;
+	content: '.';
+}
+.clearfix { zoom: 1; }
