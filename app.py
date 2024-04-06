@@ -1,13 +1,15 @@
 #utf-8
-from flask import Flask, render_template, request, redirect 
+from flask import Flask, render_template, request, redirect , url_for
 from flask_paginate import Pagination, get_page_parameter
 from flask_caching import Cache
 from flask_mail import Mail
 from flask_wtf import FlaskForm
+from flask_wtf import CSRFProtect
 from wtforms import DateField, SubmitField
 from email.mime.text import MIMEText
 import smtplib
 from datetime import date, timedelta
+from dateutil.relativedelta import relativedelta
 import re
 import pandas as pd
 import requests
@@ -33,6 +35,7 @@ import sympy
 from dotenv import load_dotenv
 import numpy as np
 import html
+import traceback
 load_dotenv()
 
 #df:pd.DataFrame  = pd.read_csv(r'csv/2022-12-09_touhou.csv')
@@ -79,12 +82,12 @@ def get_sql_target_day_list_str(target_number:int) -> str:
     print('get_sql_target_day_list_str',target_number)
     today = date.today()
     target_day_list = []
-    number = 0
+    number = 1
     for i in range(3):
         while True:
             compare_day = today - timedelta(days=number)
             #print(compare_day)
-            print(str(target_number),str(compare_day)[-1])
+            #print(str(target_number),str(compare_day)[-1])
             if str(target_number) == str(compare_day)[-1]:
                 target_day = today - timedelta(days=number)
                 print('取得日',target_day)
@@ -424,11 +427,109 @@ def create_media_map_iframe(report_df:pd.DataFrame,pref_name_jp:str,past_diffcoi
     folium_map.get_root().height = "500px"
     return folium_map.get_root()._repr_html_()
 
+def create_machine_map_iframe(map_df_list,pref_name_jp:str):
+    print('pref_name_jp',pref_name_jp)
+    pref_name_en = prefecture_df[prefecture_df['pref_name'] == pref_name_jp]['pref_name_en'].values[0]
+    report_df = map_df_list[0]
+
+    try:
+        prefecture_latitude = report_df.iloc[0]['latitude']
+        prefecture_longitude = report_df.iloc[0]['longitude']
+    except:
+        prefecture_latitude = 35.681236
+        prefecture_longitude = 139.767125
+    folium_map = folium.Map(location=[prefecture_latitude,prefecture_longitude], zoom_start=10, width="100%", height="100%")
+    # 地図表示
+    # マーカープロット（ポップアップ設定，色変更，アイコン変更）
+    #print(report_df)
+    for i,hall_df in enumerate(map_df_list):
+        #print(tenpo_name)
+        i += 1
+        longitude = hall_df.iloc[0]['longitude']
+        latitude = hall_df.iloc[0]['latitude']
+        tenpo_name = hall_df.iloc[0]['店舗名']
+        concat_ave_diff_conis = int(hall_df['総差枚'].sum() /  hall_df['総台数'].sum())
+        concat_win_rate = int(hall_df['勝利台数'].sum() / hall_df['総台数'].sum() * 100)
+        concat_win_machine_count = hall_df['勝利台数'].sum()
+        concat_sum_machine_count = hall_df['総台数'].sum()
+        hall_status_image_text = f'      過去三回平均:{concat_ave_diff_conis}枚 勝率:{concat_win_rate}% ({concat_win_machine_count}/{concat_sum_machine_count})'
+        #print('latitude,longitude',latitude,longitude)
+        syuzai_name_text = f'      {i}位 ◆' + tenpo_name + f'\n{hall_status_image_text}'
+
+        # グレースケールの画像データを作成
+        im= Image.new('RGBA', (300, 100),color=(0))
+        im.putalpha(0)
+        im2= Image.new('RGBA', (260, 35),color=(0))
+        im2.putalpha(128)
+        im.paste(im2, (15,48))
+        #print(syuzai_name_text)
+        draw = ImageDraw.Draw(im)
+        font = ImageFont.truetype('font/LightNovelPOPv2.otf',13)
+        draw = ImageDraw.Draw(im)
+        draw.multiline_text(
+            (130, 50),
+            f'{syuzai_name_text}',
+            font=font,
+            fill='white',
+            align='center',
+            spacing=0,
+            anchor='ma'
+        )
+
+        #背景と同サイズの透明な画像を生成
+        img_clear = Image.new("RGBA", im.size, (255, 255, 255, 0))
+        im3 = Image.open('icon.png')
+
+        #透明画像の上にペースト
+        img_clear.paste(im3, (-10, -10))
+        #重ね合わせる
+        bg = Image.alpha_composite(im, img_clear)
+        bg.save('syuzai_image.png')
+        img = 'syuzai_image.png'
+        popup_df = hall_df[['店舗名','日付','機種名','平均ゲーム数','平均差枚','勝率']]
+        popup_df['平均ゲーム数'] = popup_df['平均ゲーム数'].astype(str) + 'G'
+        popup_df['平均差枚'] = popup_df['平均差枚'].astype(str) + '枚'
+        #popup_df['イベント日'] = popup_df['イベント日'].apply(convert_sql_date_to_jp_date_and_weekday) 
+        popup_df = popup_df.to_html(escape=False,index=False,justify='center',classes='table-striped table-sm')
+        popup_df +=f'<a href="/tomorrow_recommend/{pref_name_en}/hall/{tenpo_name}"  target="_parent">{tenpo_name}※店舗詳細ページに飛びます </a>'
+        popup_df +='''<a class="leaflet-popup-close-button" role="button" aria-label="Close popup" href="#close">
+        <span aria-hidden="true">✖</span>
+</a>'''
+        popup_data = folium.Popup(popup_df,  max_width=1500,show=False,size=(700, 300))
+
+        folium.Marker(location=[latitude ,longitude],
+            tiles='https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png',
+            attr='国土地理院',
+            popup=popup_data,
+            icon = CustomIcon(
+                        icon_image = img,
+                        icon_size = (280, 100),
+                        icon_anchor = (0, 0),
+                        #shadow_image = shadow_img, # 影効果（今回は使用せず コメントアウト
+                        #shadow_size = (30, 30),
+                        shadow_anchor = (-4, -40),
+                        popup_anchor = (3, 3))).add_to(folium_map)
+        #break
+    
+    # set the iframe width and height
+    plugins.Fullscreen(
+                        position="topright",
+                        title="拡大する",
+                        title_cancel="元に戻す",
+                        force_separate_button=True,
+                    ).add_to(folium_map)
+    folium_map.get_root().width = "500px"
+    folium_map.get_root().height = "500px"
+    return folium_map.get_root()._repr_html_()
+
 def create_hall_map_iframe(extract_hall_name_df,zoom_size=10):
     longitude = extract_hall_name_df.iloc[0]['longitude']
     latitude = extract_hall_name_df.iloc[0]['latitude']
     folium_map = folium.Map(location=[latitude,longitude], zoom_start=zoom_size, width="100%", height="100%")
-    tenpo_name = list(extract_hall_name_df['店舗名'].unique())[0]
+    try:
+        tenpo_name = list(extract_hall_name_df['店舗名'].unique())[0]
+    except:
+        tenpo_name = extract_hall_name_df['hall_name'].values[0]
     # グレースケールの画像データを作成
     im= Image.new("L", (280, 100),color=(0))
     im.putalpha(0)
@@ -624,6 +725,19 @@ app = Flask(__name__, static_folder="static")
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY') 
 app.config.from_mapping(config)
 cache = Cache(app)
+#CsrfProtect(app)
+#csrf = CSRFProtect(app)
+
+dev_flag = os.getenv('DEV_FLAG')
+if dev_flag == 'True':
+    print('開発環境')
+    today = datetime.datetime.today() - relativedelta(hours=17)
+    #開発環境
+    dev_flag = True
+else:
+    dev_flag = False
+    today = datetime.datetime.today() - relativedelta(hours=6)
+    
 
 #都道府県テーブルの読み込み
 prefecture_df = pd.read_csv('csv/pref_lat_lon.csv')
@@ -634,7 +748,7 @@ area_str_list = ['hokkaidoutouhoku', 'kitakantou','minamikantou','hokurikukoushi
 def get_top():
     data = {}
     data['prefecture_list'] = prefecture_list
-    today = datetime.datetime.utcnow().today()
+    
     print('today',today)
     jp_str_day_list = []
     for i in range(0,7):
@@ -653,25 +767,27 @@ def get_top():
     data['tommorow_jp_str_day'] =  tommorow_jp_str_day
     data['prefecture_id_and_name_dict'] = prefecture_id_and_name_dict
     report_df = pd.read_csv('csv/kanto_top_location_df.csv', parse_dates=['イベント日'])
+    past_diffconis_df = pd.read_csv('csv/tokyo_past_diffconis_df.csv')
     try:
-        report_row_1 = str(report_df[:1]["イベント日"].values[0]).split('T')[0]
-        print(report_row_1)
+        past_diffconis_df_last_row_day_num = int(str(past_diffconis_df["日付"].values[-1]).split('(')[0].split('/')[1])
+        print(past_diffconis_df_last_row_day_num)
     except:
-        report_row_1 = 'NONE'
+        past_diffconis_df_last_row_day_num = 'NONE'
     compare_date:str = tomorrow.strftime('%Y-%m-%d')#-%d
-    if str(report_row_1) == str(compare_date):
-        print('今日のデータは取得済み'+report_row_1+"と"+compare_date)
-        post_line('今日のデータは取得済み'+report_row_1+"と"+compare_date)
-        post_line('report_df' + str(report_row_1))
+    compare_day_number = tomorrow.strftime('%d')
+    if past_diffconis_df_last_row_day_num == int(compare_day_number):
+        print('今日のデータは取得済み'+past_diffconis_df_last_row_day_num+"と"+compare_date)
+        post_line('今日のデータは取得済み'+past_diffconis_df_last_row_day_num+"と"+compare_date)
+        post_line('report_df' + str(past_diffconis_df_last_row_day_num))
     else:
-        post_line('今日のデータは未取得'+report_row_1+"と"+compare_date)
+        post_line('今日のデータは未取得'+str(past_diffconis_df_last_row_day_num)+"と"+compare_date)
         area_sql_text = get_area_sql_text('minamikantou')
         cursor = get_driver()
         sql = f'''SELECT イベント日,都道府県,店舗名,取材名,取材ランク,媒体名,latitude,longitude
                 FROM schedule as schedule2
                 left join halldata as halldata2
                 on schedule2.店舗名 = halldata2.hall_name
-                WHERE イベント日 > current_date
+                WHERE イベント日 > current_date -1
                 AND イベント日 <= current_date + 1
                 AND 媒体名 != 'ホールナビ'
                 AND 取材名 LIKE '%{target_n_day_str}のつく日%'
@@ -690,13 +806,10 @@ def get_top():
         sql_hall_name_text = sql_hall_name_text.rstrip(',')
         sql_date_text = get_sql_target_day_list_str(int(target_n_day_str))
         print('sql_date_text',sql_date_text)
-        if report_df.empty:
-            post_line('empty error'+report_row_1+"と"+compare_date)
-            sql_hall_name_text = "'マルハン池袋店'"
         sql = f"""SELECT date,hall_name,sum_diffcoins,ave_diffcoins,ave_game,win_rate
                FROM groupby_date_hall_diffcoins
                WHERE date in {sql_date_text}
-               AND hall_name in  ({sql_hall_name_text})"""
+               AND prefecture = '東京都' """
         print('sql',sql)
         cursor.execute(sql)
         print("sql_hall_name_text",sql_hall_name_text)
@@ -707,13 +820,13 @@ def get_top():
         past_diffconis_df['平均差枚'] = past_diffconis_df['平均差枚'].astype(str) + '枚'
         past_diffconis_df['総差枚'] = past_diffconis_df['総差枚'].map(lambda x: round(x,-2)).astype(str) + '枚'
         past_diffconis_df['平均G数'] = past_diffconis_df['平均G数'].astype(str) + 'G'
-        post_line('report_df'+str(report_row_1))
+        post_line('未取得report_df'+str(past_diffconis_df_last_row_day_num))
         report_df.to_csv('csv/kanto_top_location_df.csv',index=False)
         past_diffconis_df.to_csv('csv/tokyo_past_diffconis_df.csv',index=False)
 
     all_kanto_display_df = report_df = report_df.drop_duplicates(keep='first')
-    if str(report_row_1) != str(compare_date):
-        post_line('今日のデータはマップ未取得'+report_row_1+"と"+compare_date)
+    if str(past_diffconis_df_last_row_day_num) != str(compare_date):
+        post_line('今日のデータはマップ未取得'+str(past_diffconis_df_last_row_day_num)+"と"+compare_date)
         report_df['イベント日'] = pd.to_datetime(report_df['イベント日'])
         latitude_isnull_df = report_df[report_df['latitude'].isnull()]
         message = ''
@@ -828,8 +941,8 @@ def get_top():
         with open('templates/top_map.html', mode='w', encoding='utf-8') as f:
             f.write(top_map_html)
     else:
-        print('今日のデータは取得済み'+report_row_1+"と"+compare_date)
-        post_line('今日のデータはマップ取得済み'+report_row_1+"と"+compare_date)
+        print('今日のデータは取得済み'+past_diffconis_df_last_row_day_num+"と"+compare_date)
+        post_line('今日のデータはマップ取得済み'+past_diffconis_df_last_row_day_num+"と"+compare_date)
         #pass
         with open('templates/top_map.html', mode='r', encoding='utf-8') as f:
             top_map_html = f.read()
@@ -896,7 +1009,6 @@ def show_iframe():
 @app.route('/', methods=['POST'])
 def post_top():
     user_data = request.form
-    today = datetime.date.today()
     print('user_data',user_data)
     prefecture_id = int(user_data['pref_id'])
     print('prefecture_id',prefecture_id,type(prefecture_id))
@@ -1435,7 +1547,6 @@ def tomorrow_recommend_area_prefecture_prefecturename(area_name,pref_name_en):
     pref_name_df = pd.read_csv('csv/pref_lat_lon.csv')
     data = {}
     data['pref_name_jp'] = pref_name_jp = pref_name_df[pref_name_df['pref_name_en'] == pref_name_en]['pref_name'].values[0]
-    today = datetime.date.today()
     try:
         req = request.args
         target_date = req.get("target_date")
@@ -1600,8 +1711,8 @@ def tomorrow_recommend_area_syuzai_syuzainame(pref_name_en,syuzai_name):
     extract_syuzai_name_df = pd.DataFrame(cursor.fetchall(),columns=cols)
     print('extract_syuzai_name_df',extract_syuzai_name_df,extract_syuzai_name_df.shape)
     extract_syuzai_name_df.drop_duplicates(keep='first',inplace=True)
-    future_extract_syuzai_name_df = extract_syuzai_name_df[extract_syuzai_name_df['イベント日'] >= datetime.date.today() ]
-    past_extract_syuzai_name_df = extract_syuzai_name_df[extract_syuzai_name_df['イベント日'] < datetime.date.today() ]
+    future_extract_syuzai_name_df = extract_syuzai_name_df[extract_syuzai_name_df['イベント日'] >= today ]
+    past_extract_syuzai_name_df = extract_syuzai_name_df[extract_syuzai_name_df['イベント日'] < today ]
     pledge_text = extract_syuzai_name_df.iloc[0]['pledge_text']
     media_name = extract_syuzai_name_df.iloc[0]['媒体名']
     # no_pledge_visit_count = int(extract_syuzai_name_df.iloc[0]['no_pledge_visit_count'])
@@ -1659,6 +1770,7 @@ def tomorrow_recommend_area_hall_hallname(pref_name_en,hall_name):
     except:
         data['pref_name_jp'] = pref_name_jp = prefecture_df[prefecture_df['area_name_en'] == pref_name_en]['area_name_jp'].values[0]
     data['hall_name'] = hall_name
+    print('hall_nameは',hall_name)
     cursor = get_driver()
     cursor.execute(f'''SELECT  都道府県, イベント日, 曜日, 店舗名, 取材名, 媒体名, 取材ランク, 取得時間 , halldata2.id , hall_name, prefecture_name, hall_url, dmm_url, pworld_url, line_url, twitter_url,  address, longitude, latitude, anaslo_name
             FROM schedule as schedule2
@@ -1671,29 +1783,42 @@ def tomorrow_recommend_area_hall_hallname(pref_name_en,hall_name):
             ORDER BY イベント日,都道府県,媒体名 ASC;''')
     cols = [col.name for col in cursor.description]
     extract_hall_name_df = pd.DataFrame(cursor.fetchall(),columns=cols)
-    print('extract_hall_name_df.columns',extract_hall_name_df.columns)
-
-    for column_name in ['twitter_url','pworld_url','dmm_url','line_url','id','address']:
+    if extract_hall_name_df.shape[0] == 0:
+        cursor.execute(f'''SELECT *
+            FROM halldata
+            WHERE  (hall_name = '{hall_name}') or  (anaslo_name = '{hall_name}')
+            ''')
+        cols = [col.name for col in cursor.description]
+        extract_hall_name_df = pd.DataFrame(cursor.fetchall(),columns=cols)
+        print('type(extract_hall_name_df[イベント日]),',type(extract_hall_name_df['イベント日']))
+        future_extract_hall_name_df = pd.DataFrame(index=[],columns=['イベント日','都道府県','媒体名','取材名'])
+        past_extract_hall_name_df = pd.DataFrame(index=[],columns=['イベント日','都道府県','媒体名','取材名'])
+    else:
+        print('extract_hall_name_df.columns',extract_hall_name_df.columns)
+        print('extract_hall_name_df',extract_hall_name_df,extract_hall_name_df.shape)
+        for column_name in ['twitter_url','pworld_url','dmm_url','line_url','id','address']:
+            try:
+                data[column_name] = extract_hall_name_df.iloc[0].T[column_name]
+            except:
+                data[column_name] = ''
+        print('type(today)',type(today))
+        future_extract_hall_name_df = extract_hall_name_df[extract_hall_name_df['イベント日'] >= datetime.date.today()]
+        past_extract_hall_name_df = extract_hall_name_df[extract_hall_name_df['イベント日'] < datetime.date.today()]
+        
+        future_extract_hall_name_df.sort_values(['イベント日','都道府県','媒体名'],ascending=[False,True,True],inplace=True)
+        past_extract_hall_name_df.sort_values(['イベント日','都道府県','媒体名'],ascending=[False,True,True],inplace=True)
+        future_extract_hall_name_df = future_extract_hall_name_df[['イベント日','都道府県','媒体名','取材名']]
+        past_extract_hall_name_df = past_extract_hall_name_df[['イベント日','都道府県','媒体名','取材名']]
         try:
-            data[column_name] = extract_hall_name_df.iloc[0].T[column_name]
+            future_extract_hall_name_df['イベント日'] = future_extract_hall_name_df['イベント日'].map(convert_sql_date_to_jp_date_and_weekday)
         except:
-            data[column_name] = ''
+            pass
+        try:
+            past_extract_hall_name_df['イベント日'] = past_extract_hall_name_df['イベント日'].map(convert_sql_date_to_jp_date_and_weekday)
+        except:
+            pass
     data['iframe'] = create_hall_map_iframe(extract_hall_name_df,zoom_size=10)
-    future_extract_hall_name_df = extract_hall_name_df[extract_hall_name_df['イベント日'] >= datetime.date.today() ]
-    past_extract_hall_name_df = extract_hall_name_df[extract_hall_name_df['イベント日'] < datetime.date.today() ]
-    data['iframe'] = create_hall_map_iframe(extract_hall_name_df,zoom_size=10)
-    future_extract_hall_name_df.sort_values(['イベント日','都道府県','媒体名'],ascending=[False,True,True],inplace=True)
-    past_extract_hall_name_df.sort_values(['イベント日','都道府県','媒体名'],ascending=[False,True,True],inplace=True)
-    future_extract_hall_name_df = future_extract_hall_name_df[['イベント日','都道府県','媒体名','取材名']]
-    past_extract_hall_name_df = past_extract_hall_name_df[['イベント日','都道府県','媒体名','取材名']]
-    try:
-        future_extract_hall_name_df['イベント日'] = future_extract_hall_name_df['イベント日'].map(convert_sql_date_to_jp_date_and_weekday)
-    except:
-        pass
-    try:
-        past_extract_hall_name_df['イベント日'] = past_extract_hall_name_df['イベント日'].map(convert_sql_date_to_jp_date_and_weekday)
-    except:
-        pass
+    data['address'] = extract_hall_name_df.iloc[0]['address']
     future_extract_hall_name_df.rename(columns={'イベント日':'日'},inplace=True)
     future_extract_hall_name_df.drop_duplicates(keep='first',inplace=True)
     past_extract_hall_name_df.rename(columns={'イベント日':'日'},inplace=True)
@@ -1765,8 +1890,8 @@ def tomorrow_recommend_area_media_medianame(pref_name_en,media_name):
     print('extract_media_name_df',extract_media_name_df)
     create_media_map_iframe_df = extract_media_name_df
     extract_media_name_df = extract_media_name_df[['イベント日','店舗名','取材名']]
-    future_extract_media_name_df = extract_media_name_df[extract_media_name_df['イベント日'] >= datetime.date.today() ]
-    past_extract_media_name_df = extract_media_name_df[extract_media_name_df['イベント日'] < datetime.date.today() ]
+    future_extract_media_name_df = extract_media_name_df[extract_media_name_df['イベント日'] >= datetime.date.today()]
+    past_extract_media_name_df = extract_media_name_df[extract_media_name_df['イベント日'] < datetime.date.today()]
     future_extract_media_name_df = future_extract_media_name_df[['イベント日','店舗名','取材名']]
     future_extract_media_name_df['イベント日'] = future_extract_media_name_df['イベント日'].map(convert_sql_date_to_jp_date_and_weekday)
     past_extract_media_name_df['イベント日'] = past_extract_media_name_df['イベント日'].map(convert_sql_date_to_jp_date_and_weekday)
@@ -2038,16 +2163,329 @@ def select_page_prefecture(pref_name_en):
     groupby_hall_name_count_df.rename(columns={'count': '取材数'},inplace=True)
     data['groupby_hall_name_count_df'] = groupby_hall_name_count_df[['取材数','店舗名']]
     groupby_hall_name_count_df = groupby_hall_name_count_df[['取材数','店舗名']]
+
+    # 機種から選ぶ部分のデータを取得
+    sql = f'''SELECT DISTINCT machine_id,master_machine_name
+        FROM machine_image
+        order by machine_id DESC;
+        '''
+    print(sql)
+
+    #AND 都道府県 in ('東京都' , '埼玉県' , '神奈川県' , '千葉県')
+    cursor.execute(sql)
+    result = cursor.fetchall()
+    cols = [col.name for col in cursor.description]
+    select_machine_df = pd.DataFrame(result, columns=cols)
+    #select_machine_df.to_csv('csv/test_location_df.csv',encoding='utf_8_sig',index=False)
+    #../static/img/content_image/231.jpg
+    #../static/img/content_image/274.jpg
+    select_machine_df['machine_id'] = select_machine_df['machine_id'].astype(str)
+    select_machine_df['master_machine_name'] = select_machine_df['machine_id'] + '_' + select_machine_df['master_machine_name'] 
+    select_machine_df['machine_id'] = select_machine_df['master_machine_name']
+    print(select_machine_df.head(5))
+    select_machine_df.rename(columns={'machine_id':'機種画像','master_machine_name':'機種名'},inplace=True)
+    data['groupby_machine_name_count_df_column_names'] = select_machine_df.columns.values
+    data['groupby_machine_name_count_df_row_data'] = list(select_machine_df.values.tolist())
     data['groupby_hall_name_count_df_column_names'] = groupby_hall_name_count_df.columns.values
     data['groupby_hall_name_count_df_row_data'] = list(groupby_hall_name_count_df.values.tolist())
     return render_template('select_page_prefecture.html',data=data,enumerate=enumerate,zip=zip)
 
 
+@app.route("/tomorrow_recommend/machine", methods=['GET','POST'])
+def select_page_machine_list():
+    prefecture_df = pd.read_csv('csv/pref_lat_lon.csv')
+    
+
+@app.route("/tomorrow_recommend/machine/select-page", methods=['GET','POST'])
+def default_select_page_machine(error_message=False,target_machine_id=None,pref_name_en=None):
+    data = {}
+    prefecture_df = pd.read_csv('csv/pref_lat_lon.csv')
+    req = request.args
+    error_message = req.get("error_message")
+    print('error_message',error_message,type(error_message))
+    if error_message == 'True':
+        data['error_message'] = '検索条件に一致するデータが見つかりませんでした。<br> 新台の場合は検索が速すぎるか人気機種出ない場合は選択台数が多すぎる可能性が高いです。<br> 人気機種でも地域によっては平均差枚の条件が厳しすぎる場合もあるので<br> 条件を緩めるなどもう一度検索条件を変更してください。'
+        print('error_message　Trueです')
+    else:
+        data['error_message'] = ''
+        print('error_message　Falseです')
+    
+    data['target_machine_id'] = target_machine_id = req.get("target_machine_id")
+    if target_machine_id == None:
+        data['target_machine_id'] = target_machine_id = 1
+    data['pref_name_en'] = pref_name_en = req.get("target_prefecture")
+    if pref_name_en == None:
+       data['pref_name_en'] =  pref_name_en = 'tokyo'
+    print('target_machine_id',target_machine_id)
+    print('pref_name_en',pref_name_en)
+    data['pref_name_jp'] = pref_name_jp = prefecture_df[prefecture_df['pref_name_en'] == pref_name_en]['pref_name'].values[0]
+    data['area_name_jp'] = prefecture_df[prefecture_df['pref_name_en'] == pref_name_en]['area_name_jp'].values[0]
+    data['area_name_en'] = prefecture_df[prefecture_df['pref_name_en'] == pref_name_en]['area_name_en'].values[0]
+    date_dict = {}
+    display_date_list_dict = {}
+    today = datetime.date.today()
+    for i in range(0,9):
+        #print(i)
+        target_day = today + datetime.timedelta(days=i)
+        belong_day_str = target_day.strftime('%Y-%m-%d')
+        target_day_str_jp = target_day.strftime('%m/').lstrip('0')  +target_day.strftime('%d').lstrip('0') +  w_list[target_day.weekday()]
+        target_day_str_number:str = belong_day_str[-1] + 'の付く日'
+        display_date_list_dict[target_day_str_jp] = target_day_str_number
+        display_list_str = target_day_str_jp + ' ' + target_day_str_number
+        date_dict[display_list_str] = belong_day_str
+    print(date_dict)
+    data['date_dict'] = date_dict
+        # 機種から選ぶ部分のデータを取得
+    sql = f'''SELECT DISTINCT machine_id,master_machine_name
+        FROM machine_image
+        order by machine_id DESC;
+        '''
+    print(sql)
+    cursor = get_driver()
+    #AND 都道府県 in ('東京都' , '埼玉県' , '神奈川県' , '千葉県')
+    cursor.execute(sql)
+    result = cursor.fetchall()
+    cols = [col.name for col in cursor.description]
+    select_machine_df = pd.DataFrame(result, columns=cols)
+    #select_machine_df.to_csv('csv/test_location_df.csv',encoding='utf_8_sig',index=False)
+    #../static/img/content_image/231.jpg
+    #../static/img/content_image/274.jpg
+    select_machine_df['machine_id'] = select_machine_df['machine_id'].astype(str)
+    select_machine_df['master_machine_name'] = select_machine_df['machine_id'] + '_' + select_machine_df['master_machine_name'] 
+    select_machine_df['machine_id'] = select_machine_df['master_machine_name']
+    select_machine_df.rename(columns={'machine_id':'機種画像','master_machine_name':'機種名'},inplace=True)
+    data['groupby_machine_name_count_df_column_names'] = select_machine_df.columns.values
+    data['groupby_machine_name_count_df_row_data'] = list(select_machine_df.values.tolist())
+    print(select_machine_df.head(5))
+    select_machine_df.rename(columns={'machine_id':'機種画像','master_machine_name':'機種名'},inplace=True)
+    
+    return render_template('select_machine_page.html',data=data,enumerate=enumerate,zip=zip)
+
+@app.route("/tomorrow_recommend/machine/select", methods=['GET','POST'])
+def select_page_machine(error_message=False,target_machine_id=None,pref_name_en=None):
+    data = {}
+    prefecture_df = pd.read_csv('csv/pref_lat_lon.csv')
+    req = request.args
+    error_message = req.get("error_message")
+    print('error_message',error_message,type(error_message))
+    if error_message == 'True':
+        data['error_message'] = '検索条件に一致するデータが見つかりませんでした。<br> 新台の場合は検索が速すぎるか人気機種出ない場合は選択台数が多すぎる可能性が高いです。<br> 人気機種でも地域によっては平均差枚の条件が厳しすぎる場合もあるので<br> 条件を緩めるなどもう一度検索条件を変更してください。'
+        print('error_message　Trueです')
+    else:
+        data['error_message'] = ''
+        print('error_message　Falseです')
+    
+    data['target_machine_id'] = target_machine_id = req.get("target_machine_id")
+    if target_machine_id == None:
+        data['target_machine_id'] = target_machine_id = 1
+    data['pref_name_en'] = pref_name_en = req.get("target_prefecture")
+    if pref_name_en == None:
+       data['pref_name_en'] =  pref_name_en = 'tokyo'
+    print('target_machine_id',target_machine_id)
+    print('pref_name_en',pref_name_en)
+    data['pref_name_jp'] = pref_name_jp = prefecture_df[prefecture_df['pref_name_en'] == pref_name_en]['pref_name'].values[0]
+    data['area_name_jp'] = prefecture_df[prefecture_df['pref_name_en'] == pref_name_en]['area_name_jp'].values[0]
+    data['area_name_en'] = prefecture_df[prefecture_df['pref_name_en'] == pref_name_en]['area_name_en'].values[0]
+    date_dict = {}
+    display_date_list_dict = {}
+    today = datetime.date.today()
+    for i in range(0,9):
+        #print(i)
+        target_day = today + datetime.timedelta(days=i)
+        belong_day_str = target_day.strftime('%Y-%m-%d')
+        target_day_str_jp = target_day.strftime('%m/').lstrip('0')  +target_day.strftime('%d').lstrip('0') +  w_list[target_day.weekday()]
+        target_day_str_number:str = belong_day_str[-1] + 'の付く日'
+        display_date_list_dict[target_day_str_jp] = target_day_str_number
+        display_list_str = target_day_str_jp + ' ' + target_day_str_number
+        date_dict[display_list_str] = belong_day_str
+    print(date_dict)
+    data['date_dict'] = date_dict
+    return render_template('select_machine_option.html',data=data,enumerate=enumerate,zip=zip)
+
+#打ちたい機種から選ぶページから遷移するポスト先
+@app.route("/result_machine_search", methods=["POST"])  #追加
+def select_machine_search():
+    try:
+        data = {}
+        data["requests"] = request.form
+        data['pref_name_en'] = pref_name_en = request.form['pref_name_en']
+        data['pref_name_jp'] = pref_name_jp = request.form['pref_name']
+        data['target_day'] = target_day = request.form['target_day']
+        data['target_machine_number'] = target_machine_number = int(request.form['target_machine_number'])
+        data['spinner_ave_diffcoins_number'] = spinner_ave_diffcoins_number = int(request.form['spinner_ave_diffcoins_number'])
+        data['target_machine_id'] = target_machine_id = request.form['target_machine_id']
+
+        sql =f'''SELECT *
+        FROM machine_image
+        WHERE machine_id = {target_machine_id}'''
+        print(sql)
+        cursor = get_driver()
+        cursor.execute(sql)
+        result = cursor.fetchall()
+        cols = [col.name for col in cursor.description]
+        machine_image_df = pd.DataFrame(result, columns=cols)
+        #machine_image_df.to_csv('csv/test_location_df.csv',encoding='utf_8_sig',index=False)
+        pre_convert_machine_name_tuple = str(tuple(set(machine_image_df['pre_convert_machine_name'].tolist())))
+        print(pre_convert_machine_name_tuple)
+        target_day_number:int = int(target_day[-1])
+        target_day_list_str = get_sql_target_day_list_str(target_day_number)
+        #pre_convert_machine_name_list
+        sql =f'''SELECT hall_id, halldata2.hall_name, halldata2.id ,hallnavi_name, halldata2.prefecture_name, date, machine_name, win_rate, ave_game_count, ave_diff_coins, sum_game_count, sum_diff_coins, win_machine_count, sum_machine_count,  dmm_url, pworld_url, line_url, twitter_url , longitude, latitude, anaslo_name
+        from groupby_date_machine_diffcoins as machine_diffcoins
+        left join halldata as halldata2
+        on machine_diffcoins.hall_id = halldata2.id
+        WHERE machine_name IN {pre_convert_machine_name_tuple}
+        AND date in {target_day_list_str}
+        AND sum_machine_count >= {target_machine_number}
+        AND (machine_diffcoins.prefecture_name = '{pref_name_jp}')
+        '''
+        cursor.execute(sql)
+        result = cursor.fetchall()
+        cols = [col.name for col in cursor.description]
+        machine_result_df = pd.DataFrame(result, columns=cols)
+        print(sql)
+        machine_result_df.drop_duplicates(keep='first',inplace=True)
+        print('machine_result_df',machine_result_df.columns)
+        data['machine_name_jp'] = machine_name_jp = machine_image_df['master_machine_name'].values[0]
+        #文字列の日付からdatetime.dateに変換
+        target_date:datetime.date = datetime.datetime.strptime(target_day, '%Y-%m-%d').date()
+        data['target_day_jp'] = target_day_jp = convert_sql_date_to_jp_date_and_weekday(target_date)
+
+        diff_coins_all_pure_plus_df = machine_result_df[machine_result_df['ave_diff_coins'] > spinner_ave_diffcoins_number ]
+        diff_coins_all_pure_plus_df['date'] =diff_coins_all_pure_plus_df['date'].astype(str)
+        groupby_diff_coins_all_pure_plus_df = diff_coins_all_pure_plus_df.groupby('hall_name').sum().sort_values('sum_machine_count',ascending=False)
+        groupby_diff_coins_all_pure_plus_df['hall__size_count'] = diff_coins_all_pure_plus_df.groupby('hall_name').size()
+        max_count = max(list(groupby_diff_coins_all_pure_plus_df['hall__size_count'] ))
+        #groupby_diff_coins_all_pure_plus_df = groupby_diff_coins_all_pure_plus_df[groupby_diff_coins_all_pure_plus_df['hall__size_count'] == max_count]
+
+        groupby_diff_coins_all_pure_plus_df['concat_ave_diff_coins'] = groupby_diff_coins_all_pure_plus_df['sum_diff_coins'] / groupby_diff_coins_all_pure_plus_df['sum_machine_count']
+        groupby_diff_coins_all_pure_plus_df.sort_values('concat_ave_diff_coins',ascending=False,inplace=True)
+        groupby_diff_coins_all_pure_plus_df = groupby_diff_coins_all_pure_plus_df[groupby_diff_coins_all_pure_plus_df['hall__size_count'] == max_count]
+        groupby_diff_coins_all_pure_plus_df['concat_ave_diff_coins'] = groupby_diff_coins_all_pure_plus_df['concat_ave_diff_coins'].astype(int)
+        groupby_diff_coins_all_pure_plus_df.reset_index(inplace=True,drop=False)
+        groupby_diff_coins_all_pure_plus_df['hall_name']
+        #カテゴリカるデータに変換
+        groupby_diff_coins_all_pure_plus_df['hall_name'] = groupby_diff_coins_all_pure_plus_df['hall_name'].astype('category')
+        groupby_diff_coins_all_pure_plus_df
+
+        extract_hall_name_list = list(groupby_diff_coins_all_pure_plus_df['hall_name'])
+        extract_hall_name_tuple_str = str(tuple(extract_hall_name_list))
+        print(extract_hall_name_list)
+        extract_machine_result_df = machine_result_df[machine_result_df['hall_name'].isin(extract_hall_name_list)]  
+        #順番をカテゴリかるデータで並び替え
+        #  対象 column ヨシ! categories 
+        extract_machine_result_df['hall_name']  = pd.Categorical(extract_machine_result_df['hall_name'] , categories = extract_hall_name_list)
+        extract_machine_result_df.sort_values(by=['hall_name','date'],inplace=True)
+        map_df_list = []
+        rename_dict = {'hall_name':'店舗名','date':'日付','machine_name':'機種名','ave_game_count':'平均ゲーム数','ave_diff_coins':'平均差枚','win_machine_count':'勝利台数','sum_diff_coins':'総差枚','sum_machine_count':'総台数','win_rate':'勝率'}
+        machine_result_df.rename(columns=rename_dict,inplace=True)
+        print('extract_machine_result_df',machine_result_df.columns)
+        
+        #schedule
+        cursor.execute(f'''SELECT イベント日,店舗名, 取材名,媒体名,pledge_text
+        FROM schedule as schedule2
+        left join halldata as halldata2
+        on schedule2.店舗名 = halldata2.hall_name
+        left join pledge as pledge
+        on schedule2.取材名 = pledge.syuzai_name
+        WHERE イベント日 = '{target_day}'
+        AND 店舗名 in {extract_hall_name_tuple_str}
+        ORDER BY イベント日,都道府県,媒体名 desc;''')
+
+        result = cursor.fetchall()
+        cols = [col.name for col in cursor.description]
+        schedule_df = pd.DataFrame(result, columns=cols)
+        extract_machine_result_table_text = ''
+        rank = 0
+        for i,hall_name in enumerate(extract_machine_result_df['hall_name'].unique()):
+            extract_machine_result_df = machine_result_df[machine_result_df['店舗名'] == hall_name]
+            extract_schedule_df = schedule_df[schedule_df['店舗名'] == hall_name]
+            print('iは',i,hall_name,'extract_schedule_df',extract_schedule_df )
+            extract_machine_result_df = extract_machine_result_df[['hall_id','店舗名','id',
+            '日付', '機種名',
+            '平均ゲーム数', '平均差枚', '勝率','総差枚','勝利台数','総台数', 'dmm_url', 'pworld_url', 'line_url', 'twitter_url' , 'longitude', 'latitude', 'anaslo_name']]
+            # data['extract_machine_result_df'] = extract_machine_result_df.to_html(classes='table table-striped',index=False)
+            extract_machine_result_df['日付'] = extract_machine_result_df['日付'].map(convert_sql_date_to_jp_date_and_weekday)
+            extract_machine_result_df['平均ゲーム数'] = extract_machine_result_df['平均ゲーム数'].astype(int).map(lambda x: "{:,}".format(x)) + 'G'
+            extract_machine_result_df['平均差枚'] = extract_machine_result_df['平均差枚'].astype(int).map(lambda x: "{:,}".format(x)) + '枚'
+            #extract_machine_result_df['総差枚'] = extract_machine_result_df['総差枚'].astype(int).map(lambda x: "{:,}".format(x)) + '枚'
+            concat_ave_diff_conis = int(extract_machine_result_df['総差枚'].sum() /  extract_machine_result_df['総台数'].sum())
+            if concat_ave_diff_conis == 0:
+                continue
+            rank += 1
+            concat_win_rate = int(extract_machine_result_df['勝利台数'].sum() / extract_machine_result_df['総台数'].sum() * 100)
+            concat_win_machine_count = extract_machine_result_df['勝利台数'].sum()
+            concat_sum_machine_count = extract_machine_result_df['総台数'].sum()
+            hall_status_ave_machine_text = f'過去{max_count}回平均差枚:{concat_ave_diff_conis}枚 勝率:{concat_win_rate}% ({concat_win_machine_count}/{concat_sum_machine_count})'
+            extract_machine_result_table_df = extract_machine_result_df[['日付','平均ゲーム数','平均差枚','勝率','総差枚']]
+            extract_machine_result_table_text += f'''<div class="my-3 bg-light card mx-auto p-1 border border-primary" style="width:100%;">
+        <div class="heading-011 mt-1">\n{rank}位 {hall_name}<br>{hall_status_ave_machine_text}\n</div>'''
+            hall_image_id = int(extract_machine_result_df['id'].values[0])
+            dmm_url = extract_machine_result_df['dmm_url'].values[0]
+            pworld_url= extract_machine_result_df['pworld_url'].values[0]
+            line_url = extract_machine_result_df['line_url'].values[0]
+            twitter_url = extract_machine_result_df['twitter_url'].values[0]
+            sns_html_text =f'''   <div class="row no-gutters">
+            <div class="col-6">
+                <img onerror="this.remove()" class="card-img" src="../static/img/halls/hall_image_{hall_image_id}.png" width="80%" alt="{hall_name}" loading="lazy" style="max-height:150px; max-width:150px;">
+            </div>
+            <div class="col-6">
+                <div class="card-body">
+                    <div id="sns">
+                        <ul class="clearfix">'''
+            if twitter_url != '':
+                sns_html_text += f'''
+                                    <li class="twitter"><a href="{twitter_url}" title="X" rel="nofollow" target="_blank">X</a></li>'''
+            if pworld_url != '':
+                sns_html_text += f'''
+                                    <li class="pocket"><a href="{pworld_url}" title="P-World" rel="nofollow" target="_blank">P-World</a></li>'''
+            if dmm_url != '':
+                sns_html_text += f'''
+                                    <li class="dmm"><a href="{dmm_url}" title="dmm" rel="nofollow" target="_blank">DMM</a></li>'''
+            if line_url != '':
+                sns_html_text += f'''
+                                    <li class="line"><a href="{line_url}" title="line" rel="nofollow" target="_blank">LINE</a></li>'''
+            # sns_html_text += f'''
+            #     <li class="snsButtons_slomap"><i class="fa-solid fa-map-location-dot"></i><span class="snsButtons_label"><a href="/tomorrow_recommend/{self.area_name_en}/hall/{hallnavi_name}" class="text-white" >slomap店舗ページ</a></span></li>'''
+            sns_html_text += f'''
+                        </ul>
+                    </div>
+                    
+                </div>
+            </div>'''
+            
+            sns_html_text += extract_machine_result_table_df.to_html(classes="dataframe",index=False)
+            if len(extract_schedule_df) > 0:
+                extract_schedule_df['イベント日'] = extract_schedule_df['イベント日'].map(convert_sql_date_to_jp_date_and_weekday)
+                extract_schedule_df = extract_schedule_df[['イベント日','取材名','媒体名','pledge_text']]
+                extract_schedule_df.rename(columns={'イベント日':'日付','取材名':'取材名','媒体名':'媒体名','pledge_text':'取材内容'},inplace=True)
+                extract_schedule_df['取材内容'] = extract_schedule_df['取材内容'].astype(str)
+                extract_schedule_df['取材内容'] = extract_schedule_df['取材内容'].map(lambda x: x.replace('\n','<br>').replace('None',''))
+                sns_html_text += extract_schedule_df.to_html(classes='table table-striped',index=False)
+            sns_html_text += f'''<a href="/tomorrow_recommend/{pref_name_en}/hall/{hall_name}"><button class="btn btn-primary btn-lg my-1">{hall_name} 店舗別ページ</button></a>
+        </div>
+    </div>'''
+            extract_machine_result_table_text += sns_html_text
+            map_df_list.append(extract_machine_result_df)
+            if i > 8:
+                break
+
+        data['iframe'] = create_machine_map_iframe(map_df_list,pref_name_jp)
+        data['extract_machine_result_table_text'] = extract_machine_result_table_text
+        data['error_message'] = 'なし'
+        post_line(f"\n{target_day_jp} \n{pref_name_jp} \n{machine_name_jp} \n{target_machine_number}台以上 \n{spinner_ave_diffcoins_number}枚以上で検索されました。")
+        return render_template('result_machine_search.html',data=data,zip=zip)
+        #return render_template('test_templete.html',data=data,zip=zip)
+    except Exception as e:
+        error_text = traceback.format_exc()
+        print('エラーが発生しました',error_text )
+        target_prefecture = request.form['pref_name_en']
+        target_machine_id = request.form['target_machine_id']
+        return redirect(url_for('select_page_machine', error_message=True,target_machine_id= target_machine_id ,target_prefecture=target_prefecture))
 
 @app.route("/prefecture_post_detail", methods=['GET','POST'])
 def prefecture_post_detail():
     if request.method == 'POST':
-        prefecture_df = pd.read_csv('csv/pref_lat_lon.csv')
         #index番号で取り出す
 
         #北海道が選択された場合 wordpressのタグのidは72
@@ -2235,8 +2673,12 @@ def ads():
 @app.route("/test", methods=['GET','POST'])
 def test():
     data = {}
-    data['hall_name'] = 'ホール名'
-    return render_template('test_templete.html',data=data)
+    prefecture_id_and_name_dict = {}
+    for i, prefecture_name in enumerate(prefecture_list):
+        i = i + 1
+        prefecture_id_and_name_dict[i] = prefecture_name
+    data['prefecture_id_and_name_dict'] = prefecture_id_and_name_dict
+    return render_template('post_test.html',data=data)
 
 @app.route("/test2", methods=['GET','POST'])
 def post_test():
@@ -2248,5 +2690,11 @@ def post_test():
     data['prefecture_id_and_name_dict'] = prefecture_id_and_name_dict
     return render_template('test2.html',data=data)
 
+
+@app.route("/test_img_slider", methods=['GET','POST'])
+def test_img_slider():
+    data = {}
+    return render_template('test_img_slider.html',data=data)
+
 if __name__ == '__main__':
-    app.run(host="0.0.0.0",debug=False, port=int(os.environ.get('PORT', 5000)))
+    app.run(host="0.0.0.0",debug=dev_flag, port=int(os.environ.get('PORT', 5000)))
