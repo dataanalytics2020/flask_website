@@ -563,7 +563,6 @@ class Blog():
                 input_by_pledge_text += f'<img src="http://slotana777.com/wp-content/uploads/2023/04/{pledge_name}.jpg" alt="{pledge_name}" width="1000" height="400" class="size-full " />\n'
             else:
                 h2_banner_text:str =f'''<div class="box-alert box-alert-info">
-        <i class="fas fa-exclamation-circle fa-4x"></i>
         <div class="alert-message">
             <div class="alert-title">{pledge_name}</div>
             <p>{scraping.target_date_string_jp}  {scraping.prefecture_name}</p>

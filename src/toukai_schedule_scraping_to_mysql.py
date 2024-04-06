@@ -56,13 +56,15 @@ def post_line_text_and_image(message,image_path,token):
 
 def login_scraping_site(area_name):
 
-    svc = Service(executable_path=binary_path)
+    from selenium.webdriver.chrome.service import Service
+    from selenium import webdriver
+    from selenium.webdriver.chrome.service import Service as ChromeService
     options = Options()
     options.add_argument('--headless')
     options.add_argument('--disable-gpu')
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
-    browser = webdriver.Chrome(service=svc, options=options)
+    browser = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()),options=options)
     browser.implicitly_wait(10)
     url_login = f"https://{os.getenv('SCRAPING_SYUZAI_DOMAIN')}/login_form_mail"
     #admageを開く

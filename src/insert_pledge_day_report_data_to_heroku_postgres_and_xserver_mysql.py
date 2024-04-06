@@ -7,7 +7,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 import requests
 import json
-
+import traceback
 from webdriver_manager.chrome import ChromeDriverManager
 import mysql
 import mysql.connector
@@ -16,7 +16,7 @@ import datetime
 import psycopg2
 import sshtunnel
 from sshtunnel import SSHTunnelForwarder
-
+from win32com.client import GetObject
 from dotenv import load_dotenv
 load_dotenv(".env")
 
@@ -97,10 +97,23 @@ def login_scraping_site(area_name):
     browser.implicitly_wait(10)
     return browser
 
+#プロファイル付きのクロームを開くために今開いてあるクロームをすべてタスク切るする
+WMI = GetObject('winmgmts:')
+for p in WMI.ExecQuery('select * from Win32_Process where Name LIKE "%Chrome%"'):
+    print("cmd:taskkill /F /PID " + str(p.ProcessID))
+    os.system("taskkill /F /PID "+str(p.ProcessId))
+print('Chromeを全て閉じました')
+time.sleep(5)
+
+
 try:
     furture_syuzai_list_df = pd.DataFrame(index=[], columns=['都道府県','イベント日','店舗名','取材名','媒体名','取材ランク'])
     #['hokkaido','tohoku','kanto','chubu','kansai','chugoku','sikoku','kyushu']
     for area_name in ['hokkaido','tohoku','kanto','chubu','kansai','chugoku','sikoku','kyusyu']:
+        try:
+            browser.quit()
+        except:
+            pass
         browser = login_scraping_site(area_name)
         elements = browser.find_elements(By.CLASS_NAME,"mgn_serch_list_bottom")
         post_line_text(f'{area_name}の取材予定追加開始',os.getenv('WORK_LINE_TOKEN'))
@@ -311,8 +324,9 @@ try:
     print(f'{len(concat_df)}件の全国の取材予定追加おわり')
 
 except Exception as e:
-    print('エラー理由',e)
-    post_line_text(f'エラー{e}',os.getenv('WORK_LINE_TOKEN'))
+    error_message = traceback.format_exc()
+    print('エラー理由',error_message )
+    post_line_text(f'エラー{error_message }',os.getenv('WORK_LINE_TOKEN'))
     
 post_line_text(f'全ての処理が終わりました。',os.getenv('WORK_LINE_TOKEN'))
     #break

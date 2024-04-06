@@ -308,7 +308,8 @@ issue_comment_text = '座標系の問題で取得できなかった店舗一覧\
 
 prefecture_df = pd.read_csv(r'csv\pref_lat_lon.csv')
 prefecture_list = list(prefecture_df['pref_name'])
-for prefecture in prefecture_list[10:14]:#reversed([12:13]
+
+for prefecture in prefecture_list:#reversed([12:13]
     try:
         prefecture_url = urllib.parse.quote(prefecture)
         url = f'https://{os.getenv("SCRAPING_DOMAIN")}/%e3%83%9b%e3%83%bc%e3%83%ab%e3%83%87%e3%83%bc%e3%82%bf/{prefecture_url}'
@@ -334,7 +335,7 @@ for prefecture in prefecture_list[10:14]:#reversed([12:13]
         count = 0
         error_count = 0
         
-        for day_num in reversed(range(1,2)):
+        for day_num in reversed(range(1,32)):
         #tenpo_ichiran_df['ホール名']
             try:
                 target_day = today  + datetime.timedelta(days=-day_num)
@@ -349,8 +350,10 @@ for prefecture in prefecture_list[10:14]:#reversed([12:13]
                 str_target_day = target_day.strftime('%Y-%m-%d')
                 post_line_text(f"352行目 {now} \n{i} \n{prefecture} \n{str_target_day} \nrdsインサート用スクレイピング開始",line_token)
                 insert_count = 0
+                progress_count = 0
                 for i, tenpo_name in enumerate(tenpo_url_name_list):#[75:90]
                     try:
+                        progress_count += 1
                         ichiran_all_tennpo_df = pd.DataFrame(columns=[],index=[])
                         concat_df = pd.DataFrame(columns=[],index=[])
                         # if i > 5:
@@ -381,7 +384,7 @@ for prefecture in prefecture_list[10:14]:#reversed([12:13]
                         for t in soup.h1.text.split(' ')[1:-1]:
                             hall_name_text += t 
 
-                        df['hall_name'] = hall_name_text.replace('周年','').replace('年一','').rstrip(' ')
+                        df['hall_name'] = hall_name_text.replace('周年','').replace('年一','')
                         #print(tenpo_name)
 
                         df['prefecture'] = prefecture
@@ -510,7 +513,7 @@ for prefecture in prefecture_list[10:14]:#reversed([12:13]
                         gruopby_diff_coins_df = gruopby_diff_coins_df[['date','prefecture','hall_id','hall_name','hallnavi_name','url_hall_name','差枚','ave_diff_coins','ave_game_count','win_rate']]
                         gruopby_diff_coins_df.columns = ['date','prefecture','hall_id','hall_name','hallnavi_name','url_hall_name','sum_diffcoins','ave_diffcoins','ave_game','win_rate']
                         ichiran_all_tennpo_df =  pd.concat([ichiran_all_tennpo_df, gruopby_diff_coins_df],axis=0,ignore_index=True)
-                        print('成功',prefecture,i,tenpo_name)
+                        print('516行目 成功',prefecture,i,progress_count,'/',len(tenpo_url_name_list),tenpo_name)
                         #break
                         #ichiran_all_tennpo_df.to_csv('csv/tokyo_psgr_insert_df.csv',index=False)
                         concat_df.rename(columns={'機種名':'machine_name',
@@ -545,9 +548,10 @@ for prefecture in prefecture_list[10:14]:#reversed([12:13]
                         groupby_date_machine_number_diffcoins_df
                         rds_mysql_conn = rds_mysql_get_cursor()
                         table_name = 'groupby_date_machine_number_diffcoins'
-                        #insert_data_bulk(table_name,groupby_date_machine_number_diffcoins_df,rds_mysql_conn)
+                        insert_data_bulk(table_name,groupby_date_machine_number_diffcoins_df,rds_mysql_conn)
+                        
                         heroku_psgr_conn = heroku_psgr_get_cursor()
-                        #insert_data_bulk_psgr(table_name,groupby_date_machine_number_diffcoins_df,heroku_psgr_conn)
+                        insert_data_bulk_psgr(table_name,groupby_date_machine_number_diffcoins_df,heroku_psgr_conn)
 
                         concat_groupby_date_kisyubetu_df = pd.DataFrame(columns=[],index=[])
                         try:
