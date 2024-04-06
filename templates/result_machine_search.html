@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block head %}
+<title>{{data.pref_name_jp}} {{data.target_day_jp}} {{ data.machine_name_jp}} お勧め店舗マップ</title>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class='row justify-content-center'>
+        <div class='col-lg-8 text-center'>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                  <li class="breadcrumb-item"><a href="/">HOME</a></li>
+                  <li class="breadcrumb-item"><a href="/prefecture/{{data.pref_name_en}}">{{data.pref_name_jp}}</a></li>
+                  <li class="breadcrumb-item active" aria-current="page"><a href="/tomorrow_recommend/{{data.pref_name_en}}/media/{{data.media_name}}">{{data.media_name}}</a></li>
+                </ol>
+            </nav>
+            <h2 class="heading-17 my-2">
+                <span>01</span>
+                {{data.pref_name_jp}} {{data.target_day_jp}} {{ data.machine_name_jp}} お勧め店舗マップ
+            </h2>
+            <iframe class="embed-responsive-item" scrolling="no" height="450" width="100%" src={{ data.iframe|safe }}</iframe>
+            <h2 class="heading-17 my-2">
+                <span>02</span>
+                {{data.pref_name_jp}} {{data.target_day_jp}} {{ data.machine_name_jp}} お勧め店舗データ
+            </h2>
+            <div><img src="../static/img/content_image/{{ data.target_machine_id}}.jpg" width="90%"></div>
+            {{ data.extract_machine_result_table_text|safe }}
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1/i18n/jquery.ui.datepicker-ja.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/themes/cupertino/jquery-ui.min.css">  <!-- テーマcupertinoを選択 -->\
+<script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+<script>
+	$(function() {
+		$.datepicker.setDefaults($.datepicker.regional["ja"]);
+		$("#input1").datepicker({
+            minDate: new Date(),
+            maxDate: '+6d',
+            dateFormat: 'yy-mm-dd',
+        });
+	});
+
+    $(function() {
+        $('#datepicker').datepicker({
+            minDate: new Date(),
+            maxDate: '+6d',
+            dateFormat: 'yy-mm-dd',
+        }).css({
+            'margin': 'auto',
+            'padding': 'auto',
+            });
+    });
+
+
+</script>    
+{% endblock %}

@@ -7,6 +7,8 @@
     <div class="row">
         <div class="column col-lg-9">
             <dl class="info">
+                <dt><span>機能追加</span><time>2024.04.04</time></dt>
+                <dd>都道府県別ページから機種から選ぶができるようになりました</dd>
                 <dt><span>表示改善</span><time>2024.03.14</time></dt>
                 <dd>表示のベースをエリア別から都道府県別に見やすいようにUIを修正しました</dd>
                 <dt><span>表示改善</span><time>2024.01.21</time></dt>
@@ -115,14 +117,14 @@
             </h2>
             <a href="/serch-recommend-prefecture-day"><button class="button-014 my-4">
                 <div>
-                    <i class="fa-solid fa-building-circle-exclamation"></i> サイト初訪問者・スロット初心者にオススメ
+                    サイト初訪問者・スロット初心者にオススメ
                 </div>
                 <span><img src="static/img/thumbnail/thumbnail_tokyo_2023-12-29-300x200.png" loading="lazy" width="80" height="50" alt="thumbnail" class="mx-1">➀過去差枚実績から<br>お勧め店舗を探す<img src="static/img/content_image/191.jpg" loading="lazy" width="80" height="50" alt="北斗の拳" class="mx-1"></span></button>
             </a>
-            <h4 data-text="※明日みんなが注目の取材のみマップに表示中">※明日{{data.tommorow_jp_str_day}} 東京都の旧イベント日<br>過去差枚がわかる店舗をマップに表示中</h4>
+            <h4 data-text="">{{data.tommorow_jp_str_day}} 東京都の旧イベント日<br>過去差枚がわかる店舗をマップに表示中</h4>
             <iframe class="embed-responsive-item" loading="lazy" title="location_map" scrolling="no" height="450" width="100%" src= "{{url_for('show_iframe')}}" ></iframe>
 
-            <h4 class="mt-3" >明日{{data.tommorow_jp_str_day}}の東京都日別差枚順記事</h4>
+            <h4 class="mt-3" >{{data.tommorow_jp_str_day}}の東京都日別差枚順記事</h4>
             <div class="card-group">
                 <div class="card border-dark mb-1">
                     <a href="/post_prefecture/{{ data.post_slug }}" class="card-body text-dark">
@@ -136,10 +138,10 @@
                                 <li class="list_test">{{ recommend_hall_name }}</li>
                             {% endfor %}
                             </ul>
-                            <div class="heading-011 mt-3" >明日{{data.tommorow_jp_str_day}}の東京都<br>日別お勧め店舗画像</div>
-                            <img class="card-img-top" src="https://pachislo7.com/wp-content/uploads/top10_recommend_hall_name_{{data.post_slug }}.png" alt="明日{{data.tommorow_jp_str_day}}の東京都日別お勧め店舗画像" width="80%" height="80%" loading="lazy">
-                            <div class="heading-011 mt-3" >明日{{data.tommorow_jp_str_day}}の東京都<br>旧イベ日過去三回平均差枚画像</div>
-                            <img class="card-img-top" src="https://pachislo7.com/wp-content/uploads/old_event_day_hall_name_{{data.post_slug }}.png" alt="明日{{data.tommorow_jp_str_day}}の東京都旧イベ日過去三回平均差枚画像" width="80%" height="80%" loading="lazy">
+                            <div class="heading-011 mt-3" >{{data.tommorow_jp_str_day}}の東京都<br>日別お勧め店舗過去三回平均差枚画像</div>
+                            <img class="card-img-top" src="https://pachislo7.com/wp-content/uploads/top10_recommend_hall_name_{{data.post_slug }}.png" alt="{{data.tommorow_jp_str_day}}の東京都日別お勧め店舗画像" width="80%" height="80%" loading="lazy">
+                            <div class="heading-011 mt-3" >{{data.tommorow_jp_str_day}}の東京都<br>旧イベ日過去三回平均差枚画像</div>
+                            <img class="card-img-top" src="https://pachislo7.com/wp-content/uploads/old_event_day_hall_name_{{data.post_slug }}.png" alt="{{data.tommorow_jp_str_day}}の東京都旧イベ日過去三回平均差枚画像" width="80%" height="80%" loading="lazy">
                         </div>
                     </a>
                 </div>
@@ -156,7 +158,7 @@
                 <li><a class="loading link-btn colorname1mt-1" href="/post_prefecture_list/chiba">千葉県一覧</a></li>
             </ul>
 
-            <h4 class="mt-3" >※明日{{data.tommorow_jp_str_day}} 東京都のイベント一覧<br>(※差枚データのない店舗も表示中)</h4>
+            <h4 class="mt-3" >{{data.tommorow_jp_str_day}} 東京都のイベント一覧<br>(※差枚データのない店舗も表示中)</h4>
             <div class = 'heatmap .table-wrap'>
                 <div class="scroll_area" style="width:100%;max-width:2000px;overflow-x:scroll;">
                     <table id="syuzai_table" class="table table-striped compact">

@@ -1,0 +1,255 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>{{data.pref_name_jp}} マップで見えるパチンコ・スロット取材予定</title>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class='row justify-content-center'>
+        <div class='col-lg-8 text-center'>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                  <li class="breadcrumb-item"><a href="/">HOME</a></li>
+                  <li class="breadcrumb-item active" aria-current="page"><a href="/tomorrow_recommend/machine/select-page">機種から探す</a></li>
+                </ol>
+            </nav>
+            <h1>機種から探すTOP</h1>
+            {% if data.error_message != '' %}
+              <div class="p-3 mb-2 bg-danger text-white">{{data.error_message|safe }}</div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-lg-8 text-center">
+            <div class="progressbar mt-3 mb-1 py-2">
+                <div class="item active">STEP.1<br>打ちたい機種を選択</div>
+                <div class="item">STEP.2<br>行きたい日付を選択</div>
+                <div class="item">STEP.3<br>詳細を選択</div>
+            </div>
+            <p class="text-01 pt-3" id="target_machine_image_text"></p>
+            <img id="target_machine_image" alt="" width="70%" style="max-width:400px;"/>
+            <div class="row justify-content-center mt-2">
+              <div class="col-lg-8 text-center">
+                  <ul class="slider">
+                      <div><img src="/static/img/content_image/257.jpg" onclick="click_machine_image(257)" ></div>
+                      <div><img src="/static/img/content_image/191.jpg" onclick="click_machine_image(191)" ></div>
+                      <div><img src="/static/img/content_image/94.jpg" onclick="click_machine_image(94)" ></div>
+                      <div><img src="/static/img/content_image/43.jpg" onclick="click_machine_image(43)" ></div>
+                      <div><img src="/static/img/content_image/1.jpg" onclick="click_machine_image(1)" ></div>
+                      <div><img src="/static/img/content_image/253.jpg" onclick="click_machine_image(253)" ></div>
+                      <div><img src="/static/img/content_image/231.jpg" onclick="click_machine_image(231)" ></div>
+                      <div><img src="/static/img/content_image/221.jpg" onclick="click_machine_image(221)" ></div>
+                      <div><img src="/static/img/content_image/201.jpg" onclick="click_machine_image(201)" ></div>
+                      <div><img src="/static/img/content_image/136.jpg" onclick="click_machine_image(136)" ></div>
+                    </ul>
+                  <div class="dots-2"></div>
+                  <div class = '.table-wrap table-half'>
+                      <table id="machine_table" class="table table-striped">
+                          <thead>
+                              <tr>
+                                  {% for col in data.groupby_machine_name_count_df_column_names %}
+                                  <th>
+                                  {{ col | safe }}
+                                  </th>
+                                  {% endfor %}
+                              </tr>
+                          </thead>
+                          <tbody>
+                              {% for row in data.groupby_machine_name_count_df_row_data %}
+                              <tr>
+                                  {% for col, row_ in zip(data.groupby_machine_name_count_df_column_names, row) %}
+                                      {% if col == '機種画像' %}
+                                          <td><img class="table_image" src="/static/img/content_image/{{ row_.split("_")[0]  }}.jpg" onclick="click_machine_image({{ row_.split("_")[0]  }})" alt="{{ row_.split('_')[1] }}" /></td>
+                                      {% else %}
+                                          <td><a href="javascript:void(0);" onclick="click_machine_image({{ row_.split("_")[0]  }})" >{{ row_.split("_")[1] }}</a></td>
+                                      {% endif %}
+                                  {% endfor %}
+                              </tr>
+                              {% endfor %}
+                          </tbody>
+                      </table>
+                  </div>
+              </div>
+            </div>
+            <div class="progressbar mt-3 mb-1 py-2">
+                <div class="item">STEP.1<br>打ちたい機種を選択</div>
+                <div class="item active">STEP.2<br>行きたい日付を選択</div>
+                <div class="item">STEP.3<br>詳細を選択</div>
+            </div>
+            <form method="post" action="/result_machine_search">
+                <fieldset class="radio-003">
+                    {% for i , (p_text,name) in enumerate(data.date_dict.items()) %}
+                        <label>
+                            {% if i == 1 %}
+                            <input type="radio" name="target_day" value={{name}} checked/>
+                            {% else %}
+                            <input type="radio" name="target_day" value={{name}} />
+                            {% endif %}
+                            {{ p_text }}
+                        </label>
+                    {% endfor %}
+                </fieldset>
+            <div class="progressbar mt-3 mb-1 py-2">
+                <div class="item">STEP.1<br>打ちたい機種を選択</div>
+                <div class="item">STEP.2<br>行きたい日付を選択</div>
+                <div class="item active ">STEP.3<br>詳細を選択</div>
+            </div>
+
+            <div class="d-grid gap-2 col-10 mx-auto">
+              <!--8.レンジスライダーの設定-->
+              <button class="btn btn-outline-primary btn-sm" type="button">最低設置台数:</button>
+              <details class="qa-001 my-2">
+                <summary>最低設置台数とは？</summary>
+                <p>最低設置台数を選べます。台数が多い機種は最低5台以上などがお勧めです。</p>
+              </details>
+              <div class="spinner-container">
+                  <span class="spinner-sub disabled">
+                  <p class="spinner-p">-</p>
+                  </span>
+                  <input class="spinner" name="target_machine_number" id="spinner_number" type="number" min="1" max="30" value="3" onclick="change_spinner_number()">
+                  <span class="spinner-add">
+                  <p class="spinner-p1">+</p>
+                  </span>
+              </div>
+              <button class="btn btn-outline-primary btn-sm mt-3" type="button">日別最低平均差枚:</button>
+              <details class="qa-001 my-2">
+                <summary>日別最低平均差枚とは？</summary>
+                <p>店舗別日別の最低平均抽出差枚を選べます。<br>デフォルトは日別で高配分目安の-100枚以上ですが過疎地域や等価地域などでうまく出ない場合は抽出平均差枚をもう少し下げてから再検索をお勧めします。<br>2000枚以上等で検索すると前回のNの日の全台系なども探せます。</p>
+              </details>
+              <div class="spinner-container">
+                  <span class="spinner-ave-diffcoins-sub disabled">
+                  <p class="spinner-p">-</p>
+                  </span>
+                  <input class="spinner-ave" name="spinner_ave_diffcoins_number" id="spinner_ave_diffcoins_number" type="number" min="-500" max="2000" value="-100" onclick="change_spinner_ave_diff_conis()">
+                  <span class="spinner-ave-diffcoins-add">
+                  <p class="spinner-p1">+</p>
+                  </span>
+              </div>
+            </div>
+            <!-- formメソッドを使って検索するボタンを設置 -->
+                <input type="hidden" name="pref_name_en" value="tokyo">
+                <input type="hidden" name="pref_name" value="{{data.pref_name_jp}}">
+                <input type="hidden" id="target_machine_input_id" name="target_machine_id" value="">
+                <button class="btn btn-primary btn-lg my-3" id="search_btn">この条件で検索する</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1/i18n/jquery.ui.datepicker-ja.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/themes/cupertino/jquery-ui.min.css">  <!-- テーマcupertinoを選択 -->
+<script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/>
+<script type="text/javascript" src="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
+
+<script>
+    // 画像をクリックすると下に選択された機種画像が表示される関数
+    function click_machine_image(img_num){
+        console.log('click_machine_image');
+        console.log(img_num);
+        var img = document.getElementById('target_machine_image');
+        var img_text = document.getElementById('target_machine_image_text');
+        var image_input = document.getElementById('target_machine_input_id');
+        img_text.innerHTML = '選択した機種';
+        img.src = "/static/img/content_image/" + img_num + ".jpg";
+        image_input.value = img_num;
+        //document.getElementById('myImage').src='pic_bulbon.gif'
+    };
+    
+
+  
+    $(function () {
+      $('.spinner').each(function change_spinner_number() {
+        var el  = $(this);
+        var add = $('.spinner-add');
+        var sub = $('.spinner-sub');
+        var spinner_number = document.getElementById('spinner_number');
+    
+        // substract
+        el.parent().on('click', '.spinner-sub', function() {
+          if (el.val() > parseInt(el.attr('min'))) {
+            el.val(function(i, oldval) {
+              spinner_number.value = parseInt(oldval) - 1;
+              //console.log(spinner_number.value);
+              return --oldval;
+            });
+          }
+          // disabled
+          if (el.val() == parseInt(el.attr('min'))) {
+            el.prev(sub).addClass('disabled');
+          }
+          if (el.val() < parseInt(el.attr('max'))) {
+            el.next(add).removeClass('disabled');
+          }
+        });
+    
+        // increment
+        el.parent().on('click', '.spinner-add', function() {
+          if (el.val() < parseInt(el.attr('max'))) {
+            el.val(function(i, oldval) {
+              spinner_number.value = parseInt(oldval) + 1;
+              //console.log(spinner_number.value);
+              return ++oldval;
+            });
+          }
+          // disabled
+          if (el.val() > parseInt(el.attr('min'))) {
+            el.prev(sub).removeClass('disabled');
+          }
+          if (el.val() == parseInt(el.attr('max'))) {
+            el.next(add).addClass('disabled');
+          }
+        });
+      });
+    });
+
+    $(function () {
+      $('.spinner-ave').each(function change_spinner_ave_diff_conis() {
+        var el  = $(this);
+        var add = $('.spinner-ave-diffcoins-add');
+        var sub = $('.spinner-ave-diffcoins-sub');
+        var spinner_number = document.getElementById('spinner_ave_diffcoins_number');
+    
+        // substract
+        el.parent().on('click', '.spinner-ave-diffcoins-sub', function() {
+          if (el.val() > parseInt(el.attr('min'))) {
+            el.val(function(i, oldval) {
+              spinner_number.value = parseInt(oldval) - 100;
+              //console.log(spinner_number.value);
+              return parseInt(oldval) - 100 ;
+            });
+          }
+          // disabled
+          if (el.val() == parseInt(el.attr('min'))) {
+            el.prev(sub).addClass('disabled');
+          }
+          if (el.val() < parseInt(el.attr('max'))) {
+            el.next(add).removeClass('disabled');
+          }
+        });
+    
+        // increment
+        el.parent().on('click', '.spinner-ave-diffcoins-add', function() {
+          if (el.val() < parseInt(el.attr('max'))) {
+            el.val(function(i, oldval) {
+              spinner_number.value = parseInt(oldval) + 100;
+              //console.log(spinner_number.value);
+              return parseInt(oldval) + 100;
+            });
+          }
+          // disabled
+          if (el.val() > parseInt(el.attr('min'))) {
+            el.prev(sub).removeClass('disabled');
+          }
+          if (el.val() == parseInt(el.attr('max'))) {
+            el.next(add).addClass('disabled');
+          }
+        });
+      });
+    });
+</script>
+{% endblock %}
+

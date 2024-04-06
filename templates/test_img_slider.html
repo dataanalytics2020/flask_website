@@ -1,0 +1,402 @@
+{% extends "base.html" %}
+{% block content %}
+<!--==============レイアウトを制御する独自のCSSを読み込み===============-->
+<link rel="stylesheet" type="text/css" href="https://coco-factory.jp/ugokuweb/wp-content/themes/ugokuweb/data/reset.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css">
+<link rel="stylesheet" type="text/css" href="https://coco-factory.jp/ugokuweb/wp-content/themes/ugokuweb/data/6-1-6/css/6-1-6.css">
+<div class ='container'>
+    <div class="row">
+        <div class="col-lg-8 text-center">
+            <h2 class="heading-17">
+                <span>01</span>
+            行きたい都道府県を選択してください
+            </h2>
+            <ul class="slider">
+                <li><img src="https://coco-factory.jp/ugokuweb/wp-content/themes/ugokuweb/data/6-1-6/img/img_01.jpg" alt=""></li>
+                <li><img src="https://coco-factory.jp/ugokuweb/wp-content/themes/ugokuweb/data/6-1-6/img/img_02.jpg" alt=""></li>
+                <li><img src="https://coco-factory.jp/ugokuweb/wp-content/themes/ugokuweb/data/6-1-6/img/img_03.jpg" alt=""></li>
+                <li><img src="https://coco-factory.jp/ugokuweb/wp-content/themes/ugokuweb/data/6-1-6/img/img_04.jpg" alt=""></li>
+                <li><img src="https://coco-factory.jp/ugokuweb/wp-content/themes/ugokuweb/data/6-1-6/img/img_05.jpg" alt=""></li>
+                <li><img src="https://coco-factory.jp/ugokuweb/wp-content/themes/ugokuweb/data/6-1-6/img/img_06.jpg" alt=""></li>
+            </ul>
+                <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+                <script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
+                <script src="https://coco-factory.jp/ugokuweb/wp-content/themes/ugokuweb/data/6-1-6/js/6-1-6.js"></script>
+        </div>
+    </div>
+</div>
+<script>
+$(document).ready(function(){
+    $("#heatmap_table").DataTable({
+        "language":{url:"https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json",},
+            // 件数切替機能 無効
+        lengthChange: false,
+        // 検索機能 無効
+        searching: true,
+        // ソート機能 無効
+        ordering: true,
+        // 情報表示 無効
+        info: true,
+        // ページング機能 無効
+        paging: false,
+        // 初期表示の並び替えなし
+        order: [],
+        // 横スクロールバーを有効にする (scrollXはtrueかfalseで有効無効を切り替えます)
+        scrollX: true,
+        // 縦スクロールバーを有効にする (scrollYは200, "200px"など「最大の高さ」を指定します)
+        scrollY: 500,
+
+        columnDefs: [
+        // 2列目(0から始まるため1になっています)の幅を100pxにする
+        { targets: [0,3,6], width: 150 }
+    ]
+
+
+    });
+});
+
+
+
+$(document).ready(function() {
+    // 配列内の最大値を取得する関数
+    Array.max = function(array) {
+        return Math.max.apply(Math, array);
+    };
+    // すべての値を取得
+    var counts = $('.heatmap td:nth-child(2)').map(function() {
+        return parseInt($(this).text());
+    }).get();
+    // 最大値を返す
+    var plus_max = 5000;
+    var minus_max =-3000;
+    // 色を指定する
+    xr = 255;
+    xg = 255;
+    xb = 255;
+    
+    minnus_yr = 255;
+    minnus_yg = 0;
+    minnus_yb = 0;
+
+    plus_yr = 0;
+    plus_yg = 0;
+    plus_yb = 255;
+
+    yr = 255;
+    yg = 255;
+    yb = 0;
+    
+    n = 100;
+    // 各データポイントをループして、その％の値を計算する
+    $('.heatmap td:nth-child(3)').each(function() {
+        var val = parseInt($(this).text());
+        console.log(val);
+        if (val > 0) {
+            var pos = parseInt((Math.round((val / plus_max) * 100)).toFixed(0));
+            red = parseInt((xr + ((pos * (plus_yr - xr)) / (n - 1))).toFixed(0));
+            green = parseInt((xg + ((pos * (plus_yg - xg)) / (n - 1))).toFixed(0));
+            blue = parseInt((xb + ((pos * (plus_yb - xb)) / (n - 1))).toFixed(0));
+            clr = 'rgb(' + red + ',' + green + ',' + blue + ')';
+            if (val > 3000) {
+                $(this).css({
+                    backgroundColor: clr,
+                    color: 'white',
+                    fontWeight: 'bold'
+                });
+            } else {
+                $(this).css({
+                    backgroundColor: clr
+                });
+            }
+        } else {
+            var pos = parseInt((val / minus_max) * 100).toFixed(0);
+            green = parseInt((minnus_yr + ((pos * (0 - minnus_yr)) / 100))).toFixed(0);
+            blue = parseInt((minnus_yr + ((pos * (0 - minnus_yr)) / 100))).toFixed(0);
+            clr = 'rgb(' + 255 + ',' + green + ',' + blue + ')';
+            console.log(clr);
+            if (val < -3000) {
+                $(this).css({
+                    backgroundColor: clr,
+                    color: 'white',
+                    fontWeight: 'bold'
+                });
+            } else {
+                $(this).css({
+                    backgroundColor: clr
+                });
+            }
+        }
+    });
+    $('.heatmap td:nth-child(6)').each(function() {
+        var val = parseInt($(this).text());
+        console.log(val);
+        if (val > 0) {
+            var pos = parseInt((Math.round((val / plus_max) * 100)).toFixed(0));
+            red = parseInt((xr + ((pos * (plus_yr - xr)) / (n - 1))).toFixed(0));
+            green = parseInt((xg + ((pos * (plus_yg - xg)) / (n - 1))).toFixed(0));
+            blue = parseInt((xb + ((pos * (plus_yb - xb)) / (n - 1))).toFixed(0));
+            clr = 'rgb(' + red + ',' + green + ',' + blue + ')';
+            if (val > 3000) {
+                $(this).css({
+                    backgroundColor: clr,
+                    color: 'white',
+                    fontWeight: 'bold'
+                });
+            } else {
+                $(this).css({
+                    backgroundColor: clr
+                });
+            }
+        } else {
+            var pos = parseInt((val / minus_max) * 100).toFixed(0);
+            green = parseInt((minnus_yr + ((pos * (0 - minnus_yr)) / 100))).toFixed(0);
+            blue = parseInt((minnus_yr + ((pos * (0 - minnus_yr)) / 100))).toFixed(0);
+            clr = 'rgb(' + 255 + ',' + green + ',' + blue + ')';
+            console.log(clr);
+            if (val < -3000) {
+                $(this).css({
+                    backgroundColor: clr,
+                    color: 'white',
+                    fontWeight: 'bold'
+                });
+            } else {
+                $(this).css({
+                    backgroundColor: clr
+                });
+            }
+        }
+    });
+    $('.heatmap td:nth-child(9)').each(function() {
+        var val = parseInt($(this).text());
+        console.log(val);
+        if (val > 0) {
+            var pos = parseInt((Math.round((val / plus_max) * 100)).toFixed(0));
+            red = parseInt((xr + ((pos * (plus_yr - xr)) / (n - 1))).toFixed(0));
+            green = parseInt((xg + ((pos * (plus_yg - xg)) / (n - 1))).toFixed(0));
+            blue = parseInt((xb + ((pos * (plus_yb - xb)) / (n - 1))).toFixed(0));
+            clr = 'rgb(' + red + ',' + green + ',' + blue + ')';
+            if (val > 3000) {
+                $(this).css({
+                    backgroundColor: clr,
+                    color: 'white',
+                    fontWeight: 'bold'
+                });
+            } else {
+                $(this).css({
+                    backgroundColor: clr
+                });
+            }
+        } else {
+            var pos = parseInt((val / minus_max) * 100).toFixed(0);
+            green = parseInt((minnus_yr + ((pos * (0 - minnus_yr)) / 100))).toFixed(0);
+            blue = parseInt((minnus_yr + ((pos * (0 - minnus_yr)) / 100))).toFixed(0);
+            clr = 'rgb(' + 255 + ',' + green + ',' + blue + ')';
+            console.log(clr);
+            if (val < -3000) {
+                $(this).css({
+                    backgroundColor: clr,
+                    color: 'white',
+                    fontWeight: 'bold'
+                });
+            } else {
+                $(this).css({
+                    backgroundColor: clr
+                });
+            }
+        }
+    });
+    $('.heatmap td:nth-child(12)').each(function() {
+        var val = parseInt($(this).text());
+        console.log(val);
+        if (val > 0) {
+            var pos = parseInt((Math.round((val / plus_max) * 100)).toFixed(0));
+            red = parseInt((xr + ((pos * (plus_yr - xr)) / (n - 1))).toFixed(0));
+            green = parseInt((xg + ((pos * (plus_yg - xg)) / (n - 1))).toFixed(0));
+            blue = parseInt((xb + ((pos * (plus_yb - xb)) / (n - 1))).toFixed(0));
+            clr = 'rgb(' + red + ',' + green + ',' + blue + ')';
+            if (val > 3000) {
+                $(this).css({
+                    backgroundColor: clr,
+                    color: 'white',
+                    fontWeight: 'bold'
+                });
+            } else {
+                $(this).css({
+                    backgroundColor: clr
+                });
+            }
+        } else {
+            var pos = parseInt((val / minus_max) * 100).toFixed(0);
+            green = parseInt((minnus_yr + ((pos * (0 - minnus_yr)) / 100))).toFixed(0);
+            blue = parseInt((minnus_yr + ((pos * (0 - minnus_yr)) / 100))).toFixed(0);
+            clr = 'rgb(' + 255 + ',' + green + ',' + blue + ')';
+            console.log(clr);
+            if (val < -3000) {
+                $(this).css({
+                    backgroundColor: clr,
+                    color: 'white',
+                    fontWeight: 'bold'
+                });
+            } else {
+                $(this).css({
+                    backgroundColor: clr
+                });
+            }
+        }
+    });
+    $('.heatmap td:nth-child(15)').each(function() {
+        var val = parseInt($(this).text());
+        console.log(val);
+        if (val > 0) {
+            var pos = parseInt((Math.round((val / plus_max) * 100)).toFixed(0));
+            red = parseInt((xr + ((pos * (plus_yr - xr)) / (n - 1))).toFixed(0));
+            green = parseInt((xg + ((pos * (plus_yg - xg)) / (n - 1))).toFixed(0));
+            blue = parseInt((xb + ((pos * (plus_yb - xb)) / (n - 1))).toFixed(0));
+            clr = 'rgb(' + red + ',' + green + ',' + blue + ')';
+            if (val > 3000) {
+                $(this).css({
+                    backgroundColor: clr,
+                    color: 'white',
+                    fontWeight: 'bold'
+                });
+            } else {
+                $(this).css({
+                    backgroundColor: clr
+                });
+            }
+        } else {
+            var pos = parseInt((val / minus_max) * 100).toFixed(0);
+            green = parseInt((minnus_yr + ((pos * (0 - minnus_yr)) / 100))).toFixed(0);
+            blue = parseInt((minnus_yr + ((pos * (0 - minnus_yr)) / 100))).toFixed(0);
+            clr = 'rgb(' + 255 + ',' + green + ',' + blue + ')';
+            console.log(clr);
+            if (val < -3000) {
+                $(this).css({
+                    backgroundColor: clr,
+                    color: 'white',
+                    fontWeight: 'bold'
+                });
+            } else {
+                $(this).css({
+                    backgroundColor: clr
+                });
+            }
+        }
+    });
+    xr = 255;
+    xg = 255;
+    xb = 255;
+
+    yr = 0;
+    yg = 0;
+    yb = 255;
+
+    $('.heatmap td:nth-child(2)').each(function() {
+        var val = parseInt($(this).text());
+        console.log(val);
+        var max = 8000;
+        var pos = parseInt((Math.round((val / max) * 100)).toFixed(0));
+        red = parseInt((xr + ((pos * (yr - xr)) / (n - 1))).toFixed(0));
+        green = parseInt((xg + ((pos * (yg - xg)) / (n - 1))).toFixed(0));
+        blue = parseInt((xb + ((pos * (yb - xb)) / (n - 1))).toFixed(0));
+        clr = 'rgb(' + red + ',' + green + ',' + blue + ')';
+        if (val > 6000) {
+            $(this).css({
+                backgroundColor: clr,
+                color: 'white',
+                fontWeight: 'bold'
+            });
+        } else {
+            $(this).css({
+                backgroundColor: clr
+            });
+        }
+    });
+    $('.heatmap td:nth-child(5)').each(function() {
+        var val = parseInt($(this).text());
+        console.log(val);
+        var max = 10000;
+        var pos = parseInt((Math.round((val / max) * 100)).toFixed(0));
+        red = parseInt((xr + ((pos * (yr - xr)) / (n - 1))).toFixed(0));
+        green = parseInt((xg + ((pos * (yg - xg)) / (n - 1))).toFixed(0));
+        blue = parseInt((xb + ((pos * (yb - xb)) / (n - 1))).toFixed(0));
+        clr = 'rgb(' + red + ',' + green + ',' + blue + ')';
+        if (val > 6000) {
+            $(this).css({
+                backgroundColor: clr,
+                color: 'white',
+                fontWeight: 'bold'
+            });
+        } else {
+            $(this).css({
+                backgroundColor: clr
+            });
+        }
+    });
+    $('.heatmap td:nth-child(8)').each(function() {
+        var val = parseInt($(this).text());
+        console.log(val);
+        var max = 8000;
+        var pos = parseInt((Math.round((val / max) * 100)).toFixed(0));
+        red = parseInt((xr + ((pos * (yr - xr)) / (n - 1))).toFixed(0));
+        green = parseInt((xg + ((pos * (yg - xg)) / (n - 1))).toFixed(0));
+        blue = parseInt((xb + ((pos * (yb - xb)) / (n - 1))).toFixed(0));
+        clr = 'rgb(' + red + ',' + green + ',' + blue + ')';
+        if (val > 6000) {
+            $(this).css({
+                backgroundColor: clr,
+                color: 'white',
+                fontWeight: 'bold'
+            });
+        } else {
+            $(this).css({
+                backgroundColor: clr
+            });
+        }
+    });
+    $('.heatmap td:nth-child(11)').each(function() {
+        var val = parseInt($(this).text());
+        console.log(val);
+        var max = 8000;
+        var pos = parseInt((Math.round((val / max) * 100)).toFixed(0));
+        red = parseInt((xr + ((pos * (yr - xr)) / (n - 1))).toFixed(0));
+        green = parseInt((xg + ((pos * (yg - xg)) / (n - 1))).toFixed(0));
+        blue = parseInt((xb + ((pos * (yb - xb)) / (n - 1))).toFixed(0));
+        clr = 'rgb(' + red + ',' + green + ',' + blue + ')';
+        if (val > 6000) {
+            $(this).css({
+                backgroundColor: clr,
+                color: 'white',
+                fontWeight: 'bold'
+            });
+        } else {
+            $(this).css({
+                backgroundColor: clr
+            });
+        }
+    });
+    $('.heatmap td:nth-child(14)').each(function() {
+        var val = parseInt($(this).text());
+        console.log(val);
+        var max = 8000;
+        var pos = parseInt((Math.round((val / max) * 100)).toFixed(0));
+        red = parseInt((xr + ((pos * (yr - xr)) / (n - 1))).toFixed(0));
+        green = parseInt((xg + ((pos * (yg - xg)) / (n - 1))).toFixed(0));
+        blue = parseInt((xb + ((pos * (yb - xb)) / (n - 1))).toFixed(0));
+        clr = 'rgb(' + red + ',' + green + ',' + blue + ')';
+        if (val > 6000) {
+            $(this).css({
+                backgroundColor: clr,
+                color: 'white',
+                fontWeight: 'bold'
+            });
+        } else {
+            $(this).css({
+                backgroundColor: clr
+            });
+        }
+    });
+});
+</script>
+{% endblock %}
+

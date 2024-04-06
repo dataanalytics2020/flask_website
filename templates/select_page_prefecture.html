@@ -20,6 +20,53 @@
     <div class="row justify-content-center">
         <div class="col-lg-8 text-center">
             <h2 class="heading-17">
+                <span>00</span>
+                打ちたい機種から探す(画像は人気機種一覧)
+            </h2>
+            <ul class="slider">
+                <div><a href="/tomorrow_recommend/machine/select?target_machine_id=257&target_prefecture={{data.pref_name_en}}" ><img src="../static/img/content_image/257.jpg" ></a></div>
+                <div><a href="/tomorrow_recommend/machine/select?target_machine_id=191&target_prefecture={{data.pref_name_en}}" ><img src="../static/img/content_image/191.jpg" ></a></div>
+                <div><a href="/tomorrow_recommend/machine/select?target_machine_id=94&target_prefecture={{data.pref_name_en}}" ><img src="../static/img/content_image/94.jpg" ></a></div>
+                <div><a href="/tomorrow_recommend/machine/select?target_machine_id=43&target_prefecture={{data.pref_name_en}}" ><img src="../static/img/content_image/43.jpg" ></a></div>
+                <div><a href="/tomorrow_recommend/machine/select?target_machine_id=1&target_prefecture={{data.pref_name_en}}" ><img src="../static/img/content_image/1.jpg" ></a></div>
+                <div><a href="/tomorrow_recommend/machine/select?target_machine_id=253&target_prefecture={{data.pref_name_en}}" ><img src="../static/img/content_image/253.jpg" ></a></div>
+                <div><a href="/tomorrow_recommend/machine/select?target_machine_id=231&target_prefecture={{data.pref_name_en}}" ><img src="../static/img/content_image/231.jpg" ></a></div>
+                <div><a href="/tomorrow_recommend/machine/select?target_machine_id=221&target_prefecture={{data.pref_name_en}}" ><img src="../static/img/content_image/221.jpg" ></a></div>
+                <div><a href="/tomorrow_recommend/machine/select?target_machine_id=201&target_prefecture={{data.pref_name_en}}" ><img src="../static/img/content_image/201.jpg" ></a></div>
+                <div><a href="/tomorrow_recommend/machine/select?target_machine_id=136&target_prefecture={{data.pref_name_en}}" ><img src="../static/img/content_image/136.jpg" ></a></div>
+              </ul>
+            <div class="dots-2"></div>
+            <div class = '.table-wrap table-half'>
+                <table id="machine_table" class="table table-striped">
+                    <thead>
+                        <tr>
+                            {% for col in data.groupby_machine_name_count_df_column_names %}
+                            <th>
+                            {{ col | safe }}
+                            </th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in data.groupby_machine_name_count_df_row_data %}
+                        <tr>
+                            {% for col, row_ in zip(data.groupby_machine_name_count_df_column_names, row) %}
+                                {% if col == '機種画像' %}
+                                    <td><a href="/tomorrow_recommend/machine/select?target_machine_id={{ row_.split("_")[0] }}&target_prefecture={{data.pref_name_en}}" ><img class="table_image" src="../static/img/content_image/{{ row_.split("_")[0]  }}.jpg" alt="{{ row_.split('_')[1] }}" /></a></td>
+                                {% else %}
+                                    <td><a href="/tomorrow_recommend/machine/select?target_machine_id={{ row_.split("_")[0] }}&target_prefecture={{data.pref_name_en}}" >{{ row_.split("_")[1] }}</a></td>
+                                {% endif %}
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-lg-8 text-center">
+            <h2 class="heading-17">
                 <span>01</span>
                 行きたい日付からお勧め店舗を探す
             </h2>
@@ -106,11 +153,12 @@
     </div>
 </div>
 
-<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1/i18n/jquery.ui.datepicker-ja.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/themes/cupertino/jquery-ui.min.css">  <!-- テーマcupertinoを選択 -->\
 <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/>
+<script type="text/javascript" src="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
 
 {% endblock %}

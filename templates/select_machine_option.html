@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>{{data.pref_name_jp}} マップで見えるパチンコ・スロット取材予定</title>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class='row justify-content-center'>
+        <div class='col-lg-8 text-center'>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                  <li class="breadcrumb-item"><a href="/">HOME</a></li>
+                  <li class="breadcrumb-item active" aria-current="page"><a href="/prefecture/{{data.pref_name_en}}">{{data.pref_name_jp}}</a></li>
+                </ol>
+            </nav>
+            <h1>{{data.pref_name_jp}}のパチンコ・スロット取材予定</h1>
+            {% if data.error_message != '' %}
+              <div class="p-3 mb-2 bg-danger text-white">{{data.error_message|safe }}</div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-lg-8 text-center">
+            <div class="progressbar mt-3 mb-1 py-2">
+                <div class="item active">STEP.1<br>打ちたい機種を選択</div>
+                <div class="item">STEP.2<br>行きたい日付を選択</div>
+                <div class="item">STEP.3<br>詳細を選択</div>
+            </div>
+            <div class="d-grid gap-2 col-6 mx-auto">
+              <button class="btn btn-primary btn-lg my-3" type="button">選択中の都道府県:<br>{{data.pref_name_jp}}</button>
+            </div>
+            <p class="text-01 pt-3">選択中の機種</p>
+            <img src="/static/img/content_image/{{ data.target_machine_id   }}.jpg" alt="" width="90%" style="max-width:400px;"/>
+            <div class="progressbar mt-3 mb-1 py-2">
+                <div class="item">STEP.1<br>打ちたい機種を選択</div>
+                <div class="item active">STEP.2<br>行きたい日付を選択</div>
+                <div class="item">STEP.3<br>詳細を選択</div>
+            </div>
+            <form method="post" action="/result_machine_search">
+                <fieldset class="radio-003">
+                    {% for i , (p_text,name) in enumerate(data.date_dict.items()) %}
+                        <label>
+                            {% if i == 1 %}
+                            <input type="radio" name="target_day" value={{name}} checked/>
+                            {% else %}
+                            <input type="radio" name="target_day" value={{name}} />
+                            {% endif %}
+                            {{ p_text }}
+                        </label>
+                    {% endfor %}
+                </fieldset>
+            <div class="progressbar mt-3 mb-1 py-2">
+                <div class="item">STEP.1<br>打ちたい機種を選択</div>
+                <div class="item">STEP.2<br>行きたい日付を選択</div>
+                <div class="item active ">STEP.3<br>詳細を選択</div>
+            </div>
+
+            <div class="d-grid gap-2 col-10 mx-auto">
+              <!--8.レンジスライダーの設定-->
+              <button class="btn btn-outline-primary btn-sm" type="button">最低設置台数:</button>
+              <details class="qa-001 my-2">
+                <summary>最低設置台数とは？</summary>
+                <p>最低設置台数を選べます。台数が多い機種は最低5台以上などがお勧めです。</p>
+              </details>
+              <div class="spinner-container">
+                  <span class="spinner-sub disabled">
+                  <p class="spinner-p">-</p>
+                  </span>
+                  <input class="spinner" name="target_machine_number" id="spinner_number" type="number" min="1" max="30" value="3" onclick="change_spinner_number()">
+                  <span class="spinner-add">
+                  <p class="spinner-p1">+</p>
+                  </span>
+              </div>
+              <button class="btn btn-outline-primary btn-sm mt-3" type="button">日別最低平均差枚:</button>
+              <details class="qa-001 my-2">
+                <summary>日別最低平均差枚とは？</summary>
+                <p>店舗別日別の最低平均抽出差枚を選べます。<br>デフォルトは日別で高配分目安の-100枚以上ですが過疎地域や等価地域などでうまく出ない場合は抽出平均差枚をもう少し下げてから再検索をお勧めします。<br>2000枚以上等で検索すると前回のNの日の全台系なども探せます。</p>
+              </details>
+              <div class="spinner-container">
+                  <span class="spinner-ave-diffcoins-sub disabled">
+                  <p class="spinner-p">-</p>
+                  </span>
+                  <input class="spinner-ave" name="spinner_ave_diffcoins_number" id="spinner_ave_diffcoins_number" type="number" min="-500" max="2000" value="-100" onclick="change_spinner_ave_diff_conis()">
+                  <span class="spinner-ave-diffcoins-add">
+                  <p class="spinner-p1">+</p>
+                  </span>
+              </div>
+            </div>
+            <!-- formメソッドを使って検索するボタンを設置 -->
+                <input type="hidden" name="pref_name_en" value="{{data.pref_name_en}}">
+                <input type="hidden" name="pref_name" value="{{data.pref_name_jp}}">
+                <input type="hidden" name="target_machine_id" value="{{data.target_machine_id}}">
+                <button class="btn btn-primary btn-lg my-3" id="search_btn">この条件で検索する</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1/i18n/jquery.ui.datepicker-ja.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/themes/cupertino/jquery-ui.min.css">  <!-- テーマcupertinoを選択 -->
+<script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/>
+<script type="text/javascript" src="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
+
+<script>
+    $(function () {
+      $('.spinner').each(function change_spinner_number() {
+        var el  = $(this);
+        var add = $('.spinner-add');
+        var sub = $('.spinner-sub');
+        var spinner_number = document.getElementById('spinner_number');
+    
+        // substract
+        el.parent().on('click', '.spinner-sub', function() {
+          if (el.val() > parseInt(el.attr('min'))) {
+            el.val(function(i, oldval) {
+              spinner_number.value = parseInt(oldval) - 1;
+              //console.log(spinner_number.value);
+              return --oldval;
+            });
+          }
+          // disabled
+          if (el.val() == parseInt(el.attr('min'))) {
+            el.prev(sub).addClass('disabled');
+          }
+          if (el.val() < parseInt(el.attr('max'))) {
+            el.next(add).removeClass('disabled');
+          }
+        });
+    
+        // increment
+        el.parent().on('click', '.spinner-add', function() {
+          if (el.val() < parseInt(el.attr('max'))) {
+            el.val(function(i, oldval) {
+              spinner_number.value = parseInt(oldval) + 1;
+              //console.log(spinner_number.value);
+              return ++oldval;
+            });
+          }
+          // disabled
+          if (el.val() > parseInt(el.attr('min'))) {
+            el.prev(sub).removeClass('disabled');
+          }
+          if (el.val() == parseInt(el.attr('max'))) {
+            el.next(add).addClass('disabled');
+          }
+        });
+      });
+    });
+
+    $(function () {
+      $('.spinner-ave').each(function change_spinner_ave_diff_conis() {
+        var el  = $(this);
+        var add = $('.spinner-ave-diffcoins-add');
+        var sub = $('.spinner-ave-diffcoins-sub');
+        var spinner_number = document.getElementById('spinner_ave_diffcoins_number');
+    
+        // substract
+        el.parent().on('click', '.spinner-ave-diffcoins-sub', function() {
+          if (el.val() > parseInt(el.attr('min'))) {
+            el.val(function(i, oldval) {
+              spinner_number.value = parseInt(oldval) - 100;
+              //console.log(spinner_number.value);
+              return parseInt(oldval) - 100 ;
+            });
+          }
+          // disabled
+          if (el.val() == parseInt(el.attr('min'))) {
+            el.prev(sub).addClass('disabled');
+          }
+          if (el.val() < parseInt(el.attr('max'))) {
+            el.next(add).removeClass('disabled');
+          }
+        });
+    
+        // increment
+        el.parent().on('click', '.spinner-ave-diffcoins-add', function() {
+          if (el.val() < parseInt(el.attr('max'))) {
+            el.val(function(i, oldval) {
+              spinner_number.value = parseInt(oldval) + 100;
+              //console.log(spinner_number.value);
+              return parseInt(oldval) + 100;
+            });
+          }
+          // disabled
+          if (el.val() > parseInt(el.attr('min'))) {
+            el.prev(sub).removeClass('disabled');
+          }
+          if (el.val() == parseInt(el.attr('max'))) {
+            el.next(add).addClass('disabled');
+          }
+        });
+      });
+    });
+</script>
+{% endblock %}
+

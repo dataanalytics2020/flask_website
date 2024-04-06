@@ -217,6 +217,31 @@ $(document).ready(function(){
         // 初期表示の並び替えなし
         order: []
     });
+    $("#machine_table").DataTable({
+        "language":{url:"https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json",},
+            // 件数切替機能 無効
+        lengthChange: true,
+        // 検索機能 無効
+        searching: true,
+        // ソート機能 無効
+        ordering: true,
+        // 情報表示 無効
+        info: true,
+        // ページング機能 無効
+        paging: true,
+        // ページングの件数切替機能 無効
+        pagingType: "full_numbers",
+        // ページングの件数切替機能 無効
+        lengthMenu: [ 5, 10, 30, 50,100 ],
+        // ページングの件数切替機能 無効
+        pageLength: 10,
+
+        //列の幅を調整する
+        autoWidth: true,
+        
+        // 初期表示の並び替えなし
+        order: []
+    });
     $("#past_hall_table").DataTable({
         "language":{url:"https://cdn.datatables.net/plug-ins/1.11.5/i18n/ja.json",},
             // 件数切替機能 無効
@@ -262,3 +287,31 @@ $(function() {
         });
 });
 
+$('.slider').slick({
+    autoplay: true,//自動的に動き出すか。初期値はfalse。
+    infinite: true,//スライドをループさせるかどうか。初期値はtrue。
+    slidesToShow: 3,//スライドを画面に3枚見せる
+    slidesToScroll: 3,//1回のスクロールで3枚の写真を移動して見せる
+    prevArrow: '<div class="slick-prev"></div>',//矢印部分PreviewのHTMLを変更
+    nextArrow: '<div class="slick-next"></div>',//矢印部分NextのHTMLを変更
+    dots: true,//下部ドットナビゲーションの表示
+    responsive: [
+      {
+      breakpoint: 769,//モニターの横幅が769px以下の見せ方
+      settings: {
+        slidesToShow: 3,//スライドを画面に2枚見せる
+        slidesToScroll: 3,//1回のスクロールで2枚の写真を移動して見せる
+      }
+    },
+    {
+      breakpoint: 480,//モニターの横幅が480px以下の見せ方
+      settings: {
+        slidesToShow: 2,//スライドを画面に1枚見せる
+        slidesToScroll: 2,//1回のスクロールで1枚の写真を移動して見せる
+      }
+    }
+  ]
+  });
+
+
+  
