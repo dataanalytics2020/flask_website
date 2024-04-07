@@ -774,7 +774,7 @@ def get_top():
     except:
         past_diffconis_df_last_row_day_num = 'NONE'
     compare_date:str = tomorrow.strftime('%Y-%m-%d')#-%d
-    compare_day_number = int(tomorrow.strftime('%d'))
+    compare_day_number = tomorrow.strftime('%d')
     if past_diffconis_df_last_row_day_num == int(compare_day_number):
         print('今日のデータは取得済み'+past_diffconis_df_last_row_day_num+"と"+compare_day_number)
         post_line('今日のデータは取得済み'+past_diffconis_df_last_row_day_num+"と"+compare_day_number)
