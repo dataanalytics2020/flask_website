@@ -769,18 +769,18 @@ def get_top():
     report_df = pd.read_csv('csv/kanto_top_location_df.csv', parse_dates=['イベント日'])
     past_diffconis_df = pd.read_csv('csv/tokyo_past_diffconis_df.csv')
     try:
-        past_diffconis_df_last_row_day_num = int(str(past_diffconis_df["日付"].values[-1]).split('(')[0].split('/')[1])
+        past_diffconis_df_last_row_day_num = int(str(past_diffconis_df["日付"].values[0]).split('(')[0].split('/')[1])
         print(past_diffconis_df_last_row_day_num)
     except:
         past_diffconis_df_last_row_day_num = 'NONE'
     compare_date:str = tomorrow.strftime('%Y-%m-%d')#-%d
-    compare_day_number = tomorrow.strftime('%d')
+    compare_day_number = int(tomorrow.strftime('%d'))
     if past_diffconis_df_last_row_day_num == int(compare_day_number):
-        print('今日のデータは取得済み'+past_diffconis_df_last_row_day_num+"と"+compare_date)
-        post_line('今日のデータは取得済み'+past_diffconis_df_last_row_day_num+"と"+compare_date)
+        print('今日のデータは取得済み'+past_diffconis_df_last_row_day_num+"と"+compare_day_number)
+        post_line('今日のデータは取得済み'+past_diffconis_df_last_row_day_num+"と"+compare_day_number)
         post_line('report_df' + str(past_diffconis_df_last_row_day_num))
     else:
-        post_line('今日のデータは未取得'+str(past_diffconis_df_last_row_day_num)+"と"+compare_date)
+        post_line('今日のデータは未取得'+str(past_diffconis_df_last_row_day_num)+"と"+compare_day_number)
         area_sql_text = get_area_sql_text('minamikantou')
         cursor = get_driver()
         sql = f'''SELECT イベント日,都道府県,店舗名,取材名,取材ランク,媒体名,latitude,longitude
@@ -2202,6 +2202,8 @@ def default_select_page_machine(error_message=False,target_machine_id=None,pref_
     prefecture_df = pd.read_csv('csv/pref_lat_lon.csv')
     req = request.args
     error_message = req.get("error_message")
+    prefecture_name_en_and_name_dict = dict(zip(prefecture_df['pref_name_en'],prefecture_df['pref_name']))
+    data['prefecture_id_and_name_dict'] = prefecture_name_en_and_name_dict
     print('error_message',error_message,type(error_message))
     if error_message == 'True':
         data['error_message'] = '検索条件に一致するデータが見つかりませんでした。<br> 新台の場合は検索が速すぎるか人気機種出ない場合は選択台数が多すぎる可能性が高いです。<br> 人気機種でも地域によっては平均差枚の条件が厳しすぎる場合もあるので<br> 条件を緩めるなどもう一度検索条件を変更してください。'
