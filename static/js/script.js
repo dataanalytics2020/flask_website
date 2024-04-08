@@ -74,6 +74,7 @@ $(function(){
             $('[name="pref_name_en"]').val(id);
             prefReset();
             }
+            
             else {
                 console.log('else');
                 window.location.href = url + 'prefecture/' + id;
@@ -287,6 +288,19 @@ $(function() {
         });
 });
 
+$(function(){
+    //クリックで動く
+    $('.nav-open').click(function(){
+        $(this).toggleClass('active');
+        $(this).next('nav2').slideToggle();
+    });
+    //ホバーで動く
+    // $('.nav-open').hover(function(){
+    //     $(this).toggleClass('active');
+    //     $(this).next('nav').slideToggle();
+    // });
+});
+
 $('.slider').slick({
     autoplay: true,//自動的に動き出すか。初期値はfalse。
     infinite: true,//スライドをループさせるかどうか。初期値はtrue。
@@ -314,4 +328,3 @@ $('.slider').slick({
   });
 
 
-  

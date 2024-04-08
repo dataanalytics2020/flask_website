@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block head %}
-<title>{{data.syuzai_name}} 公約 マップで見えるパチンコ・スロット取材予定</title>
+<title>{{data.syuzai_name}} 公約</title>
 {% endblock %}
 {% block content %}
 <div class="container">
@@ -14,8 +14,14 @@
                 </ol>
             </nav>
             <div class="mx-auto">
-                <h1 class="fw-light">{{data.syuzai_name}} </h1>
+                <h1 class="fw-light">{{data.syuzai_name }} </h1>
+                {% if data.media_name == '' %}
+                <div class="box-004">
+                    <p>データが存在しません。下のお探しの地域が違う場合はこちらか<br><a href="/prefecture/{{data.pref_name_en}}">{{data.pref_name_jp}}エリアから探す</a>から検索しなおしてください。</p>
+                </div>
+                {% else %}
                 <h2 class="heading-28">{{data.media_name}}</h2>
+                {% endif %}
                 {% if data.pledge_text == '未調査' %}
                 <div class="box-013 my-2">
                     <span>公約不明</span>
@@ -24,7 +30,7 @@
                 {% else %}
                 <div class="box-013 my-2">
                     <span>公約</span>
-                    <p>{{data.pledge_text}}</p>
+                    <p>{{data.pledge_text | safe }}</p>
                 </div>
                 <div class="box-004">
                     <p>公約内容が違う場合、薄い場合等は<a href="https://twitter.com/slo_map">XのDM</a>もしくは<a href="/form">お問い合わせ</a>からご報告いただけますと新機能の開発がその分早く進みますのでご協力よろしくお願いします。</p>
@@ -34,6 +40,18 @@
             <iframe class="embed-responsive-item" scrolling="no" height="450" width="100%" src={{ data.iframe|safe }}</iframe>
             <div class = 'heatmap .table-wrap'>
                 <div class="scroll_area" style="width:100%;max-width:2000px;overflow-x:scroll;">
+                    <!-- トリガーの部分 -->
+                    <p class="nav-open my-2">お探しの地域が違う場合はこちら</p>
+                    <nav2>
+                        <li><a href="/tomorrow_recommend/hokkaidoutouhoku/syuzai/{{data.syuzai_name}}">北海道・東北</a></li>
+                        <li><a href="/tomorrow_recommend/hokurikukoushinetsu/syuzai/{{data.syuzai_name}}">北陸・甲信越</a></li>
+                        <li><a href="/tomorrow_recommend/kitakantou/syuzai/{{data.syuzai_name}}">北関東</a></li>
+                        <li><a href="/tomorrow_recommend/minamikantou/syuzai/{{data.syuzai_name}}">南関東</a></li>
+                        <li><a href="/tomorrow_recommend/toukai/syuzai/{{data.syuzai_name}}">東海</a></li>
+                        <li><a href="/tomorrow_recommend/kansai/syuzai/{{data.syuzai_name}}">関西</a></li>
+                        <li><a href="/tomorrow_recommend/chugokushikoku/syuzai/{{data.syuzai_name}}">中国・四国</a></li>
+                        <li><a href="/tomorrow_recommend/kyushu/syuzai/{{data.syuzai_name}}">九州・沖縄</a></li>
+                    </nav2>
                     <h4 class="my-2">取材予定(※直近一週間分表示中)</h4>
                     <table id="hall_table" class="table table-striped">
                         <thead>

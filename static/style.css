@@ -1756,7 +1756,7 @@ text-align: center; /* 内容は中央配置 */
 .heading-28 {
   color: #333333;
   font-weight: 400;
-  font-size: 1rem;
+  font-size: xx-large;
   letter-spacing: .04em;
   text-align: center;
 }
@@ -2137,3 +2137,24 @@ text-align: center; /* 内容は中央配置 */
 	content: '.';
 }
 .clearfix { zoom: 1; }
+
+
+.nav-open{
+	padding: 15px;
+	color: #fff;
+	font-size: 20px;
+	background: #2073c8;
+	position: relative;
+}
+
+nav2{
+  display: none;
+}
+.nav-open::before{/* 閉じている時 */
+	content: "＋";
+	position: absolute;
+	right: 20px;
+}
+.nav-open.active::before{/* 開いている時 */
+	content: "－";
+}
