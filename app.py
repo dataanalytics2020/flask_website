@@ -776,8 +776,8 @@ def get_top():
     compare_date:str = tomorrow.strftime('%Y-%m-%d')#-%d
     compare_day_number = tomorrow.strftime('%d')
     if past_diffconis_df_last_row_day_num == int(compare_day_number):
-        print('今日のデータは取得済み'+past_diffconis_df_last_row_day_num+"と"+compare_day_number)
-        post_line('今日のデータは取得済み'+past_diffconis_df_last_row_day_num+"と"+compare_day_number)
+        print('今日のデータは取得済み'+str(past_diffconis_df_last_row_day_num)+"と"+ compare_day_number)
+        post_line('今日のデータは取得済み'+str(past_diffconis_df_last_row_day_num)+"と"+ compare_day_number)
         post_line('report_df' + str(past_diffconis_df_last_row_day_num))
     else:
         post_line('今日のデータは未取得'+str(past_diffconis_df_last_row_day_num)+"と"+compare_day_number)
