@@ -169,7 +169,7 @@ def create_post_map_iframe(location_name_df,groupby_date_kisyubetu_df):
             popup_df = extract_syuzai_df_1[['日付','差枚合計','平均差枚','平均G数','勝率']]
             #popup_df['イベント日'] = popup_df['イベント日'].apply(convert_sql_date_to_jp_date_and_weekday) 
             popup_df =   popup_df.to_html(escape=False,index=False,justify='center',classes='table table-striped table-hover table-sm')
-            popup_df += f'<a href="#{tenpo_name}" target="_parent"> {tenpo_name} ※店舗詳細データに飛びます</a>'
+            popup_df += f'<a href="#{tenpo_name}" target="_parent"> {tenpo_name} ※店舗詳細データに飛びます7</a>'
             popup_data = folium.Popup(popup_df,  max_width=1500,show=False,size=(700, 300))
             folium.Marker(location=[latitude ,longitude],
                 tiles='https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png',
@@ -748,7 +748,7 @@ area_str_list = ['hokkaidoutouhoku', 'kitakantou','minamikantou','hokurikukoushi
 def get_top():
     data = {}
     data['prefecture_list'] = prefecture_list
-    
+
     print('today',today)
     jp_str_day_list = []
     for i in range(0,7):
@@ -1759,7 +1759,7 @@ def tomorrow_recommend_area_syuzai_syuzainame(pref_name_en,syuzai_name):
     table_df['イベント日'] = table_df['イベント日'].map(convert_sql_date_to_jp_date_and_weekday)
     table_df.rename(columns={'イベント日':'日'},inplace=True)
     table_df.drop_duplicates(keep='first',inplace=True)
-    data['iframe'] = create_syuzai_map_iframe(extract_syuzai_name_df,pref_name_jp)
+    data['iframe'] = create_syuzai_map_iframe(extract_syuzai_name_df,pref_name_en)
     data['extract_syuzai_name_df'] = table_df
     data['extract_syuzai_name_df_column_names'] = table_df.columns.values
     data['extract_syuzai_name_df_row_data'] = list(table_df.values.tolist())
@@ -1984,8 +1984,8 @@ def tomorrow_recommend_area_post(pref_name_en):
     data['pref_id'] = prefecture_id  = prefecture_df[prefecture_df['pref_name'] == '沖縄県'].index[0]
     data['pref_name_en'] = pref_name_en = prefecture_df.iloc[int(data['pref_id'])-1]['pref_name_en']
     data['pref_name_jp'] = pref_name_jp = prefecture_df.iloc[int(data['pref_id'])-1]['pref_name']
-    data['area_name_jp'] = prefecture_df.iloc[int(data['pref_id'])-1]['area_name_jp']
-    data['area_name_en'] = prefecture_df.iloc[int(data['pref_id'])-1]['area_name_en']
+    data['area_name_jp'] = area_name_jp = prefecture_df.iloc[int(data['pref_id'])-1]['area_name_jp']
+    data['area_name_en'] = area_name_en = prefecture_df.iloc[int(data['pref_id'])-1]['area_name_en']
     data = request.form
     print('dataは',data)
     print('form.inputdate.data',form.inputdate.data)
@@ -1994,10 +1994,9 @@ def tomorrow_recommend_area_post(pref_name_en):
     print('target_date',target_date)
     data = {}
     data['target_date_jp'] = target_date_jp
-    data['area_name'] = area_name
     data['target_date'] = target_date
-    data['area_name_jp'] = area_name_and_str_jp_area_name_dict[area_name]
-    area_sql_text = get_area_sql_text(area_name)
+    data['area_name_jp'] = area_name_and_str_jp_area_name_dict[area_name_jp]
+    area_sql_text = get_area_sql_text(area_name_jp)
     cursor = get_driver()
     #首都圏のイベントの媒体別の予約数を集計
     cursor.execute(f'''SELECT *
@@ -2016,7 +2015,7 @@ def tomorrow_recommend_area_post(pref_name_en):
     table_df = extract_target_date_df[['都道府県','店舗名','媒体名','取材名']]
     table_df.sort_values(['都道府県','店舗名','媒体名','取材名'],ascending=[True,True,True,True],inplace=True)
     table_df.drop_duplicates(keep='first',inplace=True)
-    data['iframe'] = create_syuzai_map_iframe(extract_target_date_df,area_name)
+    data['iframe'] = create_syuzai_map_iframe(extract_target_date_df,area_name_en)
     data['extract_target_date_df'] = table_df
     data['extract_target_date_df_column_names'] = table_df.columns.values
     data['extract_target_date_df_row_data'] = list(table_df.values.tolist())
