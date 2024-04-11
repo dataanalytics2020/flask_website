@@ -29,6 +29,7 @@ import sshtunnel
 from sshtunnel import SSHTunnelForwarder
 import datetime
 import psycopg2
+import psycopg2.extras as extras
 from folium import plugins
 import branca
 import sympy
@@ -1711,6 +1712,25 @@ def tomorrow_recommend_area_syuzai_syuzainame(pref_name_en,syuzai_name):
     extract_syuzai_name_df = pd.DataFrame(cursor.fetchall(),columns=cols)
     print('extract_syuzai_name_df',extract_syuzai_name_df,extract_syuzai_name_df.shape)
     extract_syuzai_name_df.drop_duplicates(keep='first',inplace=True)
+    try:
+        media_name = extract_syuzai_name_df.iloc[0]['媒体名']
+    except:
+        media_name = ""
+    if extract_syuzai_name_df.iloc[0]['pledge_text'] == None:
+        columns = ['syuzai_name','media_name','pledge_text','created_at','update_at','rank','no_pledge_visit_count']
+        record = (syuzai_name,media_name,'',datetime.datetime.now(),datetime.datetime.now(),'・',0)
+        insert_df = pd.DataFrame([record],columns=columns)
+        sql = str(tuple(insert_df.columns)).replace("'","") + 'values %s'
+        #print(sql)
+        tuples = [tuple(x) for x in insert_df.to_numpy()]
+        print(tuples)
+        #print(insert_df.values.tolist())
+        insert_sql = f"""INSERT INTO pledge {sql} """
+        print(insert_sql)
+        extras.execute_values(cursor,insert_sql , tuples)
+        conn.commit()
+        cursor.close()
+        post_line(f'取材を登録しました。{str(tuples)}')
     future_extract_syuzai_name_df = extract_syuzai_name_df[extract_syuzai_name_df['イベント日'] >= datetime.date.today() ]
     past_extract_syuzai_name_df = extract_syuzai_name_df[extract_syuzai_name_df['イベント日'] < datetime.date.today()  ]
     try:
