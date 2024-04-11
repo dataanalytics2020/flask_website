@@ -1730,7 +1730,7 @@ def tomorrow_recommend_area_syuzai_syuzainame(pref_name_en,syuzai_name):
         extras.execute_values(cursor,insert_sql , tuples)
         conn.commit()
         cursor.close()
-        post_line(f'取材を登録しました。{str(tuples)}')
+        #post_line(f'取材を登録しました。{str(tuples)}')
     future_extract_syuzai_name_df = extract_syuzai_name_df[extract_syuzai_name_df['イベント日'] >= datetime.date.today() ]
     past_extract_syuzai_name_df = extract_syuzai_name_df[extract_syuzai_name_df['イベント日'] < datetime.date.today()  ]
     try:
