@@ -1779,7 +1779,9 @@ text-align: center; /* 内容は中央配置 */
   border-radius: 5px;
   background-color: #ffe9ad;
   color: #000000;
-  font-size: 13px;
+  font-size: 12px;
+  width: 95%;
+  justify-content:center;
 }
 
 .box-004::before {
@@ -1817,6 +1819,7 @@ text-align: center; /* 内容は中央配置 */
 .box-011 p {
   margin: 0;
   color: #333;
+  font-weight: bold;
 }
 
 .box-013 {

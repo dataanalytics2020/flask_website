@@ -24,21 +24,21 @@
                 {% endif %}
                 {% if data.pledge_text == '未調査' %}
                 <div class="box-013 my-2">
-                    <span>公約不明</span>
-                    <p>公約未調査になります。<br>もしご存じの方いましたら<a href="https://twitter.com/slo_map">XのDM</a>もしくは<a href="/form">お問い合わせ</a>からご報告いただけますと新機能の開発がその分早く進みますのでご協力よろしくお願いします。</p>
+                    <span>傾向不明</span>
+                    <p>傾向未調査になります。<br>もしご存じの方いましたら<a href="https://twitter.com/slo_map">XのDM</a>もしくは<a href="/form">お問い合わせ</a>からご報告いただけますと新機能の開発がその分早く進みますのでご協力よろしくお願いします。</p>
                 </div>
                 {% elif data.media_name == 'DMMぱちタウン' %}
                 <div class="box-013 my-2">
-                    <span>公約不明</span>
-                    <p>公約未調査になります。<br>もしご存じの方いましたら<a href="https://twitter.com/slo_map">XのDM</a>もしくは<a href="/form">お問い合わせ</a>からご報告いただけますと新機能の開発がその分早く進みますのでご協力よろしくお願いします。</p>
+                    <span>傾向不明</span>
+                    <p>傾向未調査になります。<br>もしご存じの方いましたら<a href="https://twitter.com/slo_map">XのDM</a>もしくは<a href="/form">お問い合わせ</a>からご報告いただけますと新機能の開発がその分早く進みますのでご協力よろしくお願いします。</p>
                 </div>
                 {% else %}
                 <div class="box-013 my-2">
-                    <span>公約</span>
+                    <span>傾向</span>
                     <p>{{data.pledge_text | safe }}</p>
                 </div>
-                <div class="box-004">
-                    <p>公約内容が違う場合、薄い場合等は<a href="https://twitter.com/slo_map">XのDM</a>もしくは<a href="/form">お問い合わせ</a>からご報告いただけますと新機能の開発がその分早く進みますのでご協力よろしくお願いします。</p>
+                <div class="box-004 my-2">
+                    <p>媒体が掲げる公約は現在存在しません。<br>内容はあくまで管理人の独自の調査に基づいた推測です。<br>当サイトとイベント媒体との間に一切の関係性はありません。</p>
                 </div>
                 {% endif %}
             </div>
