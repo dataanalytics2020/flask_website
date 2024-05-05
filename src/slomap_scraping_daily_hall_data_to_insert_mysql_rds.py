@@ -360,9 +360,9 @@ for prefecture in prefecture_list[10:14]:#reversed([12:13]
                         res = requests.get(url)
                         soup = BeautifulSoup(res.text, 'html.parser')
                         try:
-                            hall_name = soup.title.text.split(' ')[1].replace('周年','').replace('年一','').rstrip(' ')
+                            hall_name = soup.title.text.split(' ')[1].replace('周年','').replace("'",'').replace('年一','').rstrip(' ')
                         except:
-                            hall_name = soup.title.text.replace('周年','').replace('年一','').rstrip(' ')
+                            hall_name = soup.title.text.replace('周年','').replace("'",'').replace('年一','').rstrip(' ')
                         table = soup.find(id = "all_data_table")
                         try:
                             dfs =pd.read_html(str(table))
@@ -381,7 +381,7 @@ for prefecture in prefecture_list[10:14]:#reversed([12:13]
                         for t in soup.h1.text.split(' ')[1:-1]:
                             hall_name_text += t 
 
-                        df['hall_name'] = hall_name_text.replace('周年','').replace('年一','').rstrip(' ')
+                        df['hall_name'] = hall_name_text.replace('周年','').replace("'",'').replace('年一','').rstrip(' ')
                         #print(tenpo_name)
 
                         df['prefecture'] = prefecture
