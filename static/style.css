@@ -562,12 +562,14 @@ vertical-align: top;
 background: #000;
 color: #fff;
 text-align: center;
-background-image: linear-gradient(to top,#cae6fa 0%,#1f48ea 100%);
+background-image: linear-gradient(to top,#cae6fa 0%,#1f48ea 100%)!important;
 }
 
 table td {
 padding: 10px;
-vertical-align: top;
+vertical-align: middle;
+text-align: center;
+
 }
 table tr:nth-child(even) {
 background: #e9fcfd;
