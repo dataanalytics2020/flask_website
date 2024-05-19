@@ -580,6 +580,10 @@ table > tr > th {
 	background-color: #419acd;
 }
 
+#machine_table th{
+  background: #419acd;
+}
+
 .scroll_area{
   width:600px;
   overflow-x:scroll;
