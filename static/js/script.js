@@ -21,8 +21,8 @@ $(window).on('load', function(){
   $('#js-loader').delay(300).fadeOut(400); //ローディング画面をフェードアウトさせることでメインコンテンツを表示
 });
 
-// ページのロードが終わらなくても20秒たったら強制的に処理を実行
-$(function(){ setTimeout('stopload()', 20000); });
+// ページのロードが終わらなくても1.2秒たったら強制的に処理を実行
+$(function(){ setTimeout('stopload()', 1200); });
 function stopload(){
   $('#js-loader').delay(300).fadeOut(400); //ローディング画面をフェードアウトさせることでメインコンテンツを表示
 }
