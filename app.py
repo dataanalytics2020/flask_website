@@ -736,8 +736,9 @@ if dev_flag == 'True':
     #開発環境
     dev_flag = True
 else:
+    print('本番環境')
     dev_flag = False
-    today = datetime.datetime.today() - relativedelta(hours=6)
+    today = datetime.datetime.today() - relativedelta(hours=-10)
     
 
 #都道府県テーブルの読み込み
@@ -2704,6 +2705,59 @@ def test():
         prefecture_id_and_name_dict[i] = prefecture_name
     data['prefecture_id_and_name_dict'] = prefecture_id_and_name_dict
     return render_template('post_test.html',data=data)
+
+@app.route("/data_test", methods=['GET','POST'])
+def data_test():
+    data = {}
+
+    data['target_date'] = request.form.get("target_date")
+    data['hall_id'] = request.form.get('hall_id')
+    data['hall_name'] = ''
+    scraping_url = f"https://sloreach.com/halls/414/hall_daily_results/2024-05-01"
+    print(scraping_url)
+    data['url'] = scraping_url
+    dfs = pd.read_html(scraping_url,encoding='utf-8')
+    grouping_status_df = dfs[0].rename(columns={0: '項目',1:'データ'})
+    data['grouping_status_df'] = grouping_status_df.to_html(index=False,
+                                                    classes=['table',
+                                                            'table-striped',
+                                                            'table-bordered'],
+                                                    justify='center', 
+                                                    table_id ='grouping_status',escape=False)
+    daily_status_df = dfs[1]
+    daily_status_df['差枚'] = daily_status_df['差枚'].map(lambda x:x.replace('+','').replace('枚',''))
+    daily_status_df['G数'] = daily_status_df['G数'].map(lambda x:x.replace('G','').replace(',',''))
+    daily_status_df['台番号'] = daily_status_df['台番号'].astype(str)
+    input_text_list = []
+    daily_status_df = daily_status_df[:30]
+    for machine_num in daily_status_df['台番号']:
+        input_text= f'''
+        <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+            <input type="radio" class="btn-check" value="0" name="btnradio_{machine_num}" id="btnradio_{machine_num}_0" autocomplete="off" checked>
+            <label class="btn btn-outline-primary m-1" for="btnradio_{machine_num}_0">×</label>
+            <input type="radio" class="btn-check" value="1" name="btnradio_{machine_num}" id="btnradio_{machine_num}_1" autocomplete="off">
+            <label class="btn btn-outline-primary m-1" for="btnradio_{machine_num}_1">1</label>
+            <input type="radio" class="btn-check" value="2" name="btnradio_{machine_num}" id="btnradio_{machine_num}_2" autocomplete="off">
+            <label class="btn btn-outline-primary m-1" for="btnradio_{machine_num}_2">2</label>
+            <input type="radio" class="btn-check" value="3" name="btnradio_{machine_num}" id="btnradio_{machine_num}_3" autocomplete="off">
+            <label class="btn btn-outline-primary m-1" for="btnradio_{machine_num}_3">3</label>
+            <input type="radio" class="btn-check" value="4" name="btnradio_{machine_num}" id="btnradio_{machine_num}_4" autocomplete="off">
+            <label class="btn btn-outline-primary m-1" for="btnradio_{machine_num}_4">4</label>
+        </div>'''.replace("\n","")
+        input_text_list.append(input_text)
+    daily_status_df['✅'] = input_text_list
+    #'<input type="checkbox" value="' + daily_status_df['台番号'] + '" name="checkbox">'
+    daily_status_df = daily_status_df[['✅','機種名', '台番号', 'G数', '差枚']]
+    daily_status_df['台番号'] = daily_status_df['台番号'].astype(int)
+    daily_status_df = daily_status_df.sort_values('台番号',ascending=True)
+    daily_status_df_html = daily_status_df.to_html(index=False,
+                                                    classes=['table',
+                                                            'table-striped',
+                                                            'table-bordered'],
+                                                    justify='center', 
+                                                    table_id ='daily_status_table',escape=False)
+    data['daily_status_df'] = daily_status_df_html
+    return render_template('test_post.html',data=data)
 
 @app.route("/test2", methods=['GET','POST'])
 def post_test():
