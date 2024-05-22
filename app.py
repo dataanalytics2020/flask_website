@@ -738,7 +738,7 @@ if dev_flag == 'True':
 else:
     print('本番環境')
     dev_flag = False
-    today = datetime.datetime.today() - relativedelta(hours=4)
+    today = datetime.datetime.today() - relativedelta(hours=3)
     
 
 #都道府県テーブルの読み込み
@@ -777,54 +777,50 @@ def get_top():
         past_diffconis_df_last_row_day_num = 'NONE'
     compare_date:str = tomorrow.strftime('%Y-%m-%d')#-%d
     compare_day_number = tomorrow.strftime('%d')
-    if past_diffconis_df_last_row_day_num == int(compare_day_number):
-        print('今日のデータは取得済み'+str(past_diffconis_df_last_row_day_num)+"と"+ compare_day_number)
-        post_line('今日のデータは取得済み'+str(past_diffconis_df_last_row_day_num)+"と"+ compare_day_number)
-        post_line('report_df' + str(past_diffconis_df_last_row_day_num))
-    else:
-        post_line('今日のデータは未取得'+str(past_diffconis_df_last_row_day_num)+"と"+compare_day_number)
-        area_sql_text = get_area_sql_text('minamikantou')
-        cursor = get_driver()
-        sql = f'''SELECT イベント日,都道府県,店舗名,取材名,取材ランク,媒体名,latitude,longitude
-                FROM schedule as schedule2
-                left join halldata as halldata2
-                on schedule2.店舗名 = halldata2.hall_name
-                WHERE イベント日 > current_date -1
-                AND イベント日 <= current_date + 1
-                AND 媒体名 != 'ホールナビ'
-                AND 取材名 LIKE '%{target_n_day_str}のつく日%'
-                AND 都道府県 = '東京都'
-                ORDER BY イベント日,都道府県,店舗名,媒体名,取材名 desc;'''#AND (取材ランク = 'S' OR 取材ランク = 'A')
-        print(sql)
-        cursor.execute(sql)
-        cols = [col[0] for col in cursor.description]
-        print('cols',cols)
-        report_df =  pd.DataFrame(cursor.fetchall(),columns = cols )
-        report_df = report_df.loc[:,~report_df.columns.duplicated()]
-        print(report_df)
-        sql_hall_name_text = ''
-        for hall_name_text in list(report_df['店舗名'].unique()):
-            sql_hall_name_text += f"'{hall_name_text}'" + ','
-        sql_hall_name_text = sql_hall_name_text.rstrip(',')
-        sql_date_text = get_sql_target_day_list_str(int(target_n_day_str))
-        print('sql_date_text',sql_date_text)
-        sql = f"""SELECT date,hall_name,sum_diffcoins,ave_diffcoins,ave_game,win_rate
-               FROM groupby_date_hall_diffcoins
-               WHERE date in {sql_date_text}
-               AND prefecture = '東京都' """
-        print('sql',sql)
-        cursor.execute(sql)
-        print("sql_hall_name_text",sql_hall_name_text)
-        cols = [col.name for col in cursor.description]
-        past_diffconis_df = pd.DataFrame(cursor.fetchall(),columns=cols)
-        past_diffconis_df['date'] = past_diffconis_df['date'].apply(convert_sql_date_to_jp_date_and_weekday)
-        past_diffconis_df.rename(columns={'date':'日付','hall_name':'店舗名','sum_diffcoins':'総差枚','ave_diffcoins':'平均差枚','ave_game':'平均G数','win_rate':'勝率'},inplace=True)
-        past_diffconis_df['平均差枚'] = past_diffconis_df['平均差枚'].astype(str) + '枚'
-        past_diffconis_df['総差枚'] = past_diffconis_df['総差枚'].map(lambda x: round(x,-2)).astype(str) + '枚'
-        past_diffconis_df['平均G数'] = past_diffconis_df['平均G数'].astype(str) + 'G'
-        post_line('未取得report_df'+str(past_diffconis_df_last_row_day_num))
-        report_df.to_csv('csv/kanto_top_location_df.csv',index=False)
-        past_diffconis_df.to_csv('csv/tokyo_past_diffconis_df.csv',index=False)
+
+    post_line('今日のデータは未取得'+str(past_diffconis_df_last_row_day_num)+"と"+compare_day_number)
+    area_sql_text = get_area_sql_text('minamikantou')
+    cursor = get_driver()
+    sql = f'''SELECT イベント日,都道府県,店舗名,取材名,取材ランク,媒体名,latitude,longitude
+            FROM schedule as schedule2
+            left join halldata as halldata2
+            on schedule2.店舗名 = halldata2.hall_name
+            WHERE イベント日 > current_date -1
+            AND イベント日 <= current_date + 1
+            AND 媒体名 != 'ホールナビ'
+            AND 取材名 LIKE '%{target_n_day_str}のつく日%'
+            AND 都道府県 = '東京都'
+            ORDER BY イベント日,都道府県,店舗名,媒体名,取材名 desc;'''#AND (取材ランク = 'S' OR 取材ランク = 'A')
+    print(sql)
+    cursor.execute(sql)
+    cols = [col[0] for col in cursor.description]
+    print('cols',cols)
+    report_df =  pd.DataFrame(cursor.fetchall(),columns = cols )
+    report_df = report_df.loc[:,~report_df.columns.duplicated()]
+    print(report_df)
+    sql_hall_name_text = ''
+    for hall_name_text in list(report_df['店舗名'].unique()):
+        sql_hall_name_text += f"'{hall_name_text}'" + ','
+    sql_hall_name_text = sql_hall_name_text.rstrip(',')
+    sql_date_text = get_sql_target_day_list_str(int(target_n_day_str))
+    print('sql_date_text',sql_date_text)
+    sql = f"""SELECT date,hall_name,sum_diffcoins,ave_diffcoins,ave_game,win_rate
+            FROM groupby_date_hall_diffcoins
+            WHERE date in {sql_date_text}
+            AND prefecture = '東京都' """
+    print('sql',sql)
+    cursor.execute(sql)
+    print("sql_hall_name_text",sql_hall_name_text)
+    cols = [col.name for col in cursor.description]
+    past_diffconis_df = pd.DataFrame(cursor.fetchall(),columns=cols)
+    past_diffconis_df['date'] = past_diffconis_df['date'].apply(convert_sql_date_to_jp_date_and_weekday)
+    past_diffconis_df.rename(columns={'date':'日付','hall_name':'店舗名','sum_diffcoins':'総差枚','ave_diffcoins':'平均差枚','ave_game':'平均G数','win_rate':'勝率'},inplace=True)
+    past_diffconis_df['平均差枚'] = past_diffconis_df['平均差枚'].astype(str) + '枚'
+    past_diffconis_df['総差枚'] = past_diffconis_df['総差枚'].map(lambda x: round(x,-2)).astype(str) + '枚'
+    past_diffconis_df['平均G数'] = past_diffconis_df['平均G数'].astype(str) + 'G'
+    post_line('未取得report_df'+str(past_diffconis_df_last_row_day_num))
+    report_df.to_csv('csv/kanto_top_location_df.csv',index=False)
+    #past_diffconis_df.to_csv('csv/tokyo_past_diffconis_df.csv',index=False)
 
     all_kanto_display_df = report_df = report_df.drop_duplicates(keep='first')
     if str(past_diffconis_df_last_row_day_num) != str(compare_date):
