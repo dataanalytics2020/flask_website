@@ -2586,7 +2586,7 @@ def post_prefecture_list(pref_name_en):
     diff = today - target_day
     print(diff.days,type(diff.days))
     total_page = diff.days//10 + 1
-    pagination = Pagination(page=page, total=total_page,  per_page=1, css_framework='bootstrap4')
+    pagination = Pagination(page=page, total=total_page,  per_page=1, css_framework='bootstrap5',outer_window=0,inner_window=1)
     return render_template('post_prefecture_list.html',items=items,data=data,enumerate=enumerate,pagination=pagination)
 
 @app.route("/post_prefecture/<post_slug>", methods=['GET','POST'])

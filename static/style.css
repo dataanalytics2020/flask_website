@@ -2167,3 +2167,42 @@ nav2{
 .nav-open.active::before{/* 開いている時 */
 	content: "－";
 }
+
+.content nav {
+  background-color: #fff;
+  padding: 10px;
+  z-index: 9999;
+}
+
+.page-item.active .page-link {
+  color: #212529;
+  border-color: #f2f2f2;
+  background-color: #f2f2f2;
+}
+
+.pagination {
+  list-style-type: none;
+  display: flex;
+  align-items: center;
+  margin: 0 0 3px 0;
+}
+
+.pagination li {
+  margin: 0 2px;
+}
+
+.pagination li.active a {
+  font-weight: bold;
+}
+
+.pagination li a {
+  text-decoration: none;
+  color: #000;
+  padding: 5px 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.pagination li a:hover {
+  background-color: #f5f5f5;
+}
