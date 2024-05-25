@@ -202,7 +202,6 @@ def create_post_map_iframe(location_name_df,groupby_date_kisyubetu_df):
 def create_syuzai_map_iframe(report_df:pd.DataFrame,pref_name_en:str):
     report_df = report_df.drop_duplicates(keep='first')
     report_df = report_df.dropna(subset=['latitude'])
-    
     #今日より前の日付のデータを削除
     furture_exist_hall_name_list  = list(report_df[report_df['イベント日'] >= datetime.date.today()]['店舗名'].unique())
     print('furture_exist_hall_name_list',furture_exist_hall_name_list)
@@ -271,10 +270,12 @@ def create_syuzai_map_iframe(report_df:pd.DataFrame,pref_name_en:str):
         bg.save('syuzai_image.png')
         img = 'syuzai_image.png'
         popup_df = extract_syuzai_df_1[['イベント日','店舗名','取材名','媒体名']].sort_values('店舗名')
+        popup_df.drop_duplicates(keep='first',inplace=True)
         furture_popup_df = popup_df[popup_df['イベント日'] >= datetime.date.today()]
         past_popup_df = popup_df[popup_df['イベント日'] < datetime.date.today()]
         furture_popup_df['イベント日'] = furture_popup_df['イベント日'].apply(convert_sql_date_to_jp_date_and_weekday) 
         past_popup_df['イベント日'] = past_popup_df['イベント日'].apply(convert_sql_date_to_jp_date_and_weekday) 
+        
         #popup_df['イベント日'] = popup_df['イベント日'].apply(convert_sql_date_to_jp_date_and_weekday) 
         popup_df = ''
         if len(furture_popup_df) != 0:
@@ -524,6 +525,7 @@ def create_machine_map_iframe(map_df_list,pref_name_jp:str):
     return folium_map.get_root()._repr_html_()
 
 def create_hall_map_iframe(extract_hall_name_df,zoom_size=10):
+    extract_hall_name_df.drop_duplicates(keep='first',inplace=True)
     longitude = extract_hall_name_df.iloc[0]['longitude']
     latitude = extract_hall_name_df.iloc[0]['latitude']
     folium_map = folium.Map(location=[latitude,longitude], zoom_start=zoom_size, width="100%", height="100%")
@@ -785,13 +787,13 @@ def get_top():
             FROM schedule as schedule2
             left join halldata as halldata2
             on schedule2.店舗名 = halldata2.hall_name
-            WHERE イベント日 > current_date -1
+            WHERE イベント日 > current_date
             AND イベント日 <= current_date + 1
             AND 媒体名 != 'ホールナビ'
-            AND 取材名 LIKE '%{target_n_day_str}のつく日%'
             AND 都道府県 = '東京都'
             ORDER BY イベント日,都道府県,店舗名,媒体名,取材名 desc;'''#AND (取材ランク = 'S' OR 取材ランク = 'A')
     print(sql)
+    #            AND 取材名 LIKE '%{target_n_day_str}のつく日%'
     cursor.execute(sql)
     cols = [col[0] for col in cursor.description]
     print('cols',cols)
@@ -833,7 +835,6 @@ def get_top():
                 message += f'{isnull_hall_name}の緯度経度が取得できていません。\n'
             post_line(message)
         report_df = report_df.dropna(subset=['latitude'])
-        tomorrow_report_df = report_df
         #(取材ランク = 'S' OR 取材ランク = 'A')のみ抽出
         #report_df =  report_df[report_df['取材ランク'].isin(['S','A'])]
         #print('report_df_2',report_df)
@@ -866,20 +867,42 @@ def get_top():
                 latitude = extract_syuzai_df_1.iloc[0]['latitude']
                 #print('latitude,longitude',latitude,longitude)
                 # グレースケールの画像データを作成
-                im= Image.new("L", (280, 100),color=(0))
-                im.putalpha(0)
-                im2= Image.new("L", (260, 50),color=(50))
-                im2.putalpha(128)
-                im3 = Image.open('icon.png')
-                draw = ImageDraw.Draw(im)
-                font = ImageFont.truetype('font/LightNovelPOPv2.otf',19)
+
                 if len(extract_syuzai_df_1)==1:
                     syuzai_name_text = '◆' + tenpo_name + f'\n {extract_syuzai_df_1["取材名"].values[0]}'
                 else:
                     syuzai_name_text = '◆' + tenpo_name + f'\n {extract_syuzai_df_1["取材名"].values[0]}、他{len(extract_syuzai_df_1)-1}件'
                 #print(syuzai_name_text)
+
+                # グレースケールの画像データを作成
+                im= Image.new('RGBA', (260, 100),color=(0))
+                im.putalpha(0)
+                im2= Image.new('RGBA', (230, 35),color=(0))
+                im2.putalpha(128)
+                im.paste(im2, (15,48))
+                #print(syuzai_name_text)
                 draw = ImageDraw.Draw(im)
-                font = ImageFont.truetype('font/LightNovelPOPv2.otf',19)
+                font = ImageFont.truetype('font/LightNovelPOPv2.otf',13)
+                draw = ImageDraw.Draw(im)
+                draw.multiline_text(
+                    (130, 50),
+                    f'{syuzai_name_text}',
+                    font=font,
+                    fill='white',
+                    align='center',
+                    spacing=0,
+                    anchor='ma'
+                )
+
+                #背景と同サイズの透明な画像を生成
+                img_clear = Image.new("RGBA", im.size, (255, 255, 255, 0))
+                im3 = Image.open('icon.png')
+                #透明画像の上にペースト
+                img_clear.paste(im3, (-10, -10))
+                #重ね合わせる
+                bg = Image.alpha_composite(im, img_clear)
+                bg.save('syuzai_image.png')
+                img = 'syuzai_image.png'
 
                 # 画像を表示
                 im.paste(im3, (-15,-14))
@@ -1682,7 +1705,7 @@ def tomorrow_recommend_area_syuzai_syuzainame(pref_name_en,syuzai_name):
                 on schedule2.店舗名 = halldata2.hall_name
                 left join pledge as pledge
                 on schedule2.取材名 = pledge.syuzai_name
-                WHERE イベント日 >= current_date - 31
+                WHERE イベント日 >= current_date - 90
                 AND イベント日 < current_date + 7
                 AND 媒体名 != 'ホールナビ'
                 AND 取材名 = '{syuzai_name}'
@@ -1699,7 +1722,7 @@ def tomorrow_recommend_area_syuzai_syuzainame(pref_name_en,syuzai_name):
                 on schedule2.店舗名 = halldata2.hall_name
                 left join pledge as pledge
                 on schedule2.取材名 = pledge.syuzai_name
-                WHERE イベント日 >= current_date - 31
+                WHERE イベント日 >= current_date - 90
                 AND イベント日 < current_date + 7
                 AND 媒体名 != 'ホールナビ'
                 AND 取材名 = '{syuzai_name}'
