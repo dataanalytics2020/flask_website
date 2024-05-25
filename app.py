@@ -1713,7 +1713,13 @@ def tomorrow_recommend_area_syuzai_syuzainame(pref_name_en,syuzai_name):
         media_name = extract_syuzai_name_df.iloc[0]['媒体名']
     except:
         media_name = ""
-    if extract_syuzai_name_df.iloc[0]['pledge_text'] == None:
+    print('extract_syuzai_name_df',extract_syuzai_name_df)
+    try:
+        pledge_text = extract_syuzai_name_df.iloc[0]['pledge_text']
+    except:
+        pledge_text = None
+
+    if pledge_text == None:
         columns = ['syuzai_name','media_name','pledge_text','created_at','update_at','rank','no_pledge_visit_count']
         record = (syuzai_name,media_name,'',datetime.datetime.now(),datetime.datetime.now(),'・',0)
         insert_df = pd.DataFrame([record],columns=columns)

@@ -121,3 +121,7 @@ git pull origin main
 ```git branch -d 作業ブランチ名 ```
 ### 最後にherokuも更新
 ```git push heroku main```
+
+
+### エラーURL
+http://127.0.0.1:5000/tomorrow_recommend/kitakantou/syuzai/%E3%82%B0%E3%83%A9%E3%83%B3%E3%83%89%E3%82%AA%E3%83%BC%E3%83%97%E3%83%B3(4%E6%97%A5%E7%9B%AE)
