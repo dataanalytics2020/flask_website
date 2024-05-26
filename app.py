@@ -740,7 +740,7 @@ if dev_flag == 'True':
 else:
     print('本番環境')
     dev_flag = False
-    today = datetime.datetime.today() - relativedelta(hours=3)
+    today = datetime.datetime.today() - relativedelta(hours=17)
     
 
 #都道府県テーブルの読み込み
