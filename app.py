@@ -763,24 +763,15 @@ def get_top():
     #today = datetime.datetime.utcnow().today()
     target_n_day_str = tomorrow.strftime('%Y-%m-%d')[-1]
     print('target_n_day_str',target_n_day_str)
-    datetime64_tomorrow = np.datetime64(tomorrow)
+    post_line(f'target_n_day_strは{target_n_day_str}')
     print(tomorrow)
     tommorow_jp_str_day = tomorrow.strftime('%m').lstrip('0') + '月' + tomorrow.strftime('%d').lstrip('0') + '日' + w_list[tomorrow.weekday()]
     print(tommorow_jp_str_day)
     data['tommorow_jp_str_day'] =  tommorow_jp_str_day
     data['prefecture_id_and_name_dict'] = prefecture_id_and_name_dict
-    report_df = pd.read_csv('csv/kanto_top_location_df.csv', parse_dates=['イベント日'])
-    past_diffconis_df = pd.read_csv('csv/tokyo_past_diffconis_df.csv')
-    try:
-        past_diffconis_df_last_row_day_num = int(str(past_diffconis_df["日付"].values[0]).split('(')[0].split('/')[1])
-        print(past_diffconis_df_last_row_day_num)
-    except:
-        past_diffconis_df_last_row_day_num = 'NONE'
-    compare_date:str = tomorrow.strftime('%Y-%m-%d')#-%d
-    compare_day_number = tomorrow.strftime('%d')
 
-    post_line('今日のデータは未取得'+str(past_diffconis_df_last_row_day_num)+"と"+compare_day_number)
-    area_sql_text = get_area_sql_text('minamikantou')
+    #post_line('今日のデータは未取得'+str(past_diffconis_df_last_row_day_num)+"と"+compare_day_number)
+    #area_sql_text = get_area_sql_text('minamikantou')
     cursor = get_driver()
     sql = f'''SELECT イベント日,都道府県,店舗名,取材名,取材ランク,媒体名,latitude,longitude
             FROM schedule as schedule2
@@ -810,6 +801,7 @@ def get_top():
             WHERE date in {sql_date_text}
             AND prefecture = '東京都' """
     print('sql',sql)
+    post_line('sqlは'+sql)
     cursor.execute(sql)
     print("sql_hall_name_text",sql_hall_name_text)
     cols = [col.name for col in cursor.description]
@@ -820,7 +812,7 @@ def get_top():
     past_diffconis_df['平均差枚'] = past_diffconis_df['平均差枚'].astype(str) + '枚'
     past_diffconis_df['総差枚'] = past_diffconis_df['総差枚'].map(lambda x: round(x,-2)).astype(str) + '枚'
     past_diffconis_df['平均G数'] = past_diffconis_df['平均G数'].astype(str) + 'G'
-    post_line('未取得report_df'+str(past_diffconis_df_last_row_day_num))
+    #post_line('未取得report_df'+str(past_diffconis_df_last_row_day_num))
     #report_df.to_csv('csv/kanto_top_location_df.csv',index=False)
     #past_diffconis_df.to_csv('csv/tokyo_past_diffconis_df.csv',index=False)
 
@@ -975,7 +967,7 @@ def get_top():
 
     #下書き状態の記事を取得
     #画像は取得するがurl以外は取得しない
-    post_slug = f'tokyo_{compare_date}'
+    post_slug = f'tokyo_{tomorrow.strftime("%Y-%m-%d")}'
     label = f'posts?slug={post_slug}&status=draft&_embed'
     url = f"{API_URL}{label}"
     # すべてのアイテムを取得
