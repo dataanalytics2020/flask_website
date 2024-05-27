@@ -1,39 +1,42 @@
 ![slomap_main_image_10s_gif](https://github.com/dataanalytics2020/flask_website/assets/117744645/c2fb4639-db6a-449f-b647-8c14d691e11d)
 
-
-<br />
-
-## サービスのURL
+## プロダクトのURL
 
 https://slo-map.com/
 
-<br />
+## プロダクト概要
 
-## サービス概要
+### パチンコを知らない担当者様へ
 
-### パチンコを知らない方へ
+#### パチンコ業界で使われるデータとは何か
+**パチンコ店屋さんは過去の日のデータをWeb上に公開しています。**
+**それをユーザーが見て出ている台はどの台だったのかを参考にして次のお店を選んだり、翌日に打つ台を選ぶ目安にしています。**
+![image](https://github.com/dataanalytics2020/flask_website/assets/117744645/b871108f-095b-44dc-8526-6c63fd8707b5)
 
-パチンコ店屋さんは過去の日のデータをWeb上に公開しています。
-それをユーザーが見て出ている台はどの台だったのかを参考にして次のお店を選んだり、翌日に打つ台を選ぶ目安にしています。
-
-ただ、複数日に渡っての集計や分析などより詳しい分析をするにはエクセルにまとめてやるしかないなど
-手間の割に得られるリターンはかなり少なく、プロの中でもやっている人は極少数です。
-
-また取材予定という概念が存在し、第三者のSNSを通じて
+また取材予定という概念が存在し、第三者のSNS(X)を通じて
 各店舗の出す日の予定などある程度の狙いがわかるような発信がXやWeb上で行われています。
+そのデータを毎日定期実行で自動でスクレイピングしてデータとして集めています。
+![image](https://github.com/dataanalytics2020/flask_website/assets/117744645/fa126480-a7fe-4827-92c8-dec51899036e)
 
-### サービスへの想い
-私自身、昔からパチスロのデータの分析をして年間収支を毎年プラスにするなどやっていましたが
-そこのデータのまとめをだれでも簡単に出来ない事にモヤモヤを感じていました。
+ただ、過去データの複数日分の集計や機種単位での分析などより詳しい分析をするには自力でエクセルにまとめてやるしかないなど
+スロットのプロの中でもそこまでやっている人は極少数です。
 
-都内だけでもパチンコ店は約700店舗存在します。
+またスクレイピングを用いて全国のパチンコ店の画像や店舗URL,住所,パチンコ台数,各種SNSリンク,緯度経度情報などもDB上に登録しています。
+
+### プロダクトへの想い
+**私自身、昔からパチスロのデータの分析をして年間収支を毎年プラスにするなどやっていましたが**
+**データのまとめをだれでも簡単に出来ない事にモヤモヤを感じていました。**
+
+都内だけでもパチンコ店は約700店舗存在します。(全国7000店舗)
 そしてプロダクト名(スロマップ)にも入ってるマップを採用したのは
 ライトユーザーでも直感的に家から近い店舗の中から選べるようにマップを採用しました。
 
+
 このプロダクトは、パチンコのライトユーザーでも明日のお勧めのパチンコ店さんの
 明日のお勧め店舗やその日の使えるデータの分析を、誰でも、いつでも、より簡単に見れるようにという想いから生まれました。
+も簡単に分析できるサイトを見て分析する面白さを知ってほしいという側面もあります。
 
-私自身がパチンコユーザーだからこそわかるライトユーザーに向けたこんなのがあったら便利だな・・・を具現化しているサイトです。
+**私自身がパチンコユーザーだからこそわかるライトユーザーに向けたこんなサイトがあったら便利だな・・・を具現化しているサイトです。**
 
 ### 現在の収益状態とSEO対策・サイト改善分析について
 Google Adsenseにも24年1月末に合格し、サーバー代含め現在黒字になっています。
@@ -41,85 +44,82 @@ Google Adsenseにも24年1月末に合格し、サーバー代含め現在黒字
 知人に使ってもらう事はまだしておらず、主にサーチコンソールとグーグルアナリティクスを使って
 需要のある人気ページやアクセス数を分析し、機能の改善・追加などしています。
 
-### サービスの現状と今後について
-おかげ様で現在では一日のDAUが3~5000人、月間PVが16万前後にまで見た頂けるサイトになりました。
-Twitterなどではまだプロモーションをあえて行っておらず、Nextjs,DRFともっとUIUXの改善を行ったのちに
-プロモーションを行っていきたいと考えています。
+### プロダクトの現状と今後について
+**おかげ様で現在では一日のDAUが3~5000人、月間PVが16万前後にまで見た頂けるサイトになりました。**
+Twitterなどではまだプロモーションをあえて行っておらず、Nextjs,DRFでリプレイスする予定でもっとUI,UXの改善を行った後に
+X上での自動ツイートプロモーションを行っていきたいと考えています。
 
-最終的には今の10倍以上の月間300万PVくらいには成長させる事ができるサービスだと考えており、
-あと2~3年をかけてサービスを成長させていく予定です。
+![slomap_2024-05-26_pv](https://github.com/dataanalytics2020/flask_website/assets/117744645/192e51dc-4c49-46dc-8c0a-094f46ce975e)
+
+
+最終的には今の10倍以上の月間300万PVくらいには成長させる事ができるプロダクトだと考えており、
+あと2~3年をかけてプロダクトを成長させていく予定です。
 最終的にはReact Nativeを使ってスマホアプリ化まで検討しています。
 
-<br />
 
-## アプリケーションのイメージ画像
+## アプリケーションの全体イメージ画像
 
 <br />
 
 ## 機能一覧
-| お知らせ機能(TOP画面) | 都道府県選択(TOP画面) |
+| **お知らせ機能(TOP画面)** | **都道府県選択(TOP画面)** |
 | ---- | ---- |
 | ![image](https://github.com/dataanalytics2020/flask_website/assets/117744645/438ba492-a8bf-4b2d-8cec-ae2fc2b17e27)| ![image](https://github.com/dataanalytics2020/flask_website/assets/117744645/e779d9d2-0fda-4b71-ab93-401f03728bdd) |
 | ユーザーにサイトが改善されてる認知のために実装 | 都道府県選択も直感的に押せるように実装|
 
-| お勧め機能リンク(TOP画面) | 明日の東京都お勧め店舗マップ表示機能(TOP画面) |
+| **お勧め機能リンク(TOP画面)** | **明日の東京都お勧め店舗マップ表示機能(TOP画面)** |
 | ---- | ---- |
-| ![Top画面](/docs/img/app-view/welcome_1.1.png) | ![ログイン画面](/docs/img/app-view/login_1.1.png) |
-| 初心者や初訪問者に向けにまず触ってほしい機能リンクを表示 | TOP画面でサービスのコアになるマップ表示機能を東京都でサンプルとして表示、以下記事のサンプルを表示|
+| ![image](https://github.com/dataanalytics2020/flask_website/assets/117744645/e6c69c02-3594-49b8-ad4f-c2c185b7306f)
+![image](https://github.com/dataanalytics2020/flask_website/assets/117744645/54635821-1abc-4a53-a202-a7ae6b8da1e5) | ![image](https://github.com/dataanalytics2020/flask_website/assets/117744645/12213f28-20e3-402c-9302-0fb5a9514ab8) |
+| 初心者や初訪問者に向けにまず触ってほしい機能のリンクを表示 | TOP画面でプロダクトのコアになるマップ表示機能を東京都でサンプルとして表示、以下記事のサンプルを表示|
 
-| 打ちたい機種から選ぶ(都道府県選択後画面) | 行きたい日付から選ぶ(都道府県選択後画面) |
+| **打ちたい機種から選ぶ(都道府県選択後画面)** | **行きたい日付から選ぶ(都道府県選択後画面)** |
 | ---- | ---- |
-| ![事業者選択画面](/docs/img/app-view/select-business_1.1.png) | ![請求書作成画面](/docs/img/app-view/create-invoice_1.1.png) |
+| ![image](https://github.com/dataanalytics2020/flask_website/assets/117744645/86c5890b-073a-4f04-8d77-949d9ab6114f) | ![image](https://github.com/dataanalytics2020/flask_website/assets/117744645/e5e8b37b-9832-47f2-b754-6ed922f5b525)|
 | 画像を使って機種がわかりやすいように表示 | 日付に曜日をつけてわかりやすいように表示 |
 
 | 取材から選ぶ(都道府県選択後画面) | 店舗から選ぶ(都道府県選択後画面) |
 | ---- | ---- |
-| ![請求書詳細画面](/docs/img/app-view/invoice-detail_1.1.png) | ![　PDF出力画面](/docs/img/app-view/print-invoice_1.1.png) |
+| ![image](https://github.com/dataanalytics2020/flask_website/assets/117744645/7e260e27-22b7-4173-ab4e-22f1f56bdf41)| ![image](https://github.com/dataanalytics2020/flask_website/assets/117744645/072ab39f-0757-4a46-8239-51acd3f993c1) |
 | 行きたい取材が決まっている人向け |  行きたい店舗が決まっている人向け |
 
 | 都道府県別日別記事機能➀(サムネイル) |　都道府県別日別記事機能➁(サムネイル) |
 | ---- | ---- |
-| ![請求書詳細画面](/docs/img/app-view/select-master_1.1.png) | ![　PDF出力画面](/docs/img/app-view/master-register-form_1.1.png) |
-|出ていた店舗の店舗名と機種名の頻出ワードをワードクラウドを使ってサムネイルとして表示| マスタ情報の登録をすることで、請求書の作成時にデータを呼び出すことができます。 |
+| ![image](https://github.com/dataanalytics2020/flask_website/assets/117744645/d48ed4a1-a9c0-4b90-9b5d-5f2e25d2c176) | ![image](https://github.com/dataanalytics2020/flask_website/assets/117744645/b3ccf596-8798-437f-8082-98e99e692e1a) |
+|出ていた店舗の店舗名と機種名の頻出ワードをワードクラウドを使ってサムネイルとして表示| **G数や平均差枚など数字をデータバーを画像で表現(お気に入り機能)** |
 
 | 都道府県別日別記事機能③(店舗概要分析) |　都道府県別日別記事機能④(お勧め機種分析) |
 | ---- | ---- |
-| ![請求書詳細画面](/docs/img/app-view/select-master_1.1.png) | ![　PDF出力画面](/docs/img/app-view/master-register-form_1.1.png) |
+| ![image](https://github.com/dataanalytics2020/flask_website/assets/117744645/5c251b7b-bfcd-4b6a-9488-14fc84a5bc24)| ![image](https://github.com/dataanalytics2020/flask_website/assets/117744645/65143d0e-c397-4f4c-94c7-796a07a40929) |
 |その店舗がどのくらい出ていたかを折れ線グラフと棒グラフで表示|過去3回分の過去データを使って出ていた機種を画像でわかりやすく表示|
 
-<br />
 
 ## 使用技術
 
-| Category          | Technology Stack                                     |
+| **カテゴリ**         | **使用技術**                                    |
 | ----------------- | --------------------------------------------------   |
-| Frontend          | HTML/CSS,Bootstrap, jQuery, Chart.js , Vanilla.js   |
-| Backend           | Flask, WordPress REST API                         |
-| Library           | Selenium, Pillow, Pandas , BeautifulSoup,                       |
-| Infrastructure    | WordPress, Heroku                          |
-| Database          | MySQL(WordPress),Postgresql(Heroku)                                         |
-| Monitoring        | Heroku                           |
-| Environment setup | Venv , pip                                         |
+| フロントエンド         | HTML/CSS,Bootstrap, jQuery, Chart.js , Vanilla.js   |
+| バックエンド           | Flask, WordPress REST API                         |
+| Python ライブラリ    | Selenium, Pillow, Pandas , BeautifulSoup,etc...            |
+| インフラ    | WordPress, Heroku                          |
+| データベース          | MySQL(WordPress),Postgresql(Heroku)                |
+| 監視ツール        | Heroku Metrics                          |
+| SEO対策・分析        |  Google Analytics4 ,Google Serch Console                      |
+| 収益源        |   Google Adsense                     |
+| Environment setup | Windows , Venv , Pip                                         |
 | CI/CD             | Heroku                                       |
-| Design            | Photoshop, Canva PRO                                     |
-| etc.              | Git, GitHub ,VScode, Windows Task Scheduler |
+| デザイン           | Photoshop, Canva PRO                                     |
+| etc.              | Git, GitHub ,VScode, Windows Task Scheduler(スクレイピング定期実行用) |
 
-<br />
 
 ## システム構成図
 
 
 
-<br />
-
 ## ER図
 
 
-
 <br />
-
-
-
 
 
 ## 以下個人用記録とコマンド備忘録
