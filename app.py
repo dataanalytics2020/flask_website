@@ -816,7 +816,7 @@ def get_top():
     #report_df.to_csv('csv/kanto_top_location_df.csv',index=False)
     #past_diffconis_df.to_csv('csv/tokyo_past_diffconis_df.csv',index=False)
 
-    all_kanto_display_df = report_df = report_df.drop_duplicates(keep='first')
+    report_df.drop_duplicates(keep='first',inplace=False)
 
     #post_line('今日のデータはマップ未取得'+str(past_diffconis_df_last_row_day_num)+"と"+compare_date)
     report_df['イベント日'] = pd.to_datetime(report_df['イベント日'])
@@ -843,8 +843,8 @@ def get_top():
     folium_map = folium.Map(location=[prefecture_latitude,prefecture_longitude], zoom_start=10, width="100%", height="100%")
     # 地図表示
     # マーカープロット（ポップアップ設定，色変更，アイコン変更）
-    print('map_report_df',map_report_df)
-    print('past_diffconis_df',past_diffconis_df)
+    #print('map_report_df',map_report_df)
+    #print('past_diffconis_df',past_diffconis_df)
     for tenpo_name in map_report_df['店舗名'].unique():
         #print(tenpo_name)
         extract_syuzai_df_1 = tomorrow_report_df[tomorrow_report_df['店舗名'] == tenpo_name]
@@ -915,11 +915,11 @@ def get_top():
             popup_df['イベント日'] = popup_df['イベント日'].map(convert_sql_date_to_jp_date_and_weekday)
             popup_df_html = popup_df.to_html(escape=False,index=False,table_id="mystyle",justify='center',classes='table table-striped table-hover table-sm')
             extract_hall_df = past_diffconis_df[past_diffconis_df['店舗名'] == tenpo_name]
-            print('extract_hall_df',extract_hall_df)
+            #print('extract_hall_df',extract_hall_df)
             if len(extract_hall_df) == 0:
                 continue
             popup_df_html += extract_hall_df.to_html(escape=False,index=False,table_id="mystyle",justify='center',classes='table table-striped table-hover table-sm')
-            popup_df_html +=f'<a href="/tomorrow_recommend/tokyo/hall/{tenpo_name}"  target="_parent">{tenpo_name}※店舗詳細ページに飛びます。 </a>'
+            popup_df_html +=f'<a href="/tomorrow_recommend/tokyo/hall/{tenpo_name}"  target="_parent">{tenpo_name}※店舗詳細ページに飛びます </a>'
             popup_data = folium.Popup(popup_df_html,  max_width=1500,show=False,size=(700, 300))
 
             folium.Marker(location=[latitude ,longitude],
@@ -948,11 +948,10 @@ def get_top():
         ).add_to(folium_map)
     folium_map.get_root().width = "500px"
     folium_map.get_root().height = "500px"
-    map_test_html = folium_map.get_root()._repr_html_()
+    #map_test_html = folium_map.get_root()._repr_html_()
     #data['iframe'] = folium_map.get_root()._repr_html_()
-    top_map_html = folium_map.get_root().render()
-
-
+    #top_map_html = folium_map.get_root()._repr_html_()
+    folium_map.save('templates/top_map.html')
 
     prefecture_df = pd.read_csv('csv/pref_lat_lon.csv')
     data['pref_name_en'] = pref_name_en = 'tokyo'
@@ -995,7 +994,7 @@ def get_top():
     recommend_hall_name_list = list(location_name_df['店舗名'].unique())
     data['recommend_hall_name_list'] = recommend_hall_name_list
     
-    display_report_df = all_kanto_display_df[['イベント日','都道府県','店舗名','媒体名','取材名']].sort_values(['イベント日','都道府県','店舗名','媒体名','取材名'],ascending=[True,False,True,True,False],inplace=False).reset_index(drop=True)
+    display_report_df = report_df[['イベント日','都道府県','店舗名','媒体名','取材名']].sort_values(['イベント日','都道府県','店舗名','媒体名','取材名'],ascending=[True,False,True,True,False],inplace=False).reset_index(drop=True)
     #print(display_report_df)
     display_report_df = display_report_df.drop_duplicates(keep='first')
     display_report_df['イベント日'] = pd.to_datetime(display_report_df['イベント日'])
