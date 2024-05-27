@@ -741,14 +741,13 @@ else:
     print('本番環境')
     dev_flag = False
     today = datetime.datetime.today() - relativedelta(hours=17)
-    
+
 
 #都道府県テーブルの読み込み
 prefecture_df = pd.read_csv('csv/pref_lat_lon.csv')
 area_str_list = ['hokkaidoutouhoku', 'kitakantou','minamikantou','hokurikukoushinetsu','toukai','kansai','chugokushikoku','kyushu']
 
 @app.route('/', methods=['GET'])
-@cache.cached(timeout=300)
 def get_top():
     data = {}
     data['prefecture_list'] = prefecture_list
@@ -815,158 +814,153 @@ def get_top():
     print("sql_hall_name_text",sql_hall_name_text)
     cols = [col.name for col in cursor.description]
     past_diffconis_df = pd.DataFrame(cursor.fetchall(),columns=cols)
+    print('past_diffconis_df',past_diffconis_df)
     past_diffconis_df['date'] = past_diffconis_df['date'].apply(convert_sql_date_to_jp_date_and_weekday)
     past_diffconis_df.rename(columns={'date':'日付','hall_name':'店舗名','sum_diffcoins':'総差枚','ave_diffcoins':'平均差枚','ave_game':'平均G数','win_rate':'勝率'},inplace=True)
     past_diffconis_df['平均差枚'] = past_diffconis_df['平均差枚'].astype(str) + '枚'
     past_diffconis_df['総差枚'] = past_diffconis_df['総差枚'].map(lambda x: round(x,-2)).astype(str) + '枚'
     past_diffconis_df['平均G数'] = past_diffconis_df['平均G数'].astype(str) + 'G'
     post_line('未取得report_df'+str(past_diffconis_df_last_row_day_num))
-    report_df.to_csv('csv/kanto_top_location_df.csv',index=False)
+    #report_df.to_csv('csv/kanto_top_location_df.csv',index=False)
     #past_diffconis_df.to_csv('csv/tokyo_past_diffconis_df.csv',index=False)
 
     all_kanto_display_df = report_df = report_df.drop_duplicates(keep='first')
-    if str(past_diffconis_df_last_row_day_num) != str(compare_date):
-        post_line('今日のデータはマップ未取得'+str(past_diffconis_df_last_row_day_num)+"と"+compare_date)
-        report_df['イベント日'] = pd.to_datetime(report_df['イベント日'])
-        latitude_isnull_df = report_df[report_df['latitude'].isnull()]
-        message = ''
-        if len(latitude_isnull_df) > 0:
-            for isnull_hall_name in latitude_isnull_df['店舗名'].unique():
-                message += f'{isnull_hall_name}の緯度経度が取得できていません。\n'
-            post_line(message)
-        report_df = report_df.dropna(subset=['latitude'])
-        #(取材ランク = 'S' OR 取材ランク = 'A')のみ抽出
-        #report_df =  report_df[report_df['取材ランク'].isin(['S','A'])]
-        #print('report_df_2',report_df)
-        map_report_df = report_df#[report_df['イベント日'] == datetime64_tomorrow ]
-        tomorrow_report_df = report_df
-        #print('map_report_df',map_report_df)
-        map_report_df = map_report_df[['店舗名','取材名','媒体名']].drop_duplicates(keep='first')
-        map_report_df = map_report_df.sort_values(['店舗名','媒体名']).reset_index(drop=True)
 
-        #東京都に設定
-        prefecture_latitude = 35.68944
-        prefecture_longitude = 139.69167
+    #post_line('今日のデータはマップ未取得'+str(past_diffconis_df_last_row_day_num)+"と"+compare_date)
+    report_df['イベント日'] = pd.to_datetime(report_df['イベント日'])
+    latitude_isnull_df = report_df[report_df['latitude'].isnull()]
+    message = ''
+    if len(latitude_isnull_df) > 0:
+        for isnull_hall_name in latitude_isnull_df['店舗名'].unique():
+            message += f'{isnull_hall_name}の緯度経度が取得できていません。\n'
+        post_line(message)
+    report_df = report_df.dropna(subset=['latitude'])
+    #(取材ランク = 'S' OR 取材ランク = 'A')のみ抽出
+    #report_df =  report_df[report_df['取材ランク'].isin(['S','A'])]
+    #print('report_df_2',report_df)
+    map_report_df = report_df#[report_df['イベント日'] == datetime64_tomorrow ]
+    tomorrow_report_df = report_df
+    #print('map_report_df',map_report_df)
+    map_report_df = map_report_df[['店舗名','取材名','媒体名']].drop_duplicates(keep='first')
+    map_report_df = map_report_df.sort_values(['店舗名','媒体名']).reset_index(drop=True)
 
-        folium_map = folium.Map(location=[prefecture_latitude,prefecture_longitude], zoom_start=10, width="100%", height="100%")
-        # 地図表示
-        # マーカープロット（ポップアップ設定，色変更，アイコン変更）
-        print('map_report_df',map_report_df)
-        print('past_diffconis_df',past_diffconis_df.columns)
-        for tenpo_name in map_report_df['店舗名'].unique():
-            #print(tenpo_name)
-            extract_syuzai_df_1 = tomorrow_report_df[tomorrow_report_df['店舗名'] == tenpo_name]
-            #extract_syuzai_df_1 = extract_syuzai_df_1[extract_syuzai_df_1['イベント日'] == datetime64_tomorrow ]
-            extract_syuzai_df_1.drop_duplicates(keep='first',inplace=True)
-            #display(extract_syuzai_df_1)
-            #print('extract_syuzai_df_1',extract_syuzai_df_1)
-            #syuzai_rank_list = list(extract_syuzai_df_1['取材ランク'].unique())
-            #print(syuzai_rank_list)
-            try:
-                longitude = extract_syuzai_df_1.iloc[0]['longitude']
-                latitude = extract_syuzai_df_1.iloc[0]['latitude']
-                #print('latitude,longitude',latitude,longitude)
-                # グレースケールの画像データを作成
+    #東京都に設定
+    prefecture_latitude = 35.68944
+    prefecture_longitude = 139.69167
 
-                if len(extract_syuzai_df_1)==1:
-                    syuzai_name_text = '◆' + tenpo_name + f'\n {extract_syuzai_df_1["取材名"].values[0]}'
-                else:
-                    syuzai_name_text = '◆' + tenpo_name + f'\n {extract_syuzai_df_1["取材名"].values[0]}、他{len(extract_syuzai_df_1)-1}件'
-                #print(syuzai_name_text)
+    folium_map = folium.Map(location=[prefecture_latitude,prefecture_longitude], zoom_start=10, width="100%", height="100%")
+    # 地図表示
+    # マーカープロット（ポップアップ設定，色変更，アイコン変更）
+    print('map_report_df',map_report_df)
+    print('past_diffconis_df',past_diffconis_df)
+    for tenpo_name in map_report_df['店舗名'].unique():
+        #print(tenpo_name)
+        extract_syuzai_df_1 = tomorrow_report_df[tomorrow_report_df['店舗名'] == tenpo_name]
+        #extract_syuzai_df_1 = extract_syuzai_df_1[extract_syuzai_df_1['イベント日'] == datetime64_tomorrow ]
+        extract_syuzai_df_1.drop_duplicates(keep='first',inplace=True)
+        #display(extract_syuzai_df_1)
+        #print('extract_syuzai_df_1',extract_syuzai_df_1)
+        #syuzai_rank_list = list(extract_syuzai_df_1['取材ランク'].unique())
+        #print(syuzai_rank_list)
+        try:
+            longitude = extract_syuzai_df_1.iloc[0]['longitude']
+            latitude = extract_syuzai_df_1.iloc[0]['latitude']
+            #print('latitude,longitude',latitude,longitude)
+            # グレースケールの画像データを作成
 
-                # グレースケールの画像データを作成
-                im= Image.new('RGBA', (260, 100),color=(0))
-                im.putalpha(0)
-                im2= Image.new('RGBA', (230, 35),color=(0))
-                im2.putalpha(128)
-                im.paste(im2, (15,48))
-                #print(syuzai_name_text)
-                draw = ImageDraw.Draw(im)
-                font = ImageFont.truetype('font/LightNovelPOPv2.otf',13)
-                draw = ImageDraw.Draw(im)
-                draw.multiline_text(
-                    (130, 50),
-                    f'{syuzai_name_text}',
-                    font=font,
-                    fill='white',
-                    align='center',
-                    spacing=0,
-                    anchor='ma'
-                )
+            if len(extract_syuzai_df_1)==1:
+                syuzai_name_text = '◆' + tenpo_name + f'\n {extract_syuzai_df_1["取材名"].values[0]}'
+            else:
+                syuzai_name_text = '◆' + tenpo_name + f'\n {extract_syuzai_df_1["取材名"].values[0]}、他{len(extract_syuzai_df_1)-1}件'
+            #print(syuzai_name_text)
 
-                #背景と同サイズの透明な画像を生成
-                img_clear = Image.new("RGBA", im.size, (255, 255, 255, 0))
-                im3 = Image.open('icon.png')
-                #透明画像の上にペースト
-                img_clear.paste(im3, (-10, -10))
-                #重ね合わせる
-                bg = Image.alpha_composite(im, img_clear)
-                bg.save('syuzai_image.png')
-                img = 'syuzai_image.png'
+            # グレースケールの画像データを作成
+            im= Image.new('RGBA', (260, 100),color=(0))
+            im.putalpha(0)
+            im2= Image.new('RGBA', (230, 35),color=(0))
+            im2.putalpha(128)
+            im.paste(im2, (15,48))
+            #print(syuzai_name_text)
+            draw = ImageDraw.Draw(im)
+            font = ImageFont.truetype('font/LightNovelPOPv2.otf',13)
+            draw = ImageDraw.Draw(im)
+            draw.multiline_text(
+                (130, 50),
+                f'{syuzai_name_text}',
+                font=font,
+                fill='white',
+                align='center',
+                spacing=0,
+                anchor='ma'
+            )
 
-                # 画像を表示
-                im.paste(im3, (-15,-14))
-                im.paste(im2, (25,48))
-                draw.multiline_text(
-                    (150, 50),
-                    f'{syuzai_name_text}',
-                    font=font,
-                    fill='white',
-                    align='center',
-                    spacing=0,
-                    anchor='ma'
-                )
+            #背景と同サイズの透明な画像を生成
+            img_clear = Image.new("RGBA", im.size, (255, 255, 255, 0))
+            im3 = Image.open('icon.png')
+            #透明画像の上にペースト
+            img_clear.paste(im3, (-10, -10))
+            #重ね合わせる
+            bg = Image.alpha_composite(im, img_clear)
+            bg.save('syuzai_image.png')
+            img = 'syuzai_image.png'
 
-                im.save('syuzai_image.png', quality=95)
-                img = 'syuzai_image.png'
-                popup_df = extract_syuzai_df_1[['イベント日','店舗名','媒体名','取材名']].sort_values('店舗名')#.reset_index(drop=True)#.T
-                popup_df['イベント日'] = popup_df['イベント日'].map(convert_sql_date_to_jp_date_and_weekday)
-                popup_df_html = popup_df.to_html(escape=False,index=False,table_id="mystyle",justify='center',classes='table table-striped table-hover table-sm')
-                extract_hall_df = past_diffconis_df[past_diffconis_df['店舗名'] == tenpo_name]
-                if len(extract_hall_df) == 0:
-                    continue
-                popup_df_html += extract_hall_df.to_html(escape=False,index=False,table_id="mystyle",justify='center',classes='table table-striped table-hover table-sm')
-                popup_df_html +=f'<a href="/tomorrow_recommend/tokyo/hall/{tenpo_name}"  target="_parent">{tenpo_name}※店舗詳細ページに飛びます </a>'
-                popup_data = folium.Popup(popup_df_html,  max_width=1500,show=False,size=(700, 300))
+            # 画像を表示
+            im.paste(im3, (-15,-14))
+            im.paste(im2, (25,48))
+            draw.multiline_text(
+                (150, 50),
+                f'{syuzai_name_text}',
+                font=font,
+                fill='white',
+                align='center',
+                spacing=0,
+                anchor='ma'
+            )
 
-                folium.Marker(location=[latitude ,longitude],
-                    tiles='https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png',
-                    attr='国土地理院',
-                    popup=popup_data,
-                    icon = CustomIcon(
-                                icon_image = img,
-                                icon_size = (280, 100),
-                                icon_anchor = (0, 0),
-                                #shadow_image = shadow_img, # 影効果（今回は使用せず コメントアウト
-                                #shadow_size = (30, 30),
-                                shadow_anchor = (-4, -40),
-                                popup_anchor = (3, 3))).add_to(folium_map)
-                #break
+            im.save('syuzai_image.png', quality=95)
+            img = 'syuzai_image.png'
+            popup_df = extract_syuzai_df_1[['イベント日','店舗名','媒体名','取材名']].sort_values('店舗名')#.reset_index(drop=True)#.T
+            popup_df['イベント日'] = popup_df['イベント日'].map(convert_sql_date_to_jp_date_and_weekday)
+            popup_df_html = popup_df.to_html(escape=False,index=False,table_id="mystyle",justify='center',classes='table table-striped table-hover table-sm')
+            extract_hall_df = past_diffconis_df[past_diffconis_df['店舗名'] == tenpo_name]
+            print('extract_hall_df',extract_hall_df)
+            if len(extract_hall_df) == 0:
+                continue
+            popup_df_html += extract_hall_df.to_html(escape=False,index=False,table_id="mystyle",justify='center',classes='table table-striped table-hover table-sm')
+            popup_df_html +=f'<a href="/tomorrow_recommend/tokyo/hall/{tenpo_name}"  target="_parent">{tenpo_name}※店舗詳細ページに飛びます。 </a>'
+            popup_data = folium.Popup(popup_df_html,  max_width=1500,show=False,size=(700, 300))
 
-            except:
-                print(tenpo_name,'の緯度経度が取得できていません。')
-                pass
-            
-        plugins.Fullscreen(
-                position="topright",
-                title="拡大する",
-                title_cancel="元に戻す",
-                force_separate_button=True,
-            ).add_to(folium_map)
-        folium_map.get_root().width = "500px"
-        folium_map.get_root().height = "500px"
-        map_test_html = folium_map.get_root()._repr_html_()
-        #data['iframe'] = folium_map.get_root()._repr_html_()
-        top_map_html = folium_map.get_root().render()
-        #top_map.html = html.unescape(map_ top_html)
-        with open('templates/top_map.html', mode='w', encoding='utf-8') as f:
-            f.write(top_map_html)
-    else:
-        print('今日のデータは取得済み'+past_diffconis_df_last_row_day_num+"と"+compare_date)
-        post_line('今日のデータはマップ取得済み'+past_diffconis_df_last_row_day_num+"と"+compare_date)
-        #pass
-        with open('templates/top_map.html', mode='r', encoding='utf-8') as f:
-            top_map_html = f.read()
+            folium.Marker(location=[latitude ,longitude],
+                tiles='https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png',
+                attr='国土地理院',
+                popup=popup_data,
+                icon = CustomIcon(
+                            icon_image = img,
+                            icon_size = (280, 100),
+                            icon_anchor = (0, 0),
+                            #shadow_image = shadow_img, # 影効果（今回は使用せず コメントアウト
+                            #shadow_size = (30, 30),
+                            shadow_anchor = (-4, -40),
+                            popup_anchor = (3, 3))).add_to(folium_map)
+            #break
+
+        except:
+            print(tenpo_name,'の緯度経度が取得できていません。')
+            pass
+        
+    plugins.Fullscreen(
+            position="topright",
+            title="拡大する",
+            title_cancel="元に戻す",
+            force_separate_button=True,
+        ).add_to(folium_map)
+    folium_map.get_root().width = "500px"
+    folium_map.get_root().height = "500px"
+    map_test_html = folium_map.get_root()._repr_html_()
+    #data['iframe'] = folium_map.get_root()._repr_html_()
+    top_map_html = folium_map.get_root().render()
+
+
 
     prefecture_df = pd.read_csv('csv/pref_lat_lon.csv')
     data['pref_name_en'] = pref_name_en = 'tokyo'
