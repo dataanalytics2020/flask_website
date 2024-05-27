@@ -1,6 +1,128 @@
-# サイトURL
+![slomap_main_image_10s_gif](https://github.com/dataanalytics2020/flask_website/assets/117744645/c2fb4639-db6a-449f-b647-8c14d691e11d)
 
-https://www.slo-map.com/
+
+<br />
+
+## サービスのURL
+
+https://slo-map.com/
+
+<br />
+
+## サービス概要
+
+### パチンコを知らない方へ
+
+パチンコ店屋さんは過去の日のデータをWeb上に公開しています。
+それをユーザーが見て出ている台はどの台だったのかを参考にして次のお店を選んだり、翌日に打つ台を選ぶ目安にしています。
+
+ただ、複数日に渡っての集計や分析などより詳しい分析をするにはエクセルにまとめてやるしかないなど
+手間の割に得られるリターンはかなり少なく、プロの中でもやっている人は極少数です。
+
+また取材予定という概念が存在し、第三者のSNSを通じて
+各店舗の出す日の予定などある程度の狙いがわかるような発信がXやWeb上で行われています。
+
+### サービスへの想い
+私自身、昔からパチスロのデータの分析をして年間収支を毎年プラスにするなどやっていましたが
+そこのデータのまとめをだれでも簡単に出来ない事にモヤモヤを感じていました。
+
+都内だけでもパチンコ店は約700店舗存在します。
+そしてプロダクト名(スロマップ)にも入ってるマップを採用したのは
+ライトユーザーでも直感的に家から近い店舗の中から選べるようにマップを採用しました。
+
+このプロダクトは、パチンコのライトユーザーでも明日のお勧めのパチンコ店さんの
+明日のお勧め店舗やその日の使えるデータの分析を、誰でも、いつでも、より簡単に見れるようにという想いから生まれました。
+
+私自身がパチンコユーザーだからこそわかるライトユーザーに向けたこんなのがあったら便利だな・・・を具現化しているサイトです。
+
+### 現在の収益状態とSEO対策・サイト改善分析について
+Google Adsenseにも24年1月末に合格し、サーバー代含め現在黒字になっています。
+インデックスされているページは現在12000ほどでPVのほとんどが検索流入です。
+知人に使ってもらう事はまだしておらず、主にサーチコンソールとグーグルアナリティクスを使って
+需要のある人気ページやアクセス数を分析し、機能の改善・追加などしています。
+
+### サービスの現状と今後について
+おかげ様で現在では一日のDAUが3~5000人、月間PVが16万前後にまで見た頂けるサイトになりました。
+Twitterなどではまだプロモーションをあえて行っておらず、Nextjs,DRFともっとUIUXの改善を行ったのちに
+プロモーションを行っていきたいと考えています。
+
+最終的には今の10倍以上の月間300万PVくらいには成長させる事ができるサービスだと考えており、
+あと2~3年をかけてサービスを成長させていく予定です。
+最終的にはReact Nativeを使ってスマホアプリ化まで検討しています。
+
+<br />
+
+## アプリケーションのイメージ画像
+
+<br />
+
+## 機能一覧
+| お知らせ機能(TOP画面) | 都道府県選択(TOP画面) |
+| ---- | ---- |
+| ![image](https://github.com/dataanalytics2020/flask_website/assets/117744645/438ba492-a8bf-4b2d-8cec-ae2fc2b17e27)| ![image](https://github.com/dataanalytics2020/flask_website/assets/117744645/e779d9d2-0fda-4b71-ab93-401f03728bdd) |
+| ユーザーにサイトが改善されてる認知のために実装 | 都道府県選択も直感的に押せるように実装|
+
+| お勧め機能リンク(TOP画面) | 明日の東京都お勧め店舗マップ表示機能(TOP画面) |
+| ---- | ---- |
+| ![Top画面](/docs/img/app-view/welcome_1.1.png) | ![ログイン画面](/docs/img/app-view/login_1.1.png) |
+| 初心者や初訪問者に向けにまず触ってほしい機能リンクを表示 | TOP画面でサービスのコアになるマップ表示機能を東京都でサンプルとして表示、以下記事のサンプルを表示|
+
+| 打ちたい機種から選ぶ(都道府県選択後画面) | 行きたい日付から選ぶ(都道府県選択後画面) |
+| ---- | ---- |
+| ![事業者選択画面](/docs/img/app-view/select-business_1.1.png) | ![請求書作成画面](/docs/img/app-view/create-invoice_1.1.png) |
+| 画像を使って機種がわかりやすいように表示 | 日付に曜日をつけてわかりやすいように表示 |
+
+| 取材から選ぶ(都道府県選択後画面) | 店舗から選ぶ(都道府県選択後画面) |
+| ---- | ---- |
+| ![請求書詳細画面](/docs/img/app-view/invoice-detail_1.1.png) | ![　PDF出力画面](/docs/img/app-view/print-invoice_1.1.png) |
+| 行きたい取材が決まっている人向け |  行きたい店舗が決まっている人向け |
+
+| 都道府県別日別記事機能➀(サムネイル) |　都道府県別日別記事機能➁(サムネイル) |
+| ---- | ---- |
+| ![請求書詳細画面](/docs/img/app-view/select-master_1.1.png) | ![　PDF出力画面](/docs/img/app-view/master-register-form_1.1.png) |
+|出ていた店舗の店舗名と機種名の頻出ワードをワードクラウドを使ってサムネイルとして表示| マスタ情報の登録をすることで、請求書の作成時にデータを呼び出すことができます。 |
+
+| 都道府県別日別記事機能③(店舗概要分析) |　都道府県別日別記事機能④(お勧め機種分析) |
+| ---- | ---- |
+| ![請求書詳細画面](/docs/img/app-view/select-master_1.1.png) | ![　PDF出力画面](/docs/img/app-view/master-register-form_1.1.png) |
+|その店舗がどのくらい出ていたかを折れ線グラフと棒グラフで表示|過去3回分の過去データを使って出ていた機種を画像でわかりやすく表示|
+
+<br />
+
+## 使用技術
+
+| Category          | Technology Stack                                     |
+| ----------------- | --------------------------------------------------   |
+| Frontend          | HTML/CSS,Bootstrap, jQuery, Chart.js , Vanilla.js   |
+| Backend           | Flask, WordPress REST API                         |
+| Library           | Selenium, Pillow, Pandas , BeautifulSoup,                       |
+| Infrastructure    | WordPress, Heroku                          |
+| Database          | MySQL(WordPress),Postgresql(Heroku)                                         |
+| Monitoring        | Heroku                           |
+| Environment setup | Venv , pip                                         |
+| CI/CD             | Heroku                                       |
+| Design            | Photoshop, Canva PRO                                     |
+| etc.              | Git, GitHub ,VScode, Windows Task Scheduler |
+
+<br />
+
+## システム構成図
+
+
+
+<br />
+
+## ER図
+
+
+
+<br />
+
+
+
+
+
+## 以下個人用記録とコマンド備忘録
 
 ## 製作過程のスクショ一覧
 ### 2023/12/01時点のTOPページ
@@ -81,9 +203,6 @@ wsl touch flaskr/templates/{layout,show_entries}.html
 
 ## ライブラリ一括インストール
 pip install -r requirements.txt
-
-
-
 
 ## postgressql起動コマンド
 heroku pg:psql postgresql-cubic-54628 --app flask-mapwebsite
