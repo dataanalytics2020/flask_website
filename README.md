@@ -18,15 +18,15 @@ https://ana-slo.com/2024-05-26-%e3%82%a2%e3%82%a4%e3%83%a9%e3%83%b3%e3%83%89%e7%
 また取材予定という概念が存在し、第三者のSNS(X)を通じて
 各店舗の出す日の予定などある程度の狙いがわかるような発信がXやWeb上で行われています。
 そのデータを毎日定期実行で自動でスクレイピングしてデータとして集めています。
-**取材予定サンプルURL**
+##### **取材予定サンプルURL**
 https://777.slopachi-station.com/report_schedule/
 
-**取材予定サンプルツイート画像**
+##### **取材予定サンプルツイート画像**
 ![image](https://github.com/dataanalytics2020/flask_website/assets/117744645/fa126480-a7fe-4827-92c8-dec51899036e)
 
 ただ、過去データの複数日分の集計や機種単位での分析などより詳しい分析をするには自力でエクセルにまとめてやるしかないなど
 スロットのプロの中でもそこまでやっている人は極少数です。
-**分析イメージ図**
+##### **分析イメージ図**
 ![slot_analytics_image](https://github.com/dataanalytics2020/flask_website/assets/117744645/cd9c9236-4b6d-4a0f-8d46-bc7675d3409c)
 
 またスクレイピングを用いて全国のパチンコ店の画像や店舗URL,住所,パチンコ台数,各種SNSリンク,緯度経度情報などもDB上に登録しています。
@@ -119,7 +119,7 @@ X上での自動ツイートプロモーションを行っていきたいと考�
 | Environment setup | Windows , Venv , Pip                                         |
 | CI/CD             | Heroku                                       |
 | デザイン           | Photoshop, Canva PRO                                     |
-| etc.              | Git, GitHub ,VScode, Windows Task Scheduler(スクレイピング定期実行用) |
+| etc.              | Git, GitHub , GitHub Copilot , VScode, Windows Task Scheduler(スクレイピング定期実行用) |
 
 
 ## システム構成図
@@ -129,6 +129,13 @@ X上での自動ツイートプロモーションを行っていきたいと考�
 ![ER](https://github.com/dataanalytics2020/flask_website/assets/117744645/7c52ff3d-46fc-4b93-8e91-648bf3751e74)
 DB初期学習中にテーブルを作成したためこのDBには主キーと外部キーは入れていません。
 
+## 最後に採用ご担当者へ
+**最後まで見ていただきありがとうございました！一言ポートフォリオ見ましたと感想頂けると非常に喜びます！！**
+
+<br />
+<br />
+<br />
+<br />
 
 ## 以下個人用記録とコマンド備忘録
 
