@@ -987,9 +987,7 @@ def get_top():
     dfs = pd.read_html(content)
     #print('dfs',dfs)
     data['write_html'] = write_html
-    
-    #data['tag_df'] = tag_df.to_html(justify='justify-all',classes='tb01')
-    dfs = pd.read_html(content)
+
     groupby_date_kisyubetu_df = dfs[0]
     location_name_df = dfs[1]
     recommend_hall_name_list = list(location_name_df['店舗名'].unique())
