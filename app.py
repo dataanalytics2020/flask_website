@@ -766,6 +766,7 @@ def get_top():
     print('target_n_day_str',target_n_day_str)
     post_line(f'target_n_day_strは{target_n_day_str}')
     print(tomorrow)
+    tommorow_en_str_day = tomorrow.strftime('%Y-%m-%d')
     tommorow_jp_str_day = tomorrow.strftime('%m').lstrip('0') + '月' + tomorrow.strftime('%d').lstrip('0') + '日' + w_list[tomorrow.weekday()]
     print(tommorow_jp_str_day)
     data['tommorow_jp_str_day'] =  tommorow_jp_str_day
@@ -778,8 +779,7 @@ def get_top():
             FROM schedule as schedule2
             left join halldata as halldata2
             on schedule2.店舗名 = halldata2.hall_name
-            WHERE イベント日 > current_date
-            AND イベント日 <= current_date + 1
+            WHERE イベント日 = '{tommorow_en_str_day}'
             AND 媒体名 != 'ホールナビ'
             AND 都道府県 = '東京都'
             ORDER BY イベント日,都道府県,店舗名,媒体名,取材名 desc;'''#AND (取材ランク = 'S' OR 取材ランク = 'A')
