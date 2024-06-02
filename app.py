@@ -734,13 +734,13 @@ cache = Cache(app)
 dev_flag = os.getenv('DEV_FLAG')
 if dev_flag == 'True':
     print('開発環境')
-    today = datetime.datetime.today() - relativedelta(hours=6)
+    today = datetime.datetime.today() + relativedelta(hours=6)
     #開発環境
     dev_flag = True
 else:
     print('本番環境')
     dev_flag = False
-    today = datetime.datetime.today() - relativedelta(hours=6)
+    today = datetime.datetime.today() + relativedelta(hours=6)
 
 
 #都道府県テーブルの読み込み
@@ -764,7 +764,7 @@ def get_top():
     #today = datetime.datetime.utcnow().today()
     target_n_day_str = tomorrow.strftime('%Y-%m-%d')[-1]
     print('target_n_day_str',target_n_day_str)
-    post_line(f'target_n_day_strは{target_n_day_str}')
+    post_line(f'target_n_day_strは{target_n_day_str}\n内部時間' + str(today.strftime('%Y-%m-%d %H:%M:%S')))
     print(tomorrow)
     tommorow_en_str_day = tomorrow.strftime('%Y-%m-%d')
     tommorow_jp_str_day = tomorrow.strftime('%m').lstrip('0') + '月' + tomorrow.strftime('%d').lstrip('0') + '日' + w_list[tomorrow.weekday()]
