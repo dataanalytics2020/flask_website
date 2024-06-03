@@ -747,7 +747,7 @@ else:
 prefecture_df = pd.read_csv('csv/pref_lat_lon.csv')
 area_str_list = ['hokkaidoutouhoku', 'kitakantou','minamikantou','hokurikukoushinetsu','toukai','kansai','chugokushikoku','kyushu']
 
-@cache.cached(timeout=600)
+@cache.cached(timeout=60)
 @app.route('/', methods=['GET'])
 def get_top():
     data = {}
