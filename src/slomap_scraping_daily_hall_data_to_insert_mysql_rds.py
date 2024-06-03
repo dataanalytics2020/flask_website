@@ -530,8 +530,8 @@ for prefecture in prefecture_list[10:14]:#reversed([12:13]
                         groupby_date_hall_diffcoins_df = ichiran_all_tennpo_df
                         groupby_date_hall_diffcoins_df
                         table_name = 'groupby_date_hall_diffcoins'
-                        rds_mysql_conn = rds_mysql_get_cursor()
-                        insert_data_bulk(table_name,groupby_date_hall_diffcoins_df,rds_mysql_conn)
+                        #rds_mysql_conn = rds_mysql_get_cursor()
+                        #insert_data_bulk(table_name,groupby_date_hall_diffcoins_df,rds_mysql_conn)
                         heroku_psgr_conn = heroku_psgr_get_cursor()
                         insert_data_bulk_psgr(table_name,groupby_date_hall_diffcoins_df,heroku_psgr_conn)
                         #daily_record用のデータフレーム作成
@@ -543,7 +543,7 @@ for prefecture in prefecture_list[10:14]:#reversed([12:13]
                             'rb_win_rate', 'art_win_rate' ]]
                         groupby_date_machine_number_diffcoins_df = daily_record_df
                         groupby_date_machine_number_diffcoins_df
-                        rds_mysql_conn = rds_mysql_get_cursor()
+                        #rds_mysql_conn = rds_mysql_get_cursor()
                         table_name = 'groupby_date_machine_number_diffcoins'
                         #insert_data_bulk(table_name,groupby_date_machine_number_diffcoins_df,rds_mysql_conn)
                         heroku_psgr_conn = heroku_psgr_get_cursor()
@@ -597,9 +597,9 @@ for prefecture in prefecture_list[10:14]:#reversed([12:13]
                         groupby_date_machine_diffcoins_df.replace('-inf', '0',inplace=True)
                         groupby_date_machine_diffcoins_df.replace('inf', '0',inplace=True)
                         groupby_date_machine_diffcoins_df['machine_ave_rate'] = groupby_date_machine_diffcoins_df['machine_ave_rate'].astype(float)
-                        rds_mysql_conn = rds_mysql_get_cursor()
+                        #rds_mysql_conn = rds_mysql_get_cursor()
                         table_name = 'groupby_date_machine_diffcoins'
-                        insert_data_bulk(table_name,groupby_date_machine_diffcoins_df,rds_mysql_conn)
+                        #insert_data_bulk(table_name,groupby_date_machine_diffcoins_df,rds_mysql_conn)
 
                         heroku_psgr_conn = heroku_psgr_get_cursor()
                         insert_data_bulk_psgr(table_name,groupby_date_machine_diffcoins_df,heroku_psgr_conn)
