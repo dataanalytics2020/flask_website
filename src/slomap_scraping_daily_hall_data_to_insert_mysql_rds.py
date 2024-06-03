@@ -196,8 +196,8 @@ def rds_mysql_get_cursor():
     )
     return conn
 # カーソルを取得
-rds_mysql_conn = rds_mysql_get_cursor()
-rds_mysql_cursor = rds_mysql_conn.cursor()
+#rds_mysql_conn = rds_mysql_get_cursor()
+#rds_mysql_cursor = rds_mysql_conn.cursor()
 
 heroku_psgr_conn = heroku_psgr_get_cursor()
 heroku_psgr_cursor = heroku_psgr_conn.cursor()
