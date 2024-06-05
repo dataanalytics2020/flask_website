@@ -753,7 +753,7 @@ area_str_list = ['hokkaidoutouhoku', 'kitakantou','minamikantou','hokurikukoushi
 def get_top():
     data = {}
     data['prefecture_list'] = prefecture_list
-
+    today = datetime.datetime.now(ZoneInfo("Asia/Tokyo"))  - relativedelta(hours=18)
     print('today',today)
     jp_str_day_list = []
     for i in range(0,7):
