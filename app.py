@@ -9,6 +9,7 @@ from wtforms import DateField, SubmitField
 from email.mime.text import MIMEText
 import smtplib
 from datetime import date, timedelta
+from zoneinfo import ZoneInfo
 from dateutil.relativedelta import relativedelta
 import re
 import pandas as pd
@@ -734,13 +735,13 @@ cache = Cache(app)
 dev_flag = os.getenv('DEV_FLAG')
 if dev_flag == 'True':
     print('開発環境')
-    today = datetime.datetime.today() - relativedelta(hours=18)
+    today = datetime.datetime.now(ZoneInfo("Asia/Tokyo"))  - relativedelta(hours=18)
     #開発環境
     dev_flag = True
 else:
     print('本番環境')
     dev_flag = False
-    today = datetime.datetime.today() - relativedelta(hours=18)
+    today = datetime.datetime.now(ZoneInfo("Asia/Tokyo"))  - relativedelta(hours=18)
 
 
 #都道府県テーブルの読み込み
