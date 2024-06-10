@@ -896,8 +896,8 @@ td.ui-datepicker-week-end a.ui-state-highlight{
 h4 {
   position: relative;
   background: #1e00b7;
-  padding: 5px 5px 12px 12px;
-  font-size: 18px!important;
+  padding: 12px;
+  font-size: 20px!important;
   color: #ffffff;
   border-radius: 5px;
 }
