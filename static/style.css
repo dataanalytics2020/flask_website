@@ -896,34 +896,16 @@ td.ui-datepicker-week-end a.ui-state-highlight{
 h4 {
   position: relative;
   background: #1e00b7;
-  padding: 12px 5px 12px 45px;
-  font-size: 16px!important;
+  padding: 5px 5px 12px 12px;
+  font-size: 18px!important;
   color: #ffffff;
   border-radius: 5px;
 }
 
 h4:before {
-  font-family: "Font Awesome 5 Free";
-  content: "\f135";
-  display: block;
-  line-height: 40px;
-  position: absolute;
-  padding: 0em;
-  color: white;
-  background: #1e00b7;
-  font-weight: 900;
-  width: 40px;
-  text-align: center;
-  height: 40px;
-  line-height: 40px;
-  left: 0em;
-  top: 50%;
-  -webkit-transform: translateY(-50%);
-  transform: translateY(-50%);
-  border: solid 3px white; 
-  border-radius: 50%;
-  margin-left: 3px;
-}
+    content: "\2713"; /* Use the Unicode character for a checkmark */
+    margin-right: 5px; /* Adjust the spacing between the mark and the text */
+  }
 
 /* SNS ボタンのグループ */
 .snsButtons {
