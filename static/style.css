@@ -2188,3 +2188,7 @@ nav2{
 .pagination li a:hover {
   background-color: #f5f5f5;
 }
+
+.hyde {
+  padding: 0px !important;
+}

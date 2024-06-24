@@ -74,6 +74,77 @@ def convert_str_date_to_jp_date_and_weekday(target_date:str) -> str:
     target_date = target_date .strftime('%m').lstrip('0') + '/' + target_date .strftime('%d').lstrip('0')  + w_list[target_date .weekday()]
     return target_date
 
+def format_sum_diffcoins(value):
+    if value < 0:
+        return '-'
+    else:
+        formatted = '{:.1f}'.format(value / 10000)
+        if formatted.endswith('.0'):
+            formatted = formatted[:-2]
+        return f'{formatted}万枚'
+    
+def format_date(date_str):
+    print()
+    date = datetime.datetime.strptime(date_str, '%Y-%m-%d')
+    weekdays = ['月', '火', '水', '木', '金', '土', '日']
+    return f'{date.month}月{date.day}日({weekdays[date.weekday()]})'
+
+def format_ave_diffcoins(value):
+    if value < 0:
+        return '-'
+    else:
+        return f'+{value}枚'
+def format_ave_game(value):
+    return f'{value:,}G'
+
+def past_hall_df(main_df, sub_df):
+    html_output = f"""
+    <table>
+        <thead>
+            <tr>{generate_table_header(main_df)}</tr>
+        </thead>
+        <tbody>
+            {generate_table_body(main_df, sub_df)}
+        </tbody>
+    </table>
+    """
+    return html_output
+
+def generate_table_header(df):
+    return "".join(f"<th>{html.escape(str(col))}</th>" for col in df.columns)
+
+def generate_table_body(main_df, sub_df):
+    rows = []
+    print('main_df',main_df.columns)
+    print('sub_df',sub_df.columns)
+    for _, row in main_df.iterrows():
+        #print(row)
+        date = row['date']
+        #print(date)
+        main_row = "<tr>"
+        for i,(col, value) in enumerate(row.items()):
+            cell_content = html.escape(str(value))
+            if i == 0:
+                # 日付をリンクとして表示
+                main_row += f"<td class='date-cell'><a href='#' class='date-link'>{cell_content}</a></td>"
+            elif i == 1:
+                interview_count = len(sub_df[sub_df['イベント日'] == date])
+                #print('interview_count',interview_count)
+                #print(sub_df['イベント日'])
+                has_sub_data = interview_count > 0
+                if has_sub_data:
+                    main_row += f"<td class='count-cell' onclick='toggleAccordion(this)'>取材{interview_count}件<span class='arrow'>▼</span></td>"
+                else:
+                    main_row += f"<td class='count-cell'>なし</td>"
+            else:
+                main_row += f"<td>{cell_content}</td>"
+        main_row += "</tr>"
+        rows.append(main_row)
+        if has_sub_data:
+            sub_table = sub_df[sub_df['イベント日'] == date].drop('イベント日', axis=1)
+            sub_table_html = sub_table.to_html(index=False, classes='nested-table')
+            rows.append(f"<tr class='accordion-content'><td colspan='{len(main_df.columns)}'>{sub_table_html}</td></tr>")
+    return "\n".join(rows)
 
 def convert_sql_date_to_jp_date_and_weekday(sql_date:datetime.date) -> str:
     w_list = ['(月)', '(火)', '(水)', '(木)', '(金)', '(土)', '(日)']
@@ -1812,12 +1883,13 @@ def tomorrow_recommend_area_hall_hallname(pref_name_en,hall_name):
             left join halldata as halldata2
             on schedule2.店舗名 = halldata2.hall_name
             WHERE (店舗名 = '{hall_name}') or (hall_name = '{hall_name}')
-            AND イベント日 >= current_date - 31
+            AND イベント日 >= current_date - 1
             AND イベント日 < current_date + 7
             AND 媒体名 != 'ホールナビ'
             ORDER BY イベント日,都道府県,媒体名 ASC;''')
     cols = [col.name for col in cursor.description]
     extract_hall_name_df = pd.DataFrame(cursor.fetchall(),columns=cols)
+    print('extract_hall_name_df',extract_hall_name_df,extract_hall_name_df.shape)
     if extract_hall_name_df.shape[0] == 0:
         cursor.execute(f'''SELECT *
             FROM halldata
@@ -1825,18 +1897,18 @@ def tomorrow_recommend_area_hall_hallname(pref_name_en,hall_name):
             ''')
         cols = [col.name for col in cursor.description]
         extract_hall_name_df = pd.DataFrame(cursor.fetchall(),columns=cols)
-        print('type(extract_hall_name_df[イベント日]),',type(extract_hall_name_df['イベント日']))
+        #print('type(extract_hall_name_df[イベント日]),',type(extract_hall_name_df['イベント日']))
         future_extract_hall_name_df = pd.DataFrame(index=[],columns=['イベント日','都道府県','媒体名','取材名'])
         past_extract_hall_name_df = pd.DataFrame(index=[],columns=['イベント日','都道府県','媒体名','取材名'])
     else:
-        print('extract_hall_name_df.columns',extract_hall_name_df.columns)
-        print('extract_hall_name_df',extract_hall_name_df,extract_hall_name_df.shape)
+        #print('extract_hall_name_df.columns',extract_hall_name_df.columns)
+        #print('extract_hall_name_df',extract_hall_name_df,extract_hall_name_df.shape)
         for column_name in ['twitter_url','pworld_url','dmm_url','line_url','id','address']:
             try:
                 data[column_name] = extract_hall_name_df.iloc[0].T[column_name]
             except:
                 data[column_name] = ''
-        print('type(today)',type(today))
+        #print('type(today)',type(today))
         future_extract_hall_name_df = extract_hall_name_df[extract_hall_name_df['イベント日'] >= datetime.date.today()]
         past_extract_hall_name_df = extract_hall_name_df[extract_hall_name_df['イベント日'] < datetime.date.today()]
         
@@ -1852,6 +1924,31 @@ def tomorrow_recommend_area_hall_hallname(pref_name_en,hall_name):
             past_extract_hall_name_df['イベント日'] = past_extract_hall_name_df['イベント日'].map(convert_sql_date_to_jp_date_and_weekday)
         except:
             pass
+
+    extract_past_pledge_df = extract_hall_name_df[['イベント日', '媒体名', '取材名']].copy()
+    extract_past_pledge_df.sort_values('イベント日',inplace=True,ascending=False)
+    extract_past_pledge_df['イベント日'] = extract_past_pledge_df['イベント日'].astype(str).apply(format_date)
+    extract_past_pledge_df
+    #sum_diffcoinsをint型に変換した上で〇.〇万枚に変換し少数第一位まで表示
+    cursor.execute(f'''SELECT  date	 ,sum_diffcoins,ave_diffcoins,ave_game,win_rate
+        FROM groupby_date_hall_diffcoins
+        WHERE  (hall_name = '{hall_name}') or (hallnavi_name = '{hall_name}')
+        AND date > CURRENT_DATE - 91
+        ORDER BY date  desc;''')
+    cols = [col.name for col in cursor.description]
+    past_hall_daily_status_df = pd.DataFrame(cursor.fetchall(),columns=cols)
+    past_hall_daily_status_df.insert(1,'取材数','')
+    past_hall_daily_status_df = past_hall_daily_status_df[past_hall_daily_status_df['date'] > (datetime.date.today() - relativedelta(months=3))]
+    past_hall_daily_status_df['date'] = past_hall_daily_status_df['date'].astype(str)
+    past_hall_daily_status_df['date'] = past_hall_daily_status_df['date'].apply(format_date)
+    past_hall_daily_status_df['sum_diffcoins'] = past_hall_daily_status_df['sum_diffcoins'].apply(format_sum_diffcoins)
+    past_hall_daily_status_df['ave_diffcoins'] = past_hall_daily_status_df['ave_diffcoins'].apply(format_ave_diffcoins)
+    past_hall_daily_status_df['ave_game'] = past_hall_daily_status_df['ave_game'].apply(format_ave_game)
+    past_hall_daily_status_df
+    past_daily_and_pledge_data_df_html = past_hall_df(past_hall_daily_status_df, extract_past_pledge_df)
+    #date	sum_diffcoins	ave_diffcoins	ave_game	win_rate
+    past_daily_and_pledge_data_df_html = past_daily_and_pledge_data_df_html.replace('date','日').replace('sum_diffcoins','総差枚').replace('ave_diffcoins','平均差枚').replace('ave_game','平均G数').replace('win_rate','勝率')
+    data['past_daily_and_pledge_data_df_html'] = past_daily_and_pledge_data_df_html
     data['iframe'] = create_hall_map_iframe(extract_hall_name_df,zoom_size=10)
     data['address'] = extract_hall_name_df.iloc[0]['address']
     future_extract_hall_name_df.rename(columns={'イベント日':'日'},inplace=True)
@@ -2779,6 +2876,55 @@ def post_test():
     data['prefecture_id_and_name_dict'] = prefecture_id_and_name_dict
     return render_template('test2.html',data=data)
 
+
+@app.route("/test_accordion_table")
+def test_accordion_table():
+    data = {}
+    cursor = get_driver()
+    hall_name = 'キコーナ府中店'
+    cursor.execute(f'''SELECT  イベント日, 媒体名, 取材名
+            FROM schedule as schedule2
+            left join halldata as halldata2
+            on schedule2.店舗名 = halldata2.hall_name
+            WHERE (店舗名 = '{hall_name}') or (hall_name = '{hall_name}')
+            AND イベント日 >= current_date - 1
+            AND イベント日 < current_date + 7
+            AND 媒体名 != 'ホールナビ'
+            ORDER BY イベント日,都道府県,媒体名 desc;''')
+    cols = [col.name for col in cursor.description]
+    extract_past_pledge_df = pd.DataFrame(cursor.fetchall(),columns=cols)
+    extract_past_pledge_df.sort_values('イベント日',inplace=True,ascending=False)
+    extract_past_pledge_df['イベント日'] = extract_past_pledge_df['イベント日'].astype(str).apply(format_date)
+    extract_past_pledge_df
+    #sum_diffcoinsをint型に変換した上で〇.〇万枚に変換し少数第一位まで表示
+    cursor.execute(f'''SELECT  date	 ,sum_diffcoins,ave_diffcoins,ave_game,win_rate
+        FROM groupby_date_hall_diffcoins
+        WHERE  (hall_name = '{hall_name}') or (hallnavi_name = '{hall_name}')
+        AND date > CURRENT_DATE - 31
+        ORDER BY date  desc;''')
+    cols = [col.name for col in cursor.description]
+    past_hall_daily_status_df = pd.DataFrame(cursor.fetchall(),columns=cols)
+    #もしsum_diffcoinsの各列がマイナスだったら、-だけにして、int型に変換した上で〇.〇万枚に変換し少数第一位まで表示
+    #past_hall_daily_status_df['sum_diffcoins'] = past_hall_daily_status_df['sum_diffcoins'].astype(int)
+    #past_hall_daily_status_df['sum_diffcoins'] = past_hall_daily_status_df['sum_diffcoins'].apply(lambda x: '{:.1f}万枚'.format(x/10000))
+
+
+
+    #past_hall_daily_status_df['sum_diffcoins'] = past_hall_daily_status_df['sum_diffcoins'].astype(int)
+    #past_hall_daily_status_df['sum_diffcoins'] = past_hall_daily_status_df['sum_diffcoins'].apply(lambda x: '{:.1f}万枚'.format(x/10000))
+    #三か月以内のデータを取得
+    past_hall_daily_status_df = past_hall_daily_status_df[past_hall_daily_status_df['date'] > (datetime.date.today() - relativedelta(months=1))]
+    past_hall_daily_status_df['date'] = past_hall_daily_status_df['date'].astype(str)
+    past_hall_daily_status_df['date'] = past_hall_daily_status_df['date'].apply(format_date)
+    past_hall_daily_status_df['sum_diffcoins'] = past_hall_daily_status_df['sum_diffcoins'].apply(format_sum_diffcoins)
+    past_hall_daily_status_df['ave_diffcoins'] = past_hall_daily_status_df['ave_diffcoins'].apply(format_ave_diffcoins)
+    past_hall_daily_status_df['ave_game'] = past_hall_daily_status_df['ave_game'].apply(format_ave_game)
+    past_hall_daily_status_df
+    past_daily_and_pledge_data_df_html = past_hall_df(past_hall_daily_status_df, extract_past_pledge_df)
+    #date	sum_diffcoins	ave_diffcoins	ave_game	win_rate
+    past_daily_and_pledge_data_df_html = past_daily_and_pledge_data_df_html.replace('date','日').replace('sum_diffcoins','総差枚').replace('ave_diffcoins','平均差枚').replace('ave_game','平均G数').replace('win_rate','勝率')
+    data['past_daily_and_pledge_data_df_html'] = past_daily_and_pledge_data_df_html
+    return render_template('test_acordion_table.html',data=data)
 
 @app.route("/test_img_slider", methods=['GET','POST'])
 def test_img_slider():

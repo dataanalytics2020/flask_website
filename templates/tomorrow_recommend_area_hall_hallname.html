@@ -3,6 +3,44 @@
 <title>{{data.hall_name}} 店舗詳細ページ</title>
 {% endblock %}
 {% block content %}
+<style>
+    table { border-collapse: collapse; width: 100%; }
+    .past_pledge_table td {
+        background-color: #FFFFFF;
+        border: 1px solid #ddd;
+        padding: 1px!important; 
+        text-align: center!important; }
+    th { background-color: #F2F2F2; }
+    .date-cell { text-align: center; }
+    .date-link {
+        text-decoration: none;
+        color: #0066CC;
+    }
+    .date-link:hover {
+        text-decoration: underline;
+    }
+    .count-cell {
+        text-align: center;
+        cursor: pointer;
+        position: relative;
+    }
+    .count-cell:hover {
+        background-color: #F0F0F0; }
+    .arrow {
+        display: inline-block;
+        margin-left: 5px;
+        transition: transform 0.3s ease;
+    }
+    .active .arrow {
+        transform: rotate(180deg); 
+        }
+    .accordion-content {
+        display: none; 
+    }
+    .past_pledge_table td {
+        margin-top: 20px!important;
+    }
+</style>
 <div class="container">
     <div class='row justify-content-center'>
         <div class='col-lg-8 text-center'>
@@ -92,6 +130,13 @@
             </div>
             <h2 class="heading-17 my-2">
                 <span>03</span>
+                過去三か月分データ(※▼をクリックすると取材表示)
+            </h2>
+            <div class="scroll_area past_pledge_table" style="width:100%;max-width:2000px;overflow-x:scroll;">
+                {{ data.past_daily_and_pledge_data_df_html|safe }}
+            </div>
+            <h2 class="heading-17 my-2">
+                <span>04</span>
                 過去取材(※過去分表示中)
             </h2>
             <div class = 'heatmap .table-wrap'>
@@ -157,6 +202,19 @@
             });
     });
 
+    function toggleAccordion(cell) {
+        // 行全体をクリックしてもアコーディオンが開閉するようにする
+        const row = cell.parentElement;
+        const nextRow = row.nextElementSibling;
+        if (nextRow.style.display === 'none') {
+            nextRow.style.display = 'table-row';
+            row.classList.add('active');
+        } else {
+            nextRow.style.display = 'none';
+            row.classList.remove('active');
+        }
+    }
 
-</script>    
+
+</script>
 {% endblock %}
