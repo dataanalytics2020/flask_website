@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% block title %}ポストテスト{% endblock %}
+{% block content %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script>
+<div class="container">
+    <div class='row justify-content-center'>
+        <div class='col-lg-8 text-center'>
+            <div id="chart-container">
+                <canvas id="bubbleChart"></canvas>
+            </div>
+            {{ data.groupby_machine_html | safe }}
+        </div>
+    </div>
+</div>
+<style>
+#chart-container {
+    width: 100%;
+    max-width: 1000px;
+    height: 440px;
+    padding: 0px;
+    box-sizing: border-box;
+}
+.machine_accordion {
+    background-color: #fff;
+    border-radius: 5px;
+    overflow: hidden;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+.machine_accordion_item {
+    border-bottom: 1px solid #e0e0e0;
+}
+.machine_accordion_header {
+    background-color: #f8f8f8;
+    padding: 15px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    display: block;
+}
+.machine_accordion_header:hover {
+    background-color: #e8e8e8;
+}
+.machine_accordion_content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+    background-color: #fff;
+}
+.machine_accordion_item input[type="checkbox"] {
+    display: none;
+}
+.machine_accordion_item input[type="checkbox"]:checked + .machine_accordion_header {
+    background-color: #e0e0e0;
+}
+.machine_accordion_item input[type="checkbox"]:checked + .machine_accordion_header + .machine_accordion_content {
+    max-height: 1000px; /* 大きな値を設定 */
+}
+.machine_table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 15px;
+}
+.machine_table th, .machine_table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+.machine_table th {
+    background-color: #f2f2f2;
+}
+.machine_table_container {
+    overflow-x: auto;
+    padding: 15px;
+}
+</style>
+<script>
+// サンプルデータ
+const data = {{ data.bubble_chart_df_data | safe }};
+
+    // バブルサイズの調整関数
+    function adjustBubbleSize(totalCoins) {
+        const baseSize = Math.abs(totalCoins) / 100;
+        return Math.min(Math.max(baseSize, 3), 50); // 最小5、最大30に制限
+    }
+
+    // チャートの設定
+    const ctx = document.getElementById('bubbleChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bubble',
+        data: {
+            datasets: [{
+                label: 'スロット機種別データ',
+                data: data.map(item => ({
+                    x: item.avgGames,
+                    y: item.avgCoins,
+                    r: adjustBubbleSize(item.totalCoins),
+                })),
+                backgroundColor: data.map(item => 
+                    item.totalCoins >= 0 ? 'rgba(75, 192, 192, 0.6)' : 'rgba(255, 99, 132, 0.6)'
+                ),
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const item = data[context.dataIndex];
+                            return `${item.machine}\n: \n平均G数: ${item.avgGames}, \n平均差枚: ${item.avgCoins}, \n総差枚: ${item.totalCoins}`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: '平均G数'
+                    },
+                    min: 0,
+                    max: 6000
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: '平均差枚'
+                    },
+                    min: -3000,
+                    max: 5000
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}
