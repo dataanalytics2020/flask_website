@@ -1161,9 +1161,9 @@ text-align: center; /* 内容は中央配置 */
 .kisyu_001:after {
     /*タブ*/
     position: absolute;
-    font-family: "Font Awesome 5 Free",'Quicksand','Avenir','Arial',sans-serif;
+    font-family: 'Quicksand','Avenir','Arial',sans-serif;
     font-weight: 900;
-    content: '\f00c Check';
+    content: '✔Check';
     background: #2196F3;
     color: #fff;
     left: 0px;
