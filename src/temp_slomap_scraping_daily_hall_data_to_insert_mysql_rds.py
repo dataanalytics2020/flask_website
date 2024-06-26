@@ -333,7 +333,7 @@ for prefecture in prefecture_list:#reversed([12:13]
         #break
         count = 0
         error_count = 0
-        for day_num in reversed(range(1,5)):
+        for day_num in reversed(range(1,15)):
         #tenpo_ichiran_df['ホール名']
             try:
                 target_day = today  + datetime.timedelta(days=-day_num)
