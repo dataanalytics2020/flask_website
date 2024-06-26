@@ -2783,6 +2783,97 @@ def target_hallname(hall_name):
     date_list = [date.strftime("%Y-%m-%d") for date in date_list]
     return render_template('target_date_recommend_schedule.html',date_list=date_list,hall_name=hall_name)
 
+
+@app.route("/halls/<hall_id>/results/<target_date>", methods=['GET'])
+def target_daily_report(hall_id:int,target_date:str):
+    data = {}
+    print('スタート')
+    data['target_date'] = target_date
+    data['hall_id'] = hall_id = int(hall_id)
+    cursor = get_driver()
+    hall_name = 'キコーナ府中店'
+    cursor.execute(f'''SELECT  machine_name,win_rate,ave_game_count,ave_diff_coins,sum_diff_coins,machine_id
+                FROM  groupby_date_machine_diffcoins
+                left join machine_image
+                on groupby_date_machine_diffcoins.machine_name = machine_image.pre_convert_machine_name
+                WHERE  hall_id = {hall_id}
+                AND date = '{target_date}'
+                ORDER BY date  desc;''')
+
+    cols = [col.name for col in cursor.description]
+    past_hall_groupby_machine_status_df = pd.DataFrame(cursor.fetchall(),columns=cols)
+    past_hall_groupby_machine_status_df.drop_duplicates(keep='first',inplace=True)
+    past_hall_groupby_machine_status_df.drop_duplicates( keep='first', inplace=True)
+    bubble_chart_df = past_hall_groupby_machine_status_df[['machine_name','ave_game_count','ave_diff_coins','sum_diff_coins']]
+    bubble_chart_df.rename({'machine_name':'machine','ave_game_count':'avgGames','ave_diff_coins':'avgCoins','sum_diff_coins':'totalCoins'},axis=1,inplace=True)
+    data['bubble_chart_df_data'] = bubble_chart_df.to_dict('records')
+    print(bubble_chart_df.to_dict('records'))
+    cursor.execute(f'''SELECT  machine_name	,machine_num,game_count,diff_coins,bb_count,rb_count,art_count,sum_win_rate,bb_win_rate,rb_win_rate,art_win_rate
+        FROM groupby_date_machine_number_diffcoins
+        WHERE  hall_id = {hall_id}
+        AND date = '{target_date}'
+        ORDER BY date  desc;''')
+    cols = [col.name for col in cursor.description]
+    print(cols)
+    past_hall_daily_status_df = pd.DataFrame(cursor.fetchall(),columns=cols)
+    past_hall_daily_status_df.drop_duplicates(keep='first',inplace=True)
+    past_hall_daily_status_df.sort_values('machine_num',inplace=True,ascending=True)
+    past_hall_daily_status_df['game_count'] = past_hall_daily_status_df['game_count'].apply(format_ave_game)
+    #past_hall_daily_status_df['diff_coins'] = past_hall_daily_status_df['diff_coins'].apply(format_ave_diffcoins)
+    past_hall_daily_status_df['machine_num'] = past_hall_daily_status_df['machine_num'].astype(str) + '番'
+    past_hall_daily_status_df['bb_count'] = past_hall_daily_status_df['bb_count'].astype(str) + '回'
+    past_hall_daily_status_df['rb_count'] = past_hall_daily_status_df['rb_count'].astype(str) + '回'
+    past_hall_daily_status_df.rename({'machine_num':'台番号','machine_name':'機種名','game_count':'平均G数','diff_coins':'平均差枚','bb_count':'BB','rb_count':'RB','art_count':'ART','sum_win_rate':'総勝率','bb_win_rate':'BB勝率','rb_win_rate':'RB勝率','art_win_rate':'ART勝率'},axis=1,inplace=True)
+
+    past_hall_groupby_machine_status_df['machine_id'] = past_hall_groupby_machine_status_df['machine_id'].astype(str)
+    past_hall_groupby_machine_status_df['machine_id'] = past_hall_groupby_machine_status_df['machine_id'].apply(lambda x: x.replace('.0',''))
+    past_hall_groupby_machine_status_df['ave_game_count'] = past_hall_groupby_machine_status_df['ave_game_count'].apply(format_ave_game)
+    past_hall_groupby_machine_status_df.sort_values('sum_diff_coins',inplace=True,ascending=False)
+    past_hall_groupby_machine_status_df['ave_diff_coins'] = past_hall_groupby_machine_status_df['ave_diff_coins'].apply(format_ave_diffcoins)
+    past_hall_groupby_machine_status_df['sum_diff_coins'] = past_hall_groupby_machine_status_df['sum_diff_coins'].apply(format_sum_diffcoins)
+    past_hall_groupby_machine_status_df.rename({'machine_name':'機種名','ave_game_count':'平均G数','ave_diff_coins':'平均差枚','sum_diff_coins':'総差枚','win_rate':'勝率'},axis=1,inplace=True)
+    print(past_hall_groupby_machine_status_df)
+    groupby_machine_html = ''
+    for i,machine_name in enumerate(past_hall_groupby_machine_status_df['機種名']):
+        i += 1
+        extract_groupby_machine_name_df = past_hall_groupby_machine_status_df[past_hall_groupby_machine_status_df['機種名'] == machine_name]
+        try:
+            machine_image_id = extract_groupby_machine_name_df['machine_id'].values[0]
+            print('machine_image_id',machine_image_id)
+        except:
+            machine_image_id = 'no_image'
+        #print(i,machine_name,machine_id)
+        extract_groupby_machine_name_df:pd.DataFrame = extract_groupby_machine_name_df[['平均差枚','総差枚','平均G数','勝率']]
+        #display(i,extract_groupby_machine_name_df)
+        extract_single_machine_df = past_hall_daily_status_df[past_hall_daily_status_df['機種名'] == machine_name]
+        extract_single_machine_df.drop('機種名',axis=1,inplace=True)
+        print('extract_single_machine_df',extract_single_machine_df)
+        #display(i,extract_single_machine_df)
+        image_url = url_for('static', filename=f'img/content_image/{machine_image_id}.jpg')
+        groupby_machine_html += f'''<div class="h2 kisyu_001 mt-5 " id="{machine_name}">総差枚 第{i}位 {machine_name}</div>
+        <img onerror="this.remove()"　class="card-img" src="{image_url}" width="85%" alt="{machine_name}" loading="lazy">
+        {extract_groupby_machine_name_df.to_html(index=False,justify='center',classes='table table-bordered')}
+        <div class="machine_accordion">
+            <div class="machine_accordion_item">
+                <input type="checkbox" id="machine_accordion{i}">
+                <label class="machine_accordion_header" for="machine_accordion{i}">{machine_name}の各台データを見る</label>
+                <div class="machine_accordion_content">
+                    <div class="machine_table_container">
+                        {extract_single_machine_df.to_html(index=False,justify='center',classes='m-1 table table-bordered')}
+                    </div>
+                </div>
+            </div>
+        </div>
+            
+        '''
+        if i > 4:
+            break
+        #break
+    #print(groupby_machine_html)
+    data['groupby_machine_html'] = groupby_machine_html
+    #target_date_single_daily_report.html
+    return render_template('test_post.html',data=data)
+
 @app.route("/privacy_policy")
 def privacy_policy():
     return render_template('privacy_policy.html')
@@ -2930,6 +3021,11 @@ def test_accordion_table():
 def test_img_slider():
     data = {}
     return render_template('test_img_slider.html',data=data)
+
+@app.route("/test_post", methods=['GET','POST'])
+def test_post():
+    data = {}
+    return render_template('test_post.html',data=data)
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0",debug=dev_flag, port=int(os.environ.get('PORT', 5000)))
