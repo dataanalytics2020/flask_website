@@ -2806,6 +2806,7 @@ def target_daily_report(hall_id:int,target_date:str):
     past_hall_groupby_machine_status_df.drop_duplicates( keep='first', inplace=True)
     bubble_chart_df = past_hall_groupby_machine_status_df[['machine_name','ave_game_count','ave_diff_coins','sum_diff_coins']]
     bubble_chart_df.rename({'machine_name':'machine','ave_game_count':'avgGames','ave_diff_coins':'avgCoins','sum_diff_coins':'totalCoins'},axis=1,inplace=True)
+    bubble_chart_df['link'] = '#' + bubble_chart_df['machine'] + '_sum'
     data['bubble_chart_df_data'] = bubble_chart_df.to_dict('records')
     print(bubble_chart_df.to_dict('records'))
     cursor.execute(f'''SELECT  machine_name	,machine_num,game_count,diff_coins,bb_count,rb_count,art_count,sum_win_rate,bb_win_rate,rb_win_rate,art_win_rate
@@ -2850,7 +2851,7 @@ def target_daily_report(hall_id:int,target_date:str):
         print('extract_single_machine_df',extract_single_machine_df)
         #display(i,extract_single_machine_df)
         image_url = url_for('static', filename=f'img/content_image/{machine_image_id}.jpg')
-        groupby_machine_html += f'''<div class="h2 kisyu_001 mt-5 " id="{machine_name}">総差枚 第{i}位 {machine_name}</div>
+        groupby_machine_html += f'''<div class="h2 kisyu_001 mt-5 " id="{machine_name}_sum">総差枚 第{i}位 {machine_name}</div>
         <img onerror="this.remove()"　class="card-img" src="{image_url}" width="85%" alt="{machine_name}" loading="lazy">
         {extract_groupby_machine_name_df.to_html(index=False,justify='center',classes='table table-bordered')}
         <div class="machine_accordion">

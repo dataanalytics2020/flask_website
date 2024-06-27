@@ -74,8 +74,34 @@
 </style>
 <script>
 // サンプルデータ
-const data = {{ data.bubble_chart_df_data | safe }};
+    const data = {{ data.bubble_chart_df_data | safe }};
+    // バブル内に文字を描画するプラグイン
+    const textInBubblePlugin = {
+        id: 'textInBubble',
+        afterDatasetsDraw(chart, args, pluginOptions) {
+            const { ctx } = chart;
 
+            chart.data.datasets.forEach((dataset, datasetIndex) => {
+                const meta = chart.getDatasetMeta(datasetIndex);
+                if (!meta.visible) return;
+
+                meta.data.forEach((element, index) => {
+                    const { x, y } = element.getCenterPoint();
+                    const text = data[index].link.replace('#', '').replace('_sum', '');
+                    console.log('index',index);
+                    console.log('text',text);
+
+                    ctx.save();
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillStyle = 'black';
+                    ctx.font = `${element.options.radius / 5}px Arial`;
+                    ctx.fillText(text, x, y);
+                    ctx.restore();
+                });
+            });
+        }
+    };
     // バブルサイズの調整関数
     function adjustBubbleSize(totalCoins) {
         const baseSize = Math.abs(totalCoins) / 100;
@@ -86,6 +112,7 @@ const data = {{ data.bubble_chart_df_data | safe }};
     const ctx = document.getElementById('bubbleChart').getContext('2d');
     new Chart(ctx, {
         type: 'bubble',
+        plugins: [textInBubblePlugin],
         data: {
             datasets: [{
                 label: 'スロット機種別データ',
@@ -119,7 +146,7 @@ const data = {{ data.bubble_chart_df_data | safe }};
                         text: '平均G数'
                     },
                     min: 0,
-                    max: 6000
+                    max: 7000
                 },
                 y: {
                     title: {
@@ -128,6 +155,18 @@ const data = {{ data.bubble_chart_df_data | safe }};
                     },
                     min: -3000,
                     max: 5000
+                }
+            },
+            onClick: (e, elements) => {
+                if (elements.length > 0) {
+                    console.log('elements[0]',elements[0].index);
+                    console.log('elementsは',elements);
+                    datapoint = data[elements[0].index];
+                    if (datapoint.link) {
+                        document.querySelector(datapoint.link).scrollIntoView({
+                            behavior: 'smooth'
+                        });
+                    }
                 }
             }
         }
