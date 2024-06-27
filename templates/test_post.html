@@ -2,9 +2,31 @@
 {% block title %}ポストテスト{% endblock %}
 {% block content %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script>
-<div class="container">
     <div class='row justify-content-center'>
         <div class='col-lg-8 text-center'>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                  <li class="breadcrumb-item"><a href="/">HOME</a></li>
+                  <li class="breadcrumb-item"><a href="/prefecture/{{data.pref_name_en}}">{{data.pref_name_jp}}</a></li>
+                  <li class="breadcrumb-item" ><a href="/tomorrow_recommend/{{data.pref_name_en}}/hall/{{data.hall_name}}">{{data.hall_name}}</a></li>
+                  <li class="breadcrumb-item active" aria-current="page"><a href="">{{data.target_date_jp}}</a></li>
+                </ol>
+            </nav>
+            <h2 class="heading-17 my-2 ">
+                <span>01</span>
+                {{data.target_date_jp}}の{{data.hall_name}}のデータ
+            </h2>
+            {{ data.result_status_df | safe }}
+            <h2 class="heading-17 my-2 ">
+                <span>02</span>
+                機種別バブルチャート分析で見る{{data.hall_name}}のデータ
+            </h2>
+            <details class="qa-001 my-2">
+                <summary>このバブルチャートは何ですか？</summary>
+                <p>円の大きさが総差枚を表しています。右に行くほど機種平均G数が大きく、上に行くほど機種平均差枚が大きくなっています。
+                    全台系や設定が入っている機種ほど右上にあります。
+                    円をタップすると機種別データに飛ぶかその場でデータが見れます。</p>
+            </details>
             <div id="chart-container">
                 <canvas id="bubbleChart"></canvas>
             </div>
@@ -87,7 +109,7 @@
 
                 meta.data.forEach((element, index) => {
                     const { x, y } = element.getCenterPoint();
-                    const text = data[index].link.replace('#', '').replace('_sum', '');
+                    const text = data[index].link.replace('#', '').replace('_ave', '');
                     console.log('index',index);
                     console.log('text',text);
 

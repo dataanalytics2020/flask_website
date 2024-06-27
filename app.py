@@ -2789,10 +2789,10 @@ def target_daily_report(hall_id:int,target_date:str):
     data = {}
     print('スタート')
     data['target_date'] = target_date
+    data['target_date_jp'] = target_date_jp = convert_sql_date_to_jp_date_and_weekday(datetime.datetime.strptime(target_date, '%Y-%m-%d').date())
     data['hall_id'] = hall_id = int(hall_id)
     cursor = get_driver()
-    hall_name = 'キコーナ府中店'
-    cursor.execute(f'''SELECT  machine_name,win_rate,ave_game_count,ave_diff_coins,sum_diff_coins,machine_id
+    cursor.execute(f'''SELECT  prefecture_name,hall_name,machine_name,win_rate,ave_game_count,ave_diff_coins,sum_diff_coins,machine_id
                 FROM  groupby_date_machine_diffcoins
                 left join machine_image
                 on groupby_date_machine_diffcoins.machine_name = machine_image.pre_convert_machine_name
@@ -2803,10 +2803,9 @@ def target_daily_report(hall_id:int,target_date:str):
     cols = [col.name for col in cursor.description]
     past_hall_groupby_machine_status_df = pd.DataFrame(cursor.fetchall(),columns=cols)
     past_hall_groupby_machine_status_df.drop_duplicates(keep='first',inplace=True)
-    past_hall_groupby_machine_status_df.drop_duplicates( keep='first', inplace=True)
     bubble_chart_df = past_hall_groupby_machine_status_df[['machine_name','ave_game_count','ave_diff_coins','sum_diff_coins']]
     bubble_chart_df.rename({'machine_name':'machine','ave_game_count':'avgGames','ave_diff_coins':'avgCoins','sum_diff_coins':'totalCoins'},axis=1,inplace=True)
-    bubble_chart_df['link'] = '#' + bubble_chart_df['machine'] + '_sum'
+    bubble_chart_df['link'] = '#' + bubble_chart_df['machine'] + '_ave'
     data['bubble_chart_df_data'] = bubble_chart_df.to_dict('records')
     print(bubble_chart_df.to_dict('records'))
     cursor.execute(f'''SELECT  machine_name	,machine_num,game_count,diff_coins,bb_count,rb_count,art_count,sum_win_rate,bb_win_rate,rb_win_rate,art_win_rate
@@ -2818,6 +2817,48 @@ def target_daily_report(hall_id:int,target_date:str):
     print(cols)
     past_hall_daily_status_df = pd.DataFrame(cursor.fetchall(),columns=cols)
     past_hall_daily_status_df.drop_duplicates(keep='first',inplace=True)
+    # 平均差枚数を計算
+    
+    # 集計を行う
+    summary_df = past_hall_daily_status_df.agg({
+        'game_count': 'sum',
+        'diff_coins': 'sum',
+        'bb_count': 'sum',
+        'rb_count': 'sum',
+        'art_count': 'sum'
+    })
+    avg_diff_coins = summary_df['diff_coins'] / len(past_hall_daily_status_df)
+
+    # 平均G数を計算
+    avg_game_count = summary_df['game_count'] / len(past_hall_daily_status_df)
+
+    # 勝率を計算（プラスの台数 / 総台数）
+    winning_machines = len(past_hall_daily_status_df[past_hall_daily_status_df['diff_coins'] > 0])
+    total_machines = len(past_hall_daily_status_df)
+    win_rate = f"{winning_machines}/{total_machines}"
+
+    # 結果をDataFrameに格納
+    result_status_df = pd.DataFrame({
+        '項目': ['総差枚', '平均差枚', '平均G数', '勝率'],
+        '数値': [summary_df['diff_coins'], avg_diff_coins, avg_game_count, win_rate]
+    })
+
+    # HTMLテーブルを生成
+    data['result_status_df'] = result_status_df.to_html(index=False, classes='table table-striped', border=0)
+
+    prefecture_df = pd.read_csv('csv/pref_lat_lon.csv')
+    try:
+        data['pref_name_jp'] = pref_name_jp = past_hall_groupby_machine_status_df['prefecture_name'].values[0]
+    except:
+        data['pref_name_jp'] = pref_name_jp = ''
+    print('pref_name_jp',pref_name_jp)
+
+    data['pref_name_en'] = pref_name_en = prefecture_df[prefecture_df['pref_name'] == pref_name_jp]['pref_name_en'].values[0]
+
+    try:
+        data['hall_name'] = hall_name = past_hall_groupby_machine_status_df['hall_name'].values[0]
+    except:
+        data['hall_name'] = hall_name = ''
     past_hall_daily_status_df.sort_values('machine_num',inplace=True,ascending=True)
     past_hall_daily_status_df['game_count'] = past_hall_daily_status_df['game_count'].apply(format_ave_game)
     #past_hall_daily_status_df['diff_coins'] = past_hall_daily_status_df['diff_coins'].apply(format_ave_diffcoins)
@@ -2829,12 +2870,13 @@ def target_daily_report(hall_id:int,target_date:str):
     past_hall_groupby_machine_status_df['machine_id'] = past_hall_groupby_machine_status_df['machine_id'].astype(str)
     past_hall_groupby_machine_status_df['machine_id'] = past_hall_groupby_machine_status_df['machine_id'].apply(lambda x: x.replace('.0',''))
     past_hall_groupby_machine_status_df['ave_game_count'] = past_hall_groupby_machine_status_df['ave_game_count'].apply(format_ave_game)
-    past_hall_groupby_machine_status_df.sort_values('sum_diff_coins',inplace=True,ascending=False)
+    past_hall_groupby_machine_status_df.sort_values('ave_diff_coins',inplace=True,ascending=False)
     past_hall_groupby_machine_status_df['ave_diff_coins'] = past_hall_groupby_machine_status_df['ave_diff_coins'].apply(format_ave_diffcoins)
     past_hall_groupby_machine_status_df['sum_diff_coins'] = past_hall_groupby_machine_status_df['sum_diff_coins'].apply(format_sum_diffcoins)
     past_hall_groupby_machine_status_df.rename({'machine_name':'機種名','ave_game_count':'平均G数','ave_diff_coins':'平均差枚','sum_diff_coins':'総差枚','win_rate':'勝率'},axis=1,inplace=True)
     print(past_hall_groupby_machine_status_df)
     groupby_machine_html = ''
+    machine_rank_num = 0
     for i,machine_name in enumerate(past_hall_groupby_machine_status_df['機種名']):
         i += 1
         extract_groupby_machine_name_df = past_hall_groupby_machine_status_df[past_hall_groupby_machine_status_df['機種名'] == machine_name]
@@ -2843,6 +2885,21 @@ def target_daily_report(hall_id:int,target_date:str):
             print('machine_image_id',machine_image_id)
         except:
             machine_image_id = 'no_image'
+        try:
+            average_diff_coins = int(extract_groupby_machine_name_df['平均差枚'].values[0].replace('枚','').replace(',',''))
+        except Exception as e:
+            print('average_diff_coins',e)
+            average_diff_coins = 0
+        try:
+            sum_machine_count = int(extract_groupby_machine_name_df['勝率'].values[0].split('台')[0].split('/')[-1])#(2/4台) 50.0%
+        except Exception as e:
+            print('sum_machine_count',e)
+            sum_machine_count = 0
+        try:
+            ave_game_count = int(extract_groupby_machine_name_df['平均G数'].values[0].replace('G','').replace(',',''))
+        except Exception as e:
+            print('ave_game_count',e)
+            ave_game_count = 0
         #print(i,machine_name,machine_id)
         extract_groupby_machine_name_df:pd.DataFrame = extract_groupby_machine_name_df[['平均差枚','総差枚','平均G数','勝率']]
         #display(i,extract_groupby_machine_name_df)
@@ -2851,13 +2908,19 @@ def target_daily_report(hall_id:int,target_date:str):
         print('extract_single_machine_df',extract_single_machine_df)
         #display(i,extract_single_machine_df)
         image_url = url_for('static', filename=f'img/content_image/{machine_image_id}.jpg')
-        groupby_machine_html += f'''<div class="h2 kisyu_001 mt-5 " id="{machine_name}_sum">総差枚 第{i}位 {machine_name}</div>
+        print('sum_machine_count,average_diff_coins,ave_game_count',sum_machine_count,average_diff_coins,ave_game_count)
+        if (sum_machine_count > 1) and (average_diff_coins > 0) and (ave_game_count > 1000):
+            pass
+        else:
+            continue
+        machine_rank_num += 1
+        groupby_machine_html += f'''<div class="h2 kisyu_001 mt-5 " id="{machine_name}_ave">平均差枚 第{machine_rank_num}位 {machine_name}</div>
         <img onerror="this.remove()"　class="card-img" src="{image_url}" width="85%" alt="{machine_name}" loading="lazy">
         {extract_groupby_machine_name_df.to_html(index=False,justify='center',classes='table table-bordered')}
         <div class="machine_accordion">
             <div class="machine_accordion_item">
-                <input type="checkbox" id="machine_accordion{i}">
-                <label class="machine_accordion_header" for="machine_accordion{i}">{machine_name}の各台データを見る</label>
+                <input type="checkbox" id="machine_accordion{machine_rank_num}">
+                <label class="machine_accordion_header" for="machine_accordion{machine_rank_num}">{machine_name}の各台データを見る</label>
                 <div class="machine_accordion_content">
                     <div class="machine_table_container">
                         {extract_single_machine_df.to_html(index=False,justify='center',classes='m-1 table table-bordered')}
@@ -2865,9 +2928,9 @@ def target_daily_report(hall_id:int,target_date:str):
                 </div>
             </div>
         </div>
-            
         '''
-        if i > 4:
+        #平均差枚が0以下になったら終了
+        if average_diff_coins < 1:
             break
         #break
     #print(groupby_machine_html)
