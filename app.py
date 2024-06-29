@@ -2818,7 +2818,8 @@ def target_daily_report(hall_id:int,target_date:str):
     past_hall_daily_status_df = pd.DataFrame(cursor.fetchall(),columns=cols)
     past_hall_daily_status_df.drop_duplicates(keep='first',inplace=True)
     # 平均差枚数を計算
-    
+    past_hall_daily_status_df_1 = past_hall_daily_status_df.copy()
+    #.to_html(index=False, classes='table table-striped', border=0,table_id='tableBody"')
     # 集計を行う
     summary_df = past_hall_daily_status_df.agg({
         'game_count': 'sum',
@@ -2827,20 +2828,29 @@ def target_daily_report(hall_id:int,target_date:str):
         'rb_count': 'sum',
         'art_count': 'sum'
     })
-    avg_diff_coins = summary_df['diff_coins'] / len(past_hall_daily_status_df)
-
+    avg_diff_coins = int(summary_df['diff_coins'] / len(past_hall_daily_status_df))
+    if avg_diff_coins < 0:
+        avg_diff_coins = '-' 
+    else:
+        avg_diff_coins = str(avg_diff_coins) + '枚'
     # 平均G数を計算
-    avg_game_count = summary_df['game_count'] / len(past_hall_daily_status_df)
+    avg_game_count = int(summary_df['game_count'] / len(past_hall_daily_status_df))
+
+    if summary_df['diff_coins'] < 0:
+        sum_diff_coins = '-'
+    else:
+        sum_diff_coins = str(f"{summary_df['diff_coins']}:02") + '枚'
 
     # 勝率を計算（プラスの台数 / 総台数）
     winning_machines = len(past_hall_daily_status_df[past_hall_daily_status_df['diff_coins'] > 0])
     total_machines = len(past_hall_daily_status_df)
-    win_rate = f"{winning_machines}/{total_machines}"
+    win_rate = int((winning_machines/total_machines) * 100)
+    win_rate_text = f"{winning_machines}/{total_machines}({win_rate}%)"
 
     # 結果をDataFrameに格納
     result_status_df = pd.DataFrame({
         '項目': ['総差枚', '平均差枚', '平均G数', '勝率'],
-        '数値': [summary_df['diff_coins'], avg_diff_coins, avg_game_count, win_rate]
+        '数値': [sum_diff_coins, avg_diff_coins, str(avg_game_count)+'G', win_rate_text]
     })
 
     # HTMLテーブルを生成
@@ -2936,7 +2946,7 @@ def target_daily_report(hall_id:int,target_date:str):
     #print(groupby_machine_html)
     data['groupby_machine_html'] = groupby_machine_html
     #target_date_single_daily_report.html
-    return render_template('test_post.html',data=data)
+    return render_template('test_post.html',data=data,past_hall_daily_status_df_1=past_hall_daily_status_df_1,zip=zip)
 
 @app.route("/privacy_policy")
 def privacy_policy():

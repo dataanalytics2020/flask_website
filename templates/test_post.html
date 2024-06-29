@@ -14,15 +14,24 @@
             </nav>
             <h2 class="heading-17 my-2 ">
                 <span>01</span>
-                {{data.target_date_jp}}の{{data.hall_name}}のデータ
+                {{data.target_date_jp}}の{{data.hall_name}}の概要データ
             </h2>
             {{ data.result_status_df | safe }}
             <h2 class="heading-17 my-2 ">
                 <span>02</span>
-                機種別バブルチャート分析で見る{{data.hall_name}}のデータ
+                {{data.target_date_jp}}の{{data.hall_name}}の日別データ
+            </h2>
+            <div class="daily_table-container">
+                <div id="tableContainer"></div>
+            </div>
+            <button class="daily_accordion-toggle mb-2">▼残りの全台データを表示▼</button>
+            
+            <h2 class="heading-17 my-2 ">
+                <span>03</span>
+                バブルチャート分析で見る機種別データ
             </h2>
             <details class="qa-001 my-2">
-                <summary>このバブルチャートは何ですか？</summary>
+                <summary>このバブルチャートとは何ですか？</summary>
                 <p>円の大きさが総差枚を表しています。右に行くほど機種平均G数が大きく、上に行くほど機種平均差枚が大きくなっています。
                     全台系や設定が入っている機種ほど右上にあります。
                     円をタップすると機種別データに飛ぶかその場でデータが見れます。</p>
@@ -93,6 +102,95 @@
     overflow-x: auto;
     padding: 15px;
 }
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+#tableContainer {
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+th, td {
+    padding: 12px;
+    text-align: center;
+    border: 1px solid #ddd;
+}
+th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+.data-bar {
+    width: 100%;
+    background-color: #e0e0e0;
+    height: 20px;
+    position: relative;
+}
+.data-bar-fill {
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+.data-bar-text {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+}
+.daily_table-container {
+    width: 100%;
+    overflow-x: auto;
+}
+.daily_accordion-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px; /* テーブルの最小幅を設定 */
+}
+.daily_accordion-table th, .daily_accordion-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+.daily_accordion-table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+.daily_accordion-table tr:nth-child(n+11) {
+    display: none;
+}
+.daily_accordion-toggle {
+    background-color: #0011ff;
+    color: #FFF;
+    cursor: pointer;
+    padding: 18px;
+    width: 100%;
+    height: 60px;
+    text-align: center;
+    font-size: 24px!important;
+    font-weight: bold;
+    border: none;
+    outline: none;
+    transition: 0.4s;
+}
+.daily_active, .daily_accordion-toggle:hover {
+    background-color: #ddd;
+}
+@media screen and (max-width: 600px) {
+    .daily_accordion-toggle {
+        font-size: 14px;
+        padding: 12px;
+    }
+}
 </style>
 <script>
 // サンプルデータ
@@ -110,8 +208,6 @@
                 meta.data.forEach((element, index) => {
                     const { x, y } = element.getCenterPoint();
                     const text = data[index].link.replace('#', '').replace('_ave', '');
-                    console.log('index',index);
-                    console.log('text',text);
 
                     ctx.save();
                     ctx.textAlign = 'center';
@@ -181,8 +277,6 @@
             },
             onClick: (e, elements) => {
                 if (elements.length > 0) {
-                    console.log('elements[0]',elements[0].index);
-                    console.log('elementsは',elements);
                     datapoint = data[elements[0].index];
                     if (datapoint.link) {
                         document.querySelector(datapoint.link).scrollIntoView({
@@ -192,6 +286,112 @@
                 }
             }
         }
+    });
+     // DataFrameのデータをJavaScript変数として定義
+    // DataFrameのデータをJavaScript変数として定義
+    const dfData = {{ past_hall_daily_status_df_1.to_json(orient='records') | safe }};
+        function createTableWithDataBars(data) {
+            function createGameCountBar(value, max) {
+                const percentage = (value / max) * 100;
+                return `
+                    <div class="data-bar">
+                        <div class="data-bar-fill" style="width: ${percentage}%; background-color: #4CAF50; left: 0;"></div>
+                        <span class="data-bar-text" style="font-weight:bold;">${value}G</span>
+                    </div>
+                `;
+            }
+
+            function createDiffCoinsBar(value, max) {
+                const percentage = Math.abs(value / max) * 50; // 50% is half of the bar width
+                const color = value >= 0 ? '#2196F3' : '#FF5722';
+                const direction = value >= 0 ? 'right' : 'left';
+                if  (value < 0 ) {
+                    background_color_postion_point = 30 - percentage
+                } else {
+                    background_color_postion_point = 30
+                }
+                return `
+                    <div class="data-bar">
+                        <div class="data-bar-fill" style="width: ${percentage}%; background-color: ${color}; left: ${background_color_postion_point}%;"></div>
+                        <span class="data-bar-text" style="font-weight:bold;">${value}枚</span>
+                    </div>
+                `;
+            }
+
+            let tableHtml = '<table class="daily_accordion-table">';
+            
+            // Create table header
+            tableHtml += '<thead><tr>';
+            Object.keys(data[0]).forEach(key => {
+                tableHtml += `<th>${key}</th>`;
+            });
+            tableHtml += '</tr></thead>';
+
+            // Create table body
+            tableHtml += '<tbody>';
+            data.forEach(row => {
+                tableHtml += '<tr>';
+                Object.entries(row).forEach(([key, value]) => {
+                    if (key === 'game_count') {
+                        tableHtml += `<td>${createGameCountBar(value, 8000)}</td>`;
+                    } else if (key === 'diff_coins') {
+                        tableHtml += `<td>${createDiffCoinsBar(value, 4500)}</td>`;
+                    } else {
+                        tableHtml += `<td>${value}</td>`;
+                    }
+                });
+                tableHtml += '</tr>';
+            });
+            tableHtml += '</tbody></table>';
+
+            return tableHtml;
+        }
+    function updateTable() {
+        const tableContainer = document.getElementById('tableContainer');
+        tableContainer.innerHTML = createTableWithDataBars(allData, visibleRows);
+
+        const showMoreBtn = document.getElementById('showMoreBtn');
+        if (visibleRows < allData.length) {
+            showMoreBtn.style.display = 'block';
+        } else {
+            showMoreBtn.style.display = 'none';
+        }
+    }
+
+
+    // サンプルデータ（実際のデータに置き換えてください）
+    const sampleData = [
+        {"machine_name": "ジャグラーガールズ", "machine_num": 601, "game_count": 5906, "diff_coins": -1418, "bb_count": 16, "rb_count": 20, "art_count": 0},
+        {"machine_name": "ゴーゴージャグラー3", "machine_num": 605, "game_count": 1066, "diff_coins": -644, "bb_count": 3, "rb_count": 1, "art_count": 0},
+        {"machine_name": "マイジャグラーV", "machine_num": 634, "game_count": 5490, "diff_coins": -935, "bb_count": 19, "rb_count": 10, "art_count": 0},
+        {"machine_name": "スマスロ北斗の拳", "machine_num": 699, "game_count": 6873, "diff_coins": -1229, "bb_count": 63, "rb_count": 27, "art_count": 0},
+        {"machine_name": "ゴジラ対エヴァンゲリオン", "machine_num": 814, "game_count": 4528, "diff_coins": 7506, "bb_count": 28, "rb_count": 0, "art_count": 83}
+    ];
+
+    // テーブルの生成と表示
+    document.addEventListener('DOMContentLoaded', function() {
+        const tableContainer = document.getElementById('tableContainer');
+        tableContainer.innerHTML = createTableWithDataBars(dfData);
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var toggleButton = document.querySelector('.daily_accordion-toggle');
+        var table = document.querySelector('.daily_accordion-table');
+        var rows = table.querySelectorAll('tr');
+
+        toggleButton.addEventListener('click', function() {
+            this.classList.toggle('daily_active');
+            
+            for (var i = 10; i < rows.length; i++) {
+                if (rows[i].style.display === 'none' || rows[i].style.display === '') {
+                    rows[i].style.display = 'table-row';
+                    this.textContent = 'テーブルを折りたたむ';
+                } else {
+                    rows[i].style.display = 'none';
+                    this.textContent = '残りの行を表示';
+                }
+            }
+             });
     });
 </script>
 {% endblock %}
