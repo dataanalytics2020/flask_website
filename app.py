@@ -2854,6 +2854,7 @@ def target_daily_report(hall_id:int,target_date:str):
     })
 
     # HTMLテーブルを生成
+    past_hall_daily_status_df_1.rename({'machine_num':'台番','machine_name':'機種名','game_count':'G数','diff_coins':'差枚','sum_win_rate':'合成確率','bb_count':'BB','rb_count':'RB','art_count':'ART','bb_win_rate':'BB確率','rb_win_rate':'RB確率','art_win_rate':'ART確率'},axis=1,inplace=True)
     data['result_status_df'] = result_status_df.to_html(index=False, classes='table table-striped', border=0)
 
     prefecture_df = pd.read_csv('csv/pref_lat_lon.csv')

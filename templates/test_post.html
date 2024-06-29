@@ -24,7 +24,7 @@
             <div class="daily_table-container">
                 <div id="tableContainer"></div>
             </div>
-            <button class="daily_accordion-toggle mb-2">▼残りの全台データを表示▼</button>
+            <button class="daily_accordion-toggle mb-2">▼残りの各台データを全表示する▼</button>
             
             <h2 class="heading-17 my-2 ">
                 <span>03</span>
@@ -119,14 +119,17 @@ th, td {
     padding: 12px;
     text-align: center;
     border: 1px solid #ddd;
+    width:auto;
 }
 th {
     background-color: #f2f2f2;
     font-weight: bold;
+    width:auto;
 }
 tr:nth-child(even) {
     background-color: #f9f9f9;
 }
+
 .data-bar {
     width: 100%;
     background-color: #e0e0e0;
@@ -149,18 +152,21 @@ tr:nth-child(even) {
     z-index: 1;
 }
 .daily_table-container {
-    width: 100%;
     overflow-x: auto;
+    overflow-y: hidden;
+    margin-bottom: 15px;
 }
 .daily_accordion-table {
+    overflow-y: scroll;
+    overflow-x: auto;
     width: 100%;
     border-collapse: collapse;
-    min-width: 600px; /* テーブルの最小幅を設定 */
+    min-width: 800px; /* テーブルの最小幅を設定 */
 }
 .daily_accordion-table th, .daily_accordion-table td {
     border: 1px solid #ddd;
     padding: 8px;
-    text-align: left;
+    text-align: center;
 }
 .daily_accordion-table tr:nth-child(even) {
     background-color: #f2f2f2;
@@ -323,7 +329,15 @@ tr:nth-child(even) {
             // Create table header
             tableHtml += '<thead><tr>';
             Object.keys(data[0]).forEach(key => {
-                tableHtml += `<th>${key}</th>`;
+                if (key === 'G数') {
+                    tableHtml += `<th style="width:100px!important;">${key}</th>`;
+                } else if (key === '差枚') {
+                    tableHtml += `<th style="width:100px!important;">${key}</th>`;
+                } else if (key === '機種名') {
+                    tableHtml += `<th style="width:120px!important;">${key}</th>`;
+                } else {
+                    tableHtml += `<th>${key}</th>`;
+                }
             });
             tableHtml += '</tr></thead>';
 
@@ -332,10 +346,10 @@ tr:nth-child(even) {
             data.forEach(row => {
                 tableHtml += '<tr>';
                 Object.entries(row).forEach(([key, value]) => {
-                    if (key === 'game_count') {
-                        tableHtml += `<td>${createGameCountBar(value, 8000)}</td>`;
-                    } else if (key === 'diff_coins') {
-                        tableHtml += `<td>${createDiffCoinsBar(value, 4500)}</td>`;
+                    if (key === 'G数') {
+                        tableHtml += `<td style="width:100px!important;">${createGameCountBar(value, 8000)}</td>`;
+                    } else if (key === '差枚') {
+                        tableHtml += `<td style="width:100px!important;">${createDiffCoinsBar(value, 4500)}</td>`;
                     } else {
                         tableHtml += `<td>${value}</td>`;
                     }
