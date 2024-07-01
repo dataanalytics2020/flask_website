@@ -759,6 +759,19 @@ def get_driver():
     cursor = conn.cursor()
     return cursor
 
+#postgresqlにデータを登録
+def insert_data_bulk(table_name,df,conn):
+    sql = str(tuple(df.columns)).replace("'","") + ' values (' +  (len(df.columns) * '%s,').rstrip(',') + ')'
+    print(sql)
+    insert_sql = f"""INSERT INTO {table_name} {sql} """
+    print(insert_sql)
+    #print(df.values.tolist())
+    cur = conn.cursor()
+    cur.executemany(insert_sql, df.values.tolist())
+    conn.commit()
+    cur.close()
+    print("success Insert bulk data")
+
 def convert_date(date):
     date:str = str(date).split('-')
     date = date[1].lstrip('0') + '/' + date[2].lstrip('0')
@@ -2888,14 +2901,19 @@ def target_daily_report(hall_id:int,target_date:str):
     print(past_hall_groupby_machine_status_df)
     groupby_machine_html = ''
     machine_rank_num = 0
+    error_message = '未登録機種\n'
+    insert_machine_image_df = pd.DataFrame(index=[],columns=['machine_id','master_machine_name','pre_convert_machine_name'])
     for i,machine_name in enumerate(past_hall_groupby_machine_status_df['機種名']):
         i += 1
         extract_groupby_machine_name_df = past_hall_groupby_machine_status_df[past_hall_groupby_machine_status_df['機種名'] == machine_name]
         try:
-            machine_image_id = extract_groupby_machine_name_df['machine_id'].values[0]
-            print('machine_image_id',machine_image_id)
+            machine_image_id :int= int(extract_groupby_machine_name_df['machine_id'].values[0])
+            print(i,machine_name,'machine_image_id',machine_image_id)
         except:
-            machine_image_id = 'no_image'
+            machine_image_id = 0
+            error_message += f'\n{machine_name}'
+            record_df = pd.DataFrame([10000,'未設定',machine_name],index=insert_machine_image_df.columns).T
+            insert_machine_image_df = pd.concat([insert_machine_image_df,record_df],axis=0)
         try:
             average_diff_coins = int(extract_groupby_machine_name_df['平均差枚'].values[0].replace('枚','').replace(',',''))
         except Exception as e:
@@ -2947,6 +2965,9 @@ def target_daily_report(hall_id:int,target_date:str):
     #print(groupby_machine_html)
     data['groupby_machine_html'] = groupby_machine_html
     #target_date_single_daily_report.html
+    insert_data_bulk('machine_image',insert_machine_image_df,conn)
+    error_message += f'\n未登録{len(insert_machine_image_df)}件\n{str(target_date_jp)} {pref_name_jp} {hall_name}の日別データが見られています。'
+    post_line(error_message)
     return render_template('test_post.html',data=data,past_hall_daily_status_df_1=past_hall_daily_status_df_1,zip=zip)
 
 @app.route("/privacy_policy")
