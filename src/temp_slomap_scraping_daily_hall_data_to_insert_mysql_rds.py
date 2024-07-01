@@ -333,7 +333,7 @@ for prefecture in prefecture_list:#reversed([12:13]
         #break
         count = 0
         error_count = 0
-        for day_num in reversed(range(1,15)):
+        for day_num in reversed(range(1,25)):
         #tenpo_ichiran_df['ホール名']
             try:
                 target_day = today  + datetime.timedelta(days=-day_num)
@@ -546,7 +546,7 @@ for prefecture in prefecture_list:#reversed([12:13]
                         table_name = 'groupby_date_machine_number_diffcoins'
                         #insert_data_bulk(table_name,groupby_date_machine_number_diffcoins_df,rds_mysql_conn)
                         heroku_psgr_conn = heroku_psgr_get_cursor()
-                        #insert_data_bulk_psgr(table_name,groupby_date_machine_number_diffcoins_df,heroku_psgr_conn)
+                        insert_data_bulk_psgr(table_name,groupby_date_machine_number_diffcoins_df,heroku_psgr_conn)
 
                         concat_groupby_date_kisyubetu_df = pd.DataFrame(columns=[],index=[])
                         try:
