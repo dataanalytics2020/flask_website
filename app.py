@@ -2805,7 +2805,7 @@ def target_daily_report(hall_id:int,target_date:str):
     data['target_date_jp'] = target_date_jp = convert_sql_date_to_jp_date_and_weekday(datetime.datetime.strptime(target_date, '%Y-%m-%d').date())
     data['hall_id'] = hall_id = int(hall_id)
     cursor = get_driver()
-    cursor.execute(f'''SELECT  prefecture_name,hall_name,machine_name,win_rate,ave_game_count,ave_diff_coins,sum_diff_coins,machine_id
+    cursor.execute(f'''SELECT  prefecture_name,hall_name,hallnavi_name,machine_name,win_rate,ave_game_count,ave_diff_coins,sum_diff_coins,machine_id
                 FROM  groupby_date_machine_diffcoins
                 left join machine_image
                 on groupby_date_machine_diffcoins.machine_name = machine_image.pre_convert_machine_name
@@ -2852,7 +2852,7 @@ def target_daily_report(hall_id:int,target_date:str):
     if summary_df['diff_coins'] < 0:
         sum_diff_coins = '-'
     else:
-        sum_diff_coins = str(f"{summary_df['diff_coins']}:02") + '枚'
+        sum_diff_coins = str(f"{round(int(summary_df['diff_coins']),-2)}") + '枚'
 
     # 勝率を計算（プラスの台数 / 総台数）
     winning_machines = len(past_hall_daily_status_df[past_hall_daily_status_df['diff_coins'] > 0])
@@ -2883,6 +2883,29 @@ def target_daily_report(hall_id:int,target_date:str):
         data['hall_name'] = hall_name = past_hall_groupby_machine_status_df['hall_name'].values[0]
     except:
         data['hall_name'] = hall_name = ''
+    
+    try:
+        data['hallnavi_name'] = hallnavi_name = past_hall_groupby_machine_status_df['hallnavi_name'].values[0]
+    except:
+        data['hallnavi_name'] = hallnavi_name = ''
+        
+    #取材予定の取得
+    cursor.execute(f'''SELECT 取材名,媒体名,pledge_text
+    FROM schedule as schedule2
+    left join halldata as halldata2
+    on schedule2.店舗名 = halldata2.hall_name
+    left join pledge as pledge
+    on schedule2.取材名 = pledge.syuzai_name
+    WHERE イベント日 = '{target_date}'
+    AND 店舗名 in ('{hall_name}','{hallnavi_name}')
+    ORDER BY イベント日,都道府県,媒体名 desc;''')
+
+    result = cursor.fetchall()
+    cols = [col.name for col in cursor.description]
+    schedule_df = pd.DataFrame(result, columns=cols)
+    schedule_df.drop_duplicates( subset=['取材名','媒体名'],keep='last',inplace=True)
+    schedule_df.rename({'pledge_text':'内容'},axis=1,inplace=True)
+    data['schedule_df_html'] = schedule_df.to_html(classes='table table-striped',index=False)
     past_hall_daily_status_df.sort_values('machine_num',inplace=True,ascending=True)
     past_hall_daily_status_df['game_count'] = past_hall_daily_status_df['game_count'].apply(format_ave_game)
     #past_hall_daily_status_df['diff_coins'] = past_hall_daily_status_df['diff_coins'].apply(format_ave_diffcoins)

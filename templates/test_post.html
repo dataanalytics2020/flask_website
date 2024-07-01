@@ -19,26 +19,36 @@
             {{ data.result_status_df | safe }}
             <h2 class="heading-17 my-2 ">
                 <span>02</span>
-                {{data.target_date_jp}}の{{data.hall_name}}の日別データ
+                {{data.target_date_jp}}の{{data.hall_name}}の取材データ
+            </h2>
+            {{ data.schedule_df_html | safe }}
+            <h2 class="heading-17 my-2 ">
+                <span>03</span>
+                {{data.target_date_jp}}の{{data.hall_name}}の各台データ
             </h2>
             <div class="daily_table-container">
                 <div id="tableContainer"></div>
             </div>
             <button class="daily_accordion-toggle mb-2">▼残りの各台データを全表示する▼</button>
-            
+
             <h2 class="heading-17 my-2 ">
-                <span>03</span>
+                <span>04</span>
                 バブルチャート分析で見る機種別データ
             </h2>
             <details class="qa-001 my-2">
                 <summary>このバブルチャートとは何ですか？</summary>
                 <p>円の大きさが総差枚を表しています。右に行くほど機種平均G数が大きく、上に行くほど機種平均差枚が大きくなっています。
                     全台系や設定が入っている機種ほど右上にあります。
-                    円をタップすると機種別データに飛ぶかその場でデータが見れます。</p>
+                    円をタップすると機種別データに飛ぶかその場でデータが見れます。
+                    <b>左下の台は要注意。右上の機種をほど設定が入っているので要注目です。</b></p>
             </details>
             <div id="chart-container">
                 <canvas id="bubbleChart"></canvas>
             </div>
+            <h2 class="heading-17 my-2 ">
+                <span>05</span>
+                平均差枚がプラスの画像付き機種別データ
+            </h2>
             {{ data.groupby_machine_html | safe }}
         </div>
     </div>
