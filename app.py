@@ -2965,7 +2965,8 @@ def target_daily_report(hall_id:int,target_date:str):
     #print(groupby_machine_html)
     data['groupby_machine_html'] = groupby_machine_html
     #target_date_single_daily_report.html
-    insert_data_bulk('machine_image',insert_machine_image_df,conn)
+    if len(insert_machine_image_df) > 0:
+        insert_data_bulk('machine_image',insert_machine_image_df,conn)
     error_message += f'\n未登録{len(insert_machine_image_df)}件\n{str(target_date_jp)} {pref_name_jp} {hall_name}の日別データが見られています。'
     post_line(error_message)
     return render_template('test_post.html',data=data,past_hall_daily_status_df_1=past_hall_daily_status_df_1,zip=zip)
